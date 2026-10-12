@@ -1,4 +1,4 @@
-import { Axis, DistortionType } from './questions';
+import type { Axis, DistortionId, DistortionType } from './personality';
 
 export interface PersonalityTypeInfo {
   type: string;
@@ -185,19 +185,19 @@ export interface DistortionInfo {
   actionTip: string;
 }
 
-export const DISTORTION_INFOS: Record<DistortionType, DistortionInfo> = {
-  all_or_nothing: {
-    type: 'all_or_nothing',
-    name: '白黒思考（全か無かの思考）',
+export const DISTORTION_INFOS: Record<string, DistortionInfo> = {
+  'all-or-nothing': {
+    type: 'all-or-nothing',
+    name: '白黒思考（0か100かの極端な思考）',
     shortName: '白黒思考',
-    headline: '「100点以外はすべて0点」と極端に結論づけてしまう心の癖',
-    explanation: '物事を「成功か失敗か」「善か悪か」「完璧か無価値か」の二者択一で捉えてしまう傾向です。中間のグレーゾーンを許容できず、小さなミスでもすべてを投げ出したくなり、自己否定感を高めてしまいます。',
-    catchphrase: '「完璧にできないなら、やる意味がない」',
-    reframingQuestion: '「0と100の間にある、60点や70点の部分にはどんな価値がありますか？」',
-    actionTip: '「白でも黒でもない、心地よいグレーゾーンを探す」。進捗が10%でも「一歩踏み出せた」と自分を褒める練習をしましょう。',
+    headline: '物事を「成功か失敗か」「全か無か」の極端な二者択一で捉えてしまう心の癖',
+    explanation: '物事を「白か黒か」「全か無か」の二者択一で捉えてしまう思考パターンです。少しのミスや不完全さを許せず、「完璧にできないなら最初からやらない方がいい」と自分を追い込みやすくなります。',
+    catchphrase: '「少しでも失敗したら、すべて台無しだ」',
+    reframingQuestion: '「白と黒の間に、灰色（グレーゾーン）の選択肢はありませんか？」',
+    actionTip: '「0か100か」ではなく、「今回は60点できた」「少し前進した」とグラデーションで捉える練習をしましょう。',
   },
-  should_statements: {
-    type: 'should_statements',
+  'should': {
+    type: 'should',
     name: '「〜すべき」思考（義務感の暴走）',
     shortName: 'すべき思考',
     headline: '「こうあるべき」「こうしなければならない」で自分と他者を縛る心の癖',
@@ -206,7 +206,7 @@ export const DISTORTION_INFOS: Record<DistortionType, DistortionInfo> = {
     reframingQuestion: '「『〜すべき』を『〜できたら好ましい』『〜したい』に言い換えてみるとどう感じますか？」',
     actionTip: '「〜すべき」と頭に浮かんだら語尾を「〜できたらラッキー」「〜しなくても死にはしない」に変換してみましょう。',
   },
-  overgeneralization: {
+  'overgeneralization': {
     type: 'overgeneralization',
     name: '過度の一般化（一度の失敗＝永遠の失敗）',
     shortName: '過度の一般化',
@@ -216,7 +216,7 @@ export const DISTORTION_INFOS: Record<DistortionType, DistortionInfo> = {
     reframingQuestion: '「過去にうまくいった例外や、平穏だった瞬間は本当に一度もありませんでしたか？」',
     actionTip: '思考の中に「いつも」「絶対に」「誰も」という言葉が出てきたら赤信号。「今回はたまたまそうだっただけ」と言い直しましょう。',
   },
-  mental_filter: {
+  'mental_filter': {
     type: 'mental_filter',
     name: '心のフィルター（ネガティブの偏食）',
     shortName: '心のフィルター',
@@ -226,7 +226,7 @@ export const DISTORTION_INFOS: Record<DistortionType, DistortionInfo> = {
     reframingQuestion: '「今見落としているポジティブな事実や、感謝できる出来事は何がありますか？」',
     actionTip: '寝る前に「今日うまくいったこと・感謝したいこと」を3つ書き出す「スリーグッドシングス」を取り入れましょう。',
   },
-  catastrophizing: {
+  'catastrophizing': {
     type: 'catastrophizing',
     name: '破局化思考（最悪事態の先回り）',
     shortName: '破局化思考',
@@ -236,8 +236,8 @@ export const DISTORTION_INFOS: Record<DistortionType, DistortionInfo> = {
     reframingQuestion: '「現実に最悪の事態が起きる確率は何%ですか？ 最も起こりやすい現実的なシナリオは何でしょう？」',
     actionTip: '「最悪のシナリオ」「最高のシナリオ」「現実的なシナリオ」の3つを紙に書き出し、現実的な落とし所を見つめましょう。',
   },
-  mind_reading: {
-    type: 'mind_reading',
+  'mind-reading': {
+    type: 'mind-reading',
     name: '心の読みすぎ（ネガティブ推測）',
     shortName: '心の読みすぎ',
     headline: '根拠もないのに「あの人は自分を嫌っている」と決めつける心の癖',
@@ -246,7 +246,7 @@ export const DISTORTION_INFOS: Record<DistortionType, DistortionInfo> = {
     reframingQuestion: '「相手がその態度をとった別の理由（忙しい、疲れている等）は考えられませんか？」',
     actionTip: '「他人の心はエスパーでも読めない」と割り切ること。相手の機嫌は相手の課題であり、あなたのせいではありません。',
   },
-  personalization: {
+  'personalization': {
     type: 'personalization',
     name: '個人化（自分への過剰な結びつけ）',
     shortName: '個人化',
@@ -257,6 +257,11 @@ export const DISTORTION_INFOS: Record<DistortionType, DistortionInfo> = {
     actionTip: 'トラブルの原因を円グラフにして、自分の関与度を客観的に分割してみましょう。あなたの責任はせいぜい10〜20%です。',
   },
 };
+
+// 互換性用エイリアス
+DISTORTION_INFOS['all_or_nothing'] = DISTORTION_INFOS['all-or-nothing'];
+DISTORTION_INFOS['should_statements'] = DISTORTION_INFOS['should'];
+DISTORTION_INFOS['mind_reading'] = DISTORTION_INFOS['mind-reading'];
 
 export interface FatigueLevelInfo {
   level: 1 | 2 | 3 | 4 | 5;

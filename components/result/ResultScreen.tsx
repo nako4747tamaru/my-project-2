@@ -23,12 +23,13 @@ import {
   Zap,
 } from 'lucide-react';
 
-import { questions as defaultQuestions, Question } from '../../lib/questions';
+import { QUESTIONS as defaultQuestions } from '../../lib/questions';
 import {
   calculatePersonality,
   PersonalityResult,
   Answers,
   DistortionScoreItem,
+  Question,
 } from '../../lib/personality';
 
 export interface ResultScreenProps {
@@ -52,27 +53,29 @@ export interface ResultScreenProps {
  * テスト表示用・未回答時のデフォルト回答サンプル生成
  * （バランスのとれたINFP系＋中度疲弊＋白黒思考・すべき思考傾向のリアルなサンプル）
  */
-function createSampleAnswers(): Answers {
+function createSampleAnswers(questionsList: Question[] = defaultQuestions): Answers {
   const sample: Answers = {};
-  for (let i = 1; i <= 100; i++) {
-    // デフォルトは3（中立）
+  questionsList.forEach((q, idx) => {
+    const key = q.id ?? idx + 1;
     let val = 3;
-    // MBTI: E(1-15)低め、I高め
-    if (i >= 1 && i <= 15) val = i % 2 === 0 ? 4 : 2;
-    // S vs N(16-30): 直観(N)寄り
-    else if (i >= 16 && i <= 30) val = i % 2 === 0 ? 2 : 4;
-    // T vs F(31-45): 感情(F)寄り
-    else if (i >= 31 && i <= 45) val = i % 2 === 0 ? 2 : 5;
-    // J vs P(46-60): 知覚(P)寄り
-    else if (i >= 46 && i <= 60) val = i % 2 === 0 ? 2 : 4;
-    // 疲弊度(61-75): 3〜4点（蓄積疲労）
-    else if (i >= 61 && i <= 75) val = (i % 3) + 2;
-    // 歪み(76-100): 白黒思考とすべき思考が高め
-    else if (i >= 76 && i <= 84) val = 4;
-    else val = 3;
-
-    sample[i] = val;
-  }
+    if (q.dim === 'EI') {
+      val = q.pole === 'I' ? 4 : 2;
+    } else if (q.dim === 'SN') {
+      val = q.pole === 'N' ? 4 : 2;
+    } else if (q.dim === 'TF') {
+      val = q.pole === 'F' ? 5 : 2;
+    } else if (q.dim === 'JP') {
+      val = q.pole === 'P' ? 4 : 2;
+    } else if (q.dim === 'fatigue') {
+      val = (idx % 3) + 2;
+    } else if (q.dim === 'all-or-nothing' || q.dim === 'should') {
+      val = 4;
+    } else {
+      val = 3;
+    }
+    sample[key] = val;
+    sample[idx] = val;
+  });
   return sample;
 }
 
@@ -88,9 +91,10 @@ export default function ResultScreen({
   // 診断結果の算出
   const result: PersonalityResult = useMemo(() => {
     if (initialResult) return initialResult;
-    const finalAnswers = answers && Object.keys(answers).length > 0
-      ? answers
-      : createSampleAnswers();
+    const finalAnswers =
+      answers && Object.keys(answers).length > 0
+        ? answers
+        : createSampleAnswers(questions);
     return calculatePersonality(questions, finalAnswers);
   }, [answers, questions, initialResult]);
 
