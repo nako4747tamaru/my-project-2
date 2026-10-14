@@ -16,6 +16,10 @@ import {
   Layers,
   ChevronDown,
   ChevronUp,
+  ArrowRight,
+  ShieldCheck,
+  CheckCircle2,
+  BookOpen,
 } from 'lucide-react';
 
 import { QUESTIONS as defaultQuestions } from '../../lib/questions';
@@ -110,17 +114,28 @@ export default function ResultScreen({
     }
   };
 
-  // シェア機能
+  // シェア機能（X / 旧Twitter 投稿 & クリップボード）
   const handleShare = () => {
+    const typeName = result.info.name || result.info.shortName || result.title;
+    const shareText = `🕊️ ココロナビ 16タイプ性格診断 🕊️\n\n【${userName}さんの診断結果】\n✨ タイプ: ${result.type}（${typeName}）\n💬 「${result.catchphrase}」\n\n心のお疲れ度: ${result.fatigue.title} (Lv.${result.fatigue.level}/5) 🌿\n自分だけの取扱説明書とセルフケアのヒントが見つかりました🦉\n\n#ココロナビ #性格診断 #MBTI`;
+
+    const shareUrl = typeof window !== 'undefined' ? window.location.href : 'https://kokoronavi.com';
+    const tweetIntentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+      shareText
+    )}&url=${encodeURIComponent(shareUrl)}`;
+
     if (onShare) {
       onShare();
-      return;
     }
-    const text = `【ココロナビ 16タイプ診断結果】\n${userName}さんの診断タイプは「${result.type} - ${result.info.shortName || result.title}」でした！\nメンタル疲弊度: ${result.fatigue.title} (${result.fatigue.level}/5)\n#ココロナビ #16タイプ診断 #メンタルヘルス`;
+
+    if (typeof window !== 'undefined') {
+      window.open(tweetIntentUrl, '_blank', 'noopener,noreferrer');
+    }
+
     if (navigator.clipboard) {
-      navigator.clipboard.writeText(text);
+      navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
+      setTimeout(() => setCopied(false), 3000);
     }
   };
 
@@ -231,21 +246,23 @@ export default function ResultScreen({
             ))}
           </div>
 
-          {/* シェアボタン */}
+          {/* シェアボタン (X / 旧Twitter) */}
           <div className="mt-6">
             <button
               onClick={handleShare}
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-gradient-to-r from-[#6366F1] to-[#7C3AED] hover:from-[#5558E6] hover:to-[#6D28D9] active:scale-[0.99] text-white font-bold text-sm shadow-lg shadow-indigo-950/50 transition-all cursor-pointer"
+              className="w-full flex items-center justify-center gap-2.5 py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[#1D9BF0] via-[#6366F1] to-[#8B5CF6] hover:from-[#1A8CD8] hover:via-[#4F46E5] hover:to-[#7C3AED] active:scale-[0.98] text-white font-bold text-sm shadow-xl shadow-indigo-950/60 transition-all cursor-pointer group"
             >
               {copied ? (
                 <>
-                  <Check className="w-4 h-4 text-emerald-300" />
-                  <span>クリップボードにコピーしました！</span>
+                  <Check className="w-4 h-4 text-emerald-300 animate-bounce" />
+                  <span className="text-emerald-200">X投稿画面を開きました！（文言コピー完了）</span>
                 </>
               ) : (
                 <>
-                  <Share2 className="w-4 h-4" />
-                  <span>結果をシェアする</span>
+                  <svg className="w-4 h-4 fill-white transition-transform group-hover:scale-110" viewBox="0 0 24 24">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                  </svg>
+                  <span>結果をX（旧Twitter）でシェアする</span>
                 </>
               )}
             </button>
@@ -466,56 +483,64 @@ export default function ResultScreen({
         </section>
 
         {/* ======================================================== */}
-        {/* 4. 有料エリア（認知の歪み詳細分析 ＆ モザイク・ロック） */}
+        {/* 4. 有料エリア（認知の歪み7パターン詳細分析 ＆ モザイク・ロック） */}
         {/* ======================================================== */}
         <section className="relative rounded-3xl bg-gradient-to-b from-[#181F33] to-[#121625] border border-slate-700/60 p-5 sm:p-6 shadow-xl overflow-hidden">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-purple-400" />
-              <h3 className="text-sm font-bold text-white">認知の歪み詳細分析 ＆ 解決ワーク</h3>
+              <Sparkles className="w-4 h-4 text-amber-400" />
+              <h3 className="text-sm font-bold text-white">認知の歪み7パターン詳細分析 ＆ 自分だけのメンタル処方箋</h3>
             </div>
-            {!unlocked && (
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-950 text-purple-300 border border-purple-800 font-bold flex items-center gap-1">
+            {!unlocked ? (
+              <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-500/20 to-purple-500/20 text-amber-300 border border-amber-500/40 font-bold flex items-center gap-1">
                 <Lock className="w-2.5 h-2.5" />
                 PREMIUM
+              </span>
+            ) : (
+              <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-700 font-bold flex items-center gap-1">
+                <CheckCircle2 className="w-2.5 h-2.5" />
+                解放済み
               </span>
             )}
           </div>
 
-          <p className="text-xs text-slate-400 mb-4">
-            物事の捉え方の癖（認知の歪み5パターン）を数値化し、心を楽にするためのセルフケアワークシートを提供します。
+          <p className="text-xs text-slate-300 mb-4 leading-relaxed">
+            物事の捉え方の癖（認知の歪み7パターン）を数値化し、心を楽にする「1日3分のCBTセルフケアワーク（自分だけのメンタル処方箋）」を提供します。
           </p>
 
           {/* 歪みスコア一覧（ロック時はぼかし表示） */}
-          <div className={`space-y-3 transition-all ${!unlocked ? 'filter blur-[5px] select-none pointer-events-none' : ''}`}>
-            {result.distortions.map((d: DistortionScoreItem) => {
+          <div className={`space-y-3 transition-all ${!unlocked ? 'filter blur-[6px] select-none pointer-events-none' : ''}`}>
+            {result.distortions.map((d: DistortionScoreItem, idx: number) => {
               const isTop = d.type === topDistortion?.type;
               return (
                 <div
                   key={d.type}
-                  className={`p-3.5 rounded-2xl border ${
+                  className={`p-3.5 rounded-2xl border transition-all ${
                     isTop
-                      ? 'bg-[#24213D] border-rose-500/40'
+                      ? 'bg-[#24213D] border-rose-500/50 shadow-md shadow-rose-950/20'
                       : 'bg-slate-900/60 border-slate-800'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-1.5">
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-2">
+                      <span className="w-5 h-5 rounded-full bg-slate-800 flex items-center justify-center text-[10px] font-mono font-bold text-slate-300">
+                        {idx + 1}
+                      </span>
                       <span className="text-xs font-bold text-slate-200">{d.name}</span>
                       {isTop && (
-                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-rose-900/80 text-rose-300 font-bold">
-                          要注意
+                        <span className="text-[9px] px-2 py-0.5 rounded-full bg-rose-900/90 text-rose-200 font-bold tracking-wide">
+                          最も顕著
                         </span>
                       )}
                     </div>
-                    <span className="text-xs font-mono font-bold text-purple-300">
+                    <span className="text-xs font-mono font-bold text-amber-300">
                       {d.percentage}%
                     </span>
                   </div>
 
                   <div className="h-1.5 rounded-full bg-slate-800 overflow-hidden mb-2">
                     <div
-                      className="h-full bg-gradient-to-r from-indigo-500 to-rose-500"
+                      className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-rose-500"
                       style={{ width: `${d.percentage}%` }}
                     />
                   </div>
@@ -523,38 +548,126 @@ export default function ResultScreen({
                   <p className="text-[11px] text-slate-400 leading-relaxed">
                     {d.explanation}
                   </p>
+
+                  {/* 解放時のみ表示される詳細ワークヒント */}
+                  {unlocked && (
+                    <div className="mt-3 pt-3 border-t border-slate-800/80 space-y-2 text-[11px]">
+                      <div className="p-2.5 rounded-xl bg-purple-950/40 border border-purple-800/40 text-purple-200">
+                        <span className="font-bold text-purple-300 mr-1.5">💡 リフレーミングの問い:</span>
+                        {d.reframingQuestion}
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-indigo-950/40 border border-indigo-800/40 text-indigo-200">
+                        <span className="font-bold text-indigo-300 mr-1.5">🎯 今日の1日3分アクション:</span>
+                        {d.actionTip}
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })}
+
+            {/* 解放時専用：メンタル処方箋サマリーカード */}
+            {unlocked && (
+              <div className="mt-6 p-4 rounded-2xl bg-gradient-to-br from-indigo-950/60 via-purple-950/60 to-slate-900 border border-purple-500/40 space-y-3">
+                <div className="flex items-center gap-2 text-xs font-bold text-purple-300">
+                  <BookOpen className="w-4 h-4 text-purple-400" />
+                  <span>あなた専用のメンタル処方箋シート</span>
+                </div>
+                <h4 className="text-sm font-bold text-white">
+                  {userName}さん（{result.type}型）の心の回復ステップ
+                </h4>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  思考の癖「{topDistortion?.name}」が出たときは、まず「事実」と「感情」をノートに書き分け、上記の「リフレーミングの問い」を自分に投げかけてみてください。1日3分の習慣で、驚くほど心が軽くなります。
+                </p>
+              </div>
+            )}
           </div>
 
-          {/* ロックオーバーレイ */}
+          {/* ロックオーバーレイ（未購入時） */}
           {!unlocked && (
-            <div className="absolute inset-0 bg-[#0C101C]/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center z-20">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-purple-900/50 mb-3">
+            <div className="absolute inset-0 bg-[#0C101C]/88 backdrop-blur-md flex flex-col items-center justify-center p-5 sm:p-6 text-center z-20 overflow-y-auto">
+              {/* 初月お試しキャンペーンバッジ */}
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500/20 via-rose-500/20 to-purple-500/20 border border-amber-400/50 text-amber-300 text-[11px] font-bold shadow-md shadow-amber-950/40 mb-3 animate-pulse">
+                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                <span>今なら初月お試しキャンペーン実施中！</span>
+              </div>
+
+              {/* アイコン */}
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 flex items-center justify-center shadow-xl shadow-rose-950/50 mb-3">
                 <Lock className="w-6 h-6 text-white" />
               </div>
 
-              <h4 className="text-base font-bold text-white mb-1">
-                思考の癖を解きほぐす完全レポート
+              {/* タイトル ＆ キャッチコピー */}
+              <h4 className="text-base sm:text-lg font-black text-white mb-1.5 tracking-tight">
+                思考の癖をほどく、あなただけのメンタル処方箋
               </h4>
-              <p className="text-xs text-slate-300 max-w-xs mb-5 leading-relaxed">
-                最もスコアの高かった「{topDistortion?.name}」の対処法と、認知行動療法（CBT）に基づいた対話ワークシートを解放します。
+              <p className="text-xs text-slate-300 max-w-sm mb-4 leading-relaxed">
+                頑張りすぎてしまう{userName}さんへ。16タイプ×認知行動療法（CBT）で、モヤモヤ・自己否定をスーッと和らげる完全レポートを解放します。
               </p>
 
+              {/* 得られるメリットの箇条書きカード */}
+              <div className="w-full max-w-sm bg-slate-900/80 border border-slate-700/80 rounded-2xl p-3.5 mb-4 text-left space-y-2.5">
+                <div className="flex items-start gap-2.5 text-xs text-slate-200">
+                  <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold text-white">認知の歪み7パターン詳細分析</span>
+                    <p className="text-[11px] text-slate-400">「白黒思考」「心の読みすぎ」など無意識の思考癖を数値化して根本特定</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2.5 text-xs text-slate-200">
+                  <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold text-white">1日3分のCBTセルフケアワーク（メンタル処方箋）</span>
+                    <p className="text-[11px] text-slate-400">{result.type}型に特化した専用処方箋で、不安やイライラをその場でリセット</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2.5 text-xs text-slate-200">
+                  <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold text-white">スキマ時間でできる一生モノの心の取扱説明書</span>
+                    <p className="text-[11px] text-slate-400">スマホでいつでも読み返せて、心が疲れたときの安心のセーフティネットに</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* 高輝度グラデーションCTAボタン */}
               <button
                 onClick={handleCheckout}
-                className="w-full max-w-xs flex items-center justify-center gap-2 py-3 px-5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs sm:text-sm shadow-xl shadow-purple-950/60 transition-transform active:scale-95 cursor-pointer"
+                className="w-full max-w-sm relative group overflow-hidden rounded-2xl p-[1px] shadow-2xl shadow-rose-950/70 transition-transform active:scale-[0.98] cursor-pointer"
               >
-                <Lock className="w-4 h-4" />
-                <span>月額980円で詳細分析と解決ワークを解放する</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-400 via-rose-500 to-indigo-600 rounded-2xl transition-all duration-300 group-hover:scale-105" />
+                <div className="relative px-5 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-rose-600 to-purple-600 text-white font-black flex flex-col items-center justify-center gap-0.5 transition-all group-hover:bg-opacity-90">
+                  <div className="flex items-center gap-2 text-xs sm:text-sm tracking-wide">
+                    <Sparkles className="w-4 h-4 text-amber-200" />
+                    <span>今すぐ初月お試しで完全レポートを解放する</span>
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                  </div>
+                  <span className="text-[10px] text-rose-100 font-medium">
+                    月額980円（初月お試し価格） ・ いつでも解約可能
+                  </span>
+                </div>
               </button>
 
+              {/* 安心バッジ */}
+              <div className="mt-3 flex items-center justify-center gap-4 text-[10px] text-slate-400">
+                <span className="flex items-center gap-1">
+                  <ShieldCheck className="w-3 h-3 text-emerald-400" />
+                  いつでも解約OK
+                </span>
+                <span className="text-slate-600">•</span>
+                <span>Stripeセキュア決済</span>
+                <span className="text-slate-600">•</span>
+                <span>1日約32円</span>
+              </div>
+
+              {/* プレビューボタン */}
               <button
                 onClick={() => setUnlocked(true)}
-                className="mt-3 text-[11px] text-slate-400 hover:text-slate-200 underline cursor-pointer"
+                className="mt-2.5 text-[10px] text-slate-500 hover:text-slate-300 underline cursor-pointer transition-colors"
               >
-                プレビュー（デモ解放）
+                プレビュー（デモ解放で中身を確認）
               </button>
             </div>
           )}

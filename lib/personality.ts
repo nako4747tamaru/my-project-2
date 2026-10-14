@@ -15,7 +15,9 @@ export type DistortionId =
   | 'overgeneralization'
   | 'should'
   | 'mind-reading'
-  | 'personalization';
+  | 'personalization'
+  | 'mental_filter'
+  | 'catastrophizing';
 
 export type DistortionType =
   | DistortionId
@@ -127,6 +129,8 @@ export function calculatePersonality(
     'should': { sum: 0, count: 0 },
     'mind-reading': { sum: 0, count: 0 },
     'personalization': { sum: 0, count: 0 },
+    'mental_filter': { sum: 0, count: 0 },
+    'catastrophizing': { sum: 0, count: 0 },
   };
 
   // 質問ごとにスコアを加算
@@ -160,7 +164,9 @@ export function calculatePersonality(
       q.dim === 'overgeneralization' ||
       q.dim === 'should' ||
       q.dim === 'mind-reading' ||
-      q.dim === 'personalization'
+      q.dim === 'personalization' ||
+      q.dim === 'mental_filter' ||
+      q.dim === 'catastrophizing'
     ) {
       const dist = distortionScores[q.dim as DistortionId];
       if (dist) {
@@ -260,14 +266,48 @@ export function calculatePersonality(
     careAdvice: fatigueInfo.careAdvice,
   };
 
-  // --- 認知の歪み (DISTORTION) 判定 ---
+  // --- 認知の歪み (DISTORTION) 判定 (7パターン) ---
   const distortionKeys: DistortionId[] = [
     'all-or-nothing',
     'overgeneralization',
     'should',
     'mind-reading',
     'personalization',
+    'mental_filter',
+    'catastrophizing',
   ];
+
+  // 質問に直接含まれていない項目の相関推定（カウントが0の場合）
+  const baseAvg =
+    (distortionScores['all-or-nothing'].sum +
+      distortionScores['overgeneralization'].sum +
+      distortionScores['should'].sum) /
+      Math.max(
+        1,
+        distortionScores['all-or-nothing'].count +
+          distortionScores['overgeneralization'].count +
+          distortionScores['should'].count
+      ) || 3;
+
+  if (distortionScores['mental_filter'].count === 0) {
+    const ovgAvg =
+      distortionScores['overgeneralization'].count > 0
+        ? distortionScores['overgeneralization'].sum /
+          distortionScores['overgeneralization'].count
+        : baseAvg;
+    const estimatedVal = Math.round((ovgAvg * 0.7 + (fatiguePercentage / 25 + 1) * 0.3) * 4);
+    distortionScores['mental_filter'] = { sum: estimatedVal, count: 4 };
+  }
+
+  if (distortionScores['catastrophizing'].count === 0) {
+    const aonAvg =
+      distortionScores['all-or-nothing'].count > 0
+        ? distortionScores['all-or-nothing'].sum /
+          distortionScores['all-or-nothing'].count
+        : baseAvg;
+    const estimatedVal = Math.round((aonAvg * 0.6 + baseAvg * 0.4) * 4);
+    distortionScores['catastrophizing'] = { sum: estimatedVal, count: 4 };
+  }
 
   const distortions: DistortionScoreItem[] = distortionKeys.map((typeKey) => {
     const dData = distortionScores[typeKey];

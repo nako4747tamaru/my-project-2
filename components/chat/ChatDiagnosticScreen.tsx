@@ -71,12 +71,12 @@ export default function ChatDiagnosticScreen({
         {
           id: 'welcome-1',
           sender: 'mascot',
-          text: 'こんにちは！ ココロナビのフクロウ「ナビ」だよ。',
+          text: 'こんにちは！ ココロナビの案内役、フクロウの「ナビ」だよ🦉',
         },
         {
           id: 'welcome-2',
           sender: 'mascot',
-          text: '前回の続きから診断を再開するよ。安心して進めてね。',
+          text: `お帰りなさい、${savedName}さん！ 前回の続き（${safeIdx + 1}問目）から再開するね。肩の力を抜いて、リラックスして進めていこうね🍀`,
         },
         {
           id: 'welcome-user',
@@ -89,17 +89,17 @@ export default function ChatDiagnosticScreen({
         {
           id: 'welcome-1',
           sender: 'mascot',
-          text: 'こんにちは！ ココロナビのフクロウ「ナビ」だよ。',
+          text: 'こんにちは！ ココロナビの案内役、フクロウの「ナビ」だよ🦉',
         },
         {
           id: 'welcome-2',
           sender: 'mascot',
-          text: '100問の質問で、あなたの性格タイプと心のコンディションを分析するよ。途中で閉じても続きから再開できるから安心してね。',
+          text: '今日は来てくれてありがとう！ 100問の対話を通して、あなたの16タイプ性格や心のエネルギー、無意識の思考の癖を一緒に解き明かしていくね🌿',
         },
         {
           id: 'welcome-3',
           sender: 'mascot',
-          text: 'まずはニックネームを教えてね。',
+          text: '途中で画面を閉じても自動で保存されるから安心してね。まずは、あなたのお名前（ニックネーム）を教えてもらえるかな？✨',
         },
       ]);
     }
@@ -132,41 +132,70 @@ export default function ChatDiagnosticScreen({
       {
         id: `mascot-greeting-${Date.now()}`,
         sender: 'mascot',
-        text: `${trimmed}さん、よろしくね！ 直感で自分に当てはまる度合いを選んでね。`,
+        text: `${trimmed}さん、よろしくね！お話しできてすごく嬉しいな🦉✨\n質問には正解・不正解はないよ。深く考え込みすぎず、「直感」でピンときたものをぽちっと選んでみてね！ さあ、始めよう🌿`,
       },
     ]);
   };
 
   // 質問への回答処理
   const handleSelectOption = (value: number, label: string) => {
-    const nextAnswers = { ...answers, [currentIndex + 1]: value, [currentIndex]: value };
+    const nextIndex = currentIndex + 1;
+    const nextAnswers = { ...answers, [nextIndex]: value, [currentIndex]: value };
     setAnswers(nextAnswers);
 
     try {
       localStorage.setItem(STORAGE_KEY_ANSWERS, JSON.stringify(nextAnswers));
-      localStorage.setItem(STORAGE_KEY_INDEX, String(currentIndex + 1));
+      localStorage.setItem(STORAGE_KEY_INDEX, String(nextIndex));
     } catch {
       // ignore
     }
 
-    // 回答バブルを追加
-    const currentQ = QUESTIONS[currentIndex];
-    setMessages((prev) => [
-      ...prev,
+    // 回答バブルの作成
+    const newMessages: ChatMessage[] = [
       {
         id: `q-ans-${currentIndex}-${Date.now()}`,
         sender: 'user',
-        text: `${label}`,
+        text: label,
       },
-    ]);
+    ];
+
+    // 25問・50問・75問・100問ごとのナビの労い・励ましメッセージバブル
+    const targetName = nickname || 'あなた';
+    if (nextIndex === 25) {
+      newMessages.push({
+        id: `milestone-25-${Date.now()}`,
+        sender: 'mascot',
+        text: `🎉 25問クリア！ ${targetName}さん、とっても順調だよ！\nまずは1/4達成だね。深呼吸して肩の力を抜いて、あなたのペースでゆったり進めていこうね🍵✨`,
+      });
+    } else if (nextIndex === 50) {
+      newMessages.push({
+        id: `milestone-50-${Date.now()}`,
+        sender: 'mascot',
+        text: `🌟 50問突破！ ちょうど折り返しの中間地点だよ、すごい集中力だね👏\n${targetName}さんの心の輪郭や個性がだんだん見えてきたよ！ 少し首を回してリフレッシュしながらいこうね🕊️`,
+      });
+    } else if (nextIndex === 75) {
+      newMessages.push({
+        id: `milestone-75-${Date.now()}`,
+        sender: 'mascot',
+        text: `🎈 75問クリア！ あと1/4でゴールだよ、本当にえらいっ！✨\n${targetName}さんの大切な個性と思考の癖が、もうすぐ詳細レポートになるよ。ラストスパート、楽しんでいこうね🦉🌈`,
+      });
+    } else if (nextIndex >= QUESTIONS.length) {
+      newMessages.push({
+        id: `milestone-100-${Date.now()}`,
+        sender: 'mascot',
+        text: `🎊 100問完走お疲れさま！！ 最後まで答えてくれて本当にありがとう💐✨\nいま${targetName}さんの心の状態と16タイプをじっくり分析中だよ…結果レポートを開くね！`,
+      });
+    }
+
+    setMessages((prev) => [...prev, ...newMessages]);
 
     // 次の質問へ進むか、完了か
-    if (currentIndex + 1 >= QUESTIONS.length) {
+    if (nextIndex >= QUESTIONS.length) {
       setTimeout(() => {
         onComplete(nextAnswers, nickname);
-      }, 500);
+      }, 900);
     } else {
-      setCurrentIndex((prev) => prev + 1);
+      setCurrentIndex(nextIndex);
     }
   };
 
@@ -196,7 +225,7 @@ export default function ChatDiagnosticScreen({
         {
           id: 'welcome-1',
           sender: 'mascot',
-          text: 'こんにちは！ ココロナビのフクロウ「ナビ」だよ。',
+          text: 'こんにちは！ ココロナビの案内役、フクロウの「ナビ」だよ🦉',
         },
         {
           id: 'welcome-2',
@@ -206,7 +235,7 @@ export default function ChatDiagnosticScreen({
         {
           id: 'welcome-3',
           sender: 'mascot',
-          text: 'まずはニックネームを教えてね。',
+          text: 'まずはニックネームを教えてね✨',
         },
       ]);
     }
