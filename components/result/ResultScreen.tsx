@@ -35,6 +35,8 @@ import {
 } from '../../lib/personality';
 import OwlMascot from '../common/OwlMascot';
 import DistortionRadarChart from './DistortionRadarChart';
+import LegalModal, { LegalTab } from '../common/LegalModal';
+import LegalFooter from '../common/LegalFooter';
 
 export interface ResultScreenProps {
   /** ユーザーのニックネーム */
@@ -261,6 +263,15 @@ export default function ResultScreen({
   const [exportingState, setExportingState] = useState<'idle' | 'image' | 'pdf'>('idle');
   const [exportSuccessMessage, setExportSuccessMessage] = useState<string | null>(null);
   const [exportErrorMessage, setExportErrorMessage] = useState<string | null>(null);
+
+  // 法務・規約モーダルステート
+  const [legalModalOpen, setLegalModalOpen] = useState(false);
+  const [legalModalTab, setLegalModalTab] = useState<LegalTab>('privacy');
+
+  const handleOpenLegal = (tab: LegalTab) => {
+    setLegalModalTab(tab);
+    setLegalModalOpen(true);
+  };
 
   // キャプチャ対象エリアの参照
   const captureCardRef = useRef<HTMLDivElement>(null);
@@ -498,6 +509,15 @@ ${shareUrl}
           </div>
 
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => handleOpenLegal('privacy')}
+              title="プライバシーポリシー・利用規約"
+              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-800/90 hover:bg-slate-700 text-xs text-slate-400 hover:text-white transition-colors border border-slate-700/60 cursor-pointer"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
+              <span className="hidden sm:inline">規約・ポリシー</span>
+            </button>
+
             {onRetest && (
               <button
                 onClick={onRetest}
@@ -1173,6 +1193,16 @@ ${shareUrl}
           )}
         </section>
       </main>
+
+      {/* 法務・規約フッター */}
+      <LegalFooter onOpenLegal={handleOpenLegal} />
+
+      {/* 法務・規約モーダル */}
+      <LegalModal
+        isOpen={legalModalOpen}
+        onClose={() => setLegalModalOpen(false)}
+        initialTab={legalModalTab}
+      />
 
       {/* ======================================================== */}
       {/* 処理中ローディング表示（連打・誤操作防止オーバーレイ） */}

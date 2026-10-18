@@ -9,10 +9,13 @@ import {
   ChevronLeft,
   Menu,
   CheckCircle2,
+  ShieldCheck,
 } from 'lucide-react';
 import { QUESTIONS, Question } from '../../lib/questions';
 import { Answers } from '../../lib/personality';
 import OwlMascot from '../common/OwlMascot';
+import LegalModal, { LegalTab } from '../common/LegalModal';
+import LegalFooter from '../common/LegalFooter';
 
 interface ChatDiagnosticScreenProps {
   onComplete: (answers: Answers, nickname: string) => void;
@@ -43,6 +46,15 @@ export default function ChatDiagnosticScreen({
   const [answers, setAnswers] = useState<Answers>({});
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const chatEndRef = useRef<HTMLDivElement>(null);
+
+  // 法務・規約モーダル用ステート
+  const [legalModalOpen, setLegalModalOpen] = useState(false);
+  const [legalModalTab, setLegalModalTab] = useState<LegalTab>('privacy');
+
+  const handleOpenLegal = (tab: LegalTab) => {
+    setLegalModalTab(tab);
+    setLegalModalOpen(true);
+  };
 
   // 初期メッセージ設定 ＆ localStorage復元
   useEffect(() => {
@@ -286,11 +298,18 @@ export default function ChatDiagnosticScreen({
           </div>
 
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => handleOpenLegal('privacy')}
+              title="プライバシーポリシー・利用規約"
+              className="p-1.5 rounded-full bg-slate-800 text-slate-400 hover:text-white transition-colors cursor-pointer"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
+            </button>
             {isStarted && (
               <button
                 onClick={handleReset}
                 title="やり直す"
-                className="p-1.5 rounded-full bg-slate-800 text-slate-400 hover:text-white transition-colors"
+                className="p-1.5 rounded-full bg-slate-800 text-slate-400 hover:text-white transition-colors cursor-pointer"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
               </button>
@@ -298,7 +317,7 @@ export default function ChatDiagnosticScreen({
             {onPreviewSample && (
               <button
                 onClick={onPreviewSample}
-                className="px-2.5 py-1 rounded-full bg-purple-900/60 hover:bg-purple-800 text-purple-200 text-xs font-semibold border border-purple-700/60 transition-colors"
+                className="px-2.5 py-1 rounded-full bg-purple-900/60 hover:bg-purple-800 text-purple-200 text-xs font-semibold border border-purple-700/60 transition-colors cursor-pointer"
               >
                 結果を見る
               </button>
@@ -442,26 +461,57 @@ export default function ChatDiagnosticScreen({
         <footer className="sticky bottom-0 bg-[#0C101C]/95 backdrop-blur-md border-t border-slate-800/80 px-4 py-3">
           <form
             onSubmit={handleSendNickname}
-            className="max-w-md mx-auto flex items-center gap-2"
+            className="max-w-md mx-auto space-y-2"
           >
-            <input
-              type="text"
-              value={inputName}
-              onChange={(e) => setInputName(e.target.value)}
-              placeholder="ニックネームを入力 (例: タカ)"
-              maxLength={20}
-              className="flex-1 bg-[#151B2E] border border-slate-700/80 rounded-2xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 transition-colors"
-              autoFocus
-            />
-            <button
-              type="submit"
-              className="w-10 h-10 rounded-full bg-gradient-to-r from-[#6366F1] to-[#7C3AED] hover:from-[#5558E6] hover:to-[#6D28D9] flex items-center justify-center text-white transition-transform active:scale-95 shrink-0 shadow-md shadow-indigo-950 cursor-pointer"
-            >
-              <Send className="w-4 h-4" />
-            </button>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={inputName}
+                onChange={(e) => setInputName(e.target.value)}
+                placeholder="ニックネームを入力 (例: タカ)"
+                maxLength={20}
+                className="flex-1 bg-[#151B2E] border border-slate-700/80 rounded-2xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 transition-colors"
+                autoFocus
+              />
+              <button
+                type="submit"
+                className="w-10 h-10 rounded-full bg-gradient-to-r from-[#6366F1] to-[#7C3AED] hover:from-[#5558E6] hover:to-[#6D28D9] flex items-center justify-center text-white transition-transform active:scale-95 shrink-0 shadow-md shadow-indigo-950 cursor-pointer"
+              >
+                <Send className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="text-[10px] text-slate-500 text-center">
+              診断を開始することで、
+              <button
+                type="button"
+                onClick={() => handleOpenLegal('terms')}
+                className="text-slate-400 hover:text-indigo-300 underline underline-offset-2 mx-1 cursor-pointer"
+              >
+                利用規約
+              </button>
+              および
+              <button
+                type="button"
+                onClick={() => handleOpenLegal('privacy')}
+                className="text-slate-400 hover:text-indigo-300 underline underline-offset-2 mx-1 cursor-pointer"
+              >
+                プライバシーポリシー
+              </button>
+              に同意したものとみなされます。
+            </p>
           </form>
         </footer>
       )}
+
+      {/* 初期画面での法務・規約フッター */}
+      {!isStarted && <LegalFooter onOpenLegal={handleOpenLegal} />}
+
+      {/* 法務・規約モーダル */}
+      <LegalModal
+        isOpen={legalModalOpen}
+        onClose={() => setLegalModalOpen(false)}
+        initialTab={legalModalTab}
+      />
     </div>
   );
 }
