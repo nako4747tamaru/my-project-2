@@ -20,7 +20,7 @@ import {
   ShieldCheck,
   CheckCircle2,
   BookOpen,
-  Image as ImageIcon,
+  Camera,
   FileDown,
   Loader2,
 } from 'lucide-react';
@@ -85,6 +85,155 @@ function createSampleAnswers(questionsList: Question[] = defaultQuestions): Answ
   return sample;
 }
 
+/**
+ * 2×2 配置の SNSシェア ＆ 画像・PDF保存ボタングループ
+ */
+interface ShareButtonGroupProps {
+  onShareX: () => void;
+  onShareLine: () => void;
+  onSaveImage: () => void;
+  onShareNative: () => void;
+  onSavePdf: () => void;
+  isExportingImage: boolean;
+  isExportingPdf: boolean;
+  isExportingAny: boolean;
+  title?: string;
+  subtitle?: string;
+}
+
+function ShareButtonGroup({
+  onShareX,
+  onShareLine,
+  onSaveImage,
+  onShareNative,
+  onSavePdf,
+  isExportingImage,
+  isExportingPdf,
+  isExportingAny,
+  title = '診断結果をシェア・保存',
+  subtitle = 'X・LINE・Instagram・TikTok対応',
+}: ShareButtonGroupProps) {
+  return (
+    <div className="rounded-3xl bg-gradient-to-b from-[#1C2339] to-[#121625] border border-slate-700/70 p-4 sm:p-5 shadow-xl space-y-3.5">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
+          <span className="text-xs font-bold text-white tracking-wide">{title}</span>
+        </div>
+        <span className="text-[10px] text-slate-400 font-medium">{subtitle}</span>
+      </div>
+
+      {/* 2×2 グリッド配置（スマートフォン・PC両対応） */}
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
+        {/* 1. X（旧Twitter）シェアボタン */}
+        <button
+          onClick={onShareX}
+          className="flex flex-col items-start p-3 sm:p-3.5 rounded-2xl bg-[#0b0e14] hover:bg-[#141a24] border border-slate-700/80 hover:border-slate-500 shadow-md text-left transition-all active:scale-[0.98] cursor-pointer group"
+          title="診断結果をXでポスト"
+        >
+          <div className="flex items-center justify-between w-full mb-1.5">
+            <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center text-white group-hover:bg-white/20 transition-colors">
+              <svg className="w-3.5 h-3.5 fill-white" viewBox="0 0 24 24">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+              </svg>
+            </div>
+            <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-white/10 text-slate-300 font-semibold group-hover:text-white">
+              ポスト
+            </span>
+          </div>
+          <span className="text-xs sm:text-sm font-bold text-white tracking-wide">X でシェア</span>
+          <span className="text-[10px] text-slate-400 mt-0.5">#ココロナビ 投稿</span>
+        </button>
+
+        {/* 2. LINEで送るボタン */}
+        <button
+          onClick={onShareLine}
+          className="flex flex-col items-start p-3 sm:p-3.5 rounded-2xl bg-[#06C755] hover:bg-[#05b34c] shadow-md shadow-emerald-950/40 text-left transition-all active:scale-[0.98] cursor-pointer group"
+          title="LINEで友だちやトークに共有"
+        >
+          <div className="flex items-center justify-between w-full mb-1.5">
+            <div className="w-7 h-7 rounded-lg bg-black/15 flex items-center justify-center text-white">
+              <svg className="w-4 h-4 fill-white" viewBox="0 0 24 24">
+                <path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 4.269 8.846 10.019 9.576.39.085.922.259 1.057.595.121.304.08.779.039 1.085l-.171 1.026c-.053.303-.242 1.185 1.039.646 1.281-.54 6.911-4.069 9.428-6.967 1.739-1.907 2.589-3.864 2.589-5.965z"/>
+              </svg>
+            </div>
+            <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-black/20 text-white font-semibold">
+              トーク
+            </span>
+          </div>
+          <span className="text-xs sm:text-sm font-bold text-white tracking-wide">LINEで送る</span>
+          <span className="text-[10px] text-emerald-100 mt-0.5">友だちに教える</span>
+        </button>
+
+        {/* 3. 「結果カードを画像として保存」（Instagram・TikTok・保存用） */}
+        <button
+          onClick={onSaveImage}
+          disabled={isExportingAny}
+          className="flex flex-col items-start p-3 sm:p-3.5 rounded-2xl bg-gradient-to-tr from-[#F58529] via-[#DD2A7B] to-[#8134AF] hover:opacity-95 shadow-md shadow-pink-950/40 text-left transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer group"
+          title="インスタストーリーやTikTok用の高画質画像（PNG）として保存"
+        >
+          <div className="flex items-center justify-between w-full mb-1.5">
+            <div className="w-7 h-7 rounded-lg bg-black/20 flex items-center justify-center text-white">
+              {isExportingImage ? (
+                <Loader2 className="w-4 h-4 animate-spin text-white" />
+              ) : (
+                <Camera className="w-4 h-4 text-white group-hover:scale-110 transition-transform" />
+              )}
+            </div>
+            <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-black/25 text-white font-semibold">
+              PNG保存
+            </span>
+          </div>
+          <span className="text-xs sm:text-sm font-bold text-white tracking-wide">
+            {isExportingImage ? '画像作成中...' : '画像として保存'}
+          </span>
+          <span className="text-[10px] text-pink-100 mt-0.5">ストーリー・TikTok📸</span>
+        </button>
+
+        {/* 4. スマホ標準の共有（Web Share API / その他） */}
+        <button
+          onClick={onShareNative}
+          className="flex flex-col items-start p-3 sm:p-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-sky-600 hover:from-indigo-500 hover:to-sky-500 shadow-md shadow-indigo-950/40 text-left transition-all active:scale-[0.98] cursor-pointer group"
+          title="AirDropやその他のSNSで共有、またはリンクをコピー"
+        >
+          <div className="flex items-center justify-between w-full mb-1.5">
+            <div className="w-7 h-7 rounded-lg bg-black/20 flex items-center justify-center text-white">
+              <Share2 className="w-4 h-4 text-white group-hover:scale-110 transition-transform" />
+            </div>
+            <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-black/25 text-white font-semibold">
+              共有
+            </span>
+          </div>
+          <span className="text-xs sm:text-sm font-bold text-white tracking-wide">その他で共有</span>
+          <span className="text-[10px] text-indigo-100 mt-0.5">AirDrop・リンクコピー</span>
+        </button>
+      </div>
+
+      {/* PDF形式ダウンロード用オプションボタン */}
+      <div className="flex items-center justify-between pt-1 border-t border-slate-800/80">
+        <span className="text-[10px] text-slate-400">印刷・保管用フォーマット</span>
+        <button
+          onClick={onSavePdf}
+          disabled={isExportingAny}
+          className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-300 hover:text-emerald-200 py-1 px-2.5 rounded-xl bg-emerald-950/60 hover:bg-emerald-900/60 border border-emerald-700/60 transition-colors disabled:opacity-50 cursor-pointer"
+        >
+          {isExportingPdf ? (
+            <>
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-300" />
+              <span>PDF作成中...</span>
+            </>
+          ) : (
+            <>
+              <FileDown className="w-3.5 h-3.5 text-emerald-400" />
+              <span>PDFでダウンロード</span>
+            </>
+          )}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function ResultScreen({
   userName = 'たか',
   answers,
@@ -106,7 +255,6 @@ export default function ResultScreen({
   }, [answers, questions, initialResult]);
 
   const [unlocked, setUnlocked] = useState(isPremiumUnlocked);
-  const [copied, setCopied] = useState(false);
   const [showAxesDetail, setShowAxesDetail] = useState(true);
 
   // 画像 / PDF 保存用のステート
@@ -117,6 +265,8 @@ export default function ResultScreen({
   // キャプチャ対象エリアの参照
   const captureCardRef = useRef<HTMLDivElement>(null);
 
+  const topDistortion = result.topDistortions[0];
+
   // Stripe決済ボタンハンドラー
   const handleCheckout = () => {
     if (onUnlockPremium) {
@@ -126,8 +276,8 @@ export default function ResultScreen({
     }
   };
 
-  // シェア機能（X / 旧Twitter 投稿 & クリップボード）
-  const handleShare = () => {
+  // 共通の共有用文言生成
+  const getShareDetails = () => {
     const typeName = result.info.shortName || result.info.name || result.title;
     const distortionSnippet = topDistortion?.name ? `\n🧠 思考の癖傾向: ${topDistortion.name}` : '';
     const shareText = `＼ ココロナビで心と性格を診断したよ 🦉✨ ／
@@ -142,23 +292,85 @@ export default function ResultScreen({
 
 #ココロナビ #性格診断 #MBTI`;
 
-    const shareUrl = typeof window !== 'undefined' ? window.location.origin || window.location.href : 'https://kokoronavi.com';
+    const shareUrl =
+      typeof window !== 'undefined'
+        ? window.location.origin || window.location.href
+        : 'https://kokoronavi.com';
+
+    return { shareText, shareUrl, typeName };
+  };
+
+  // 1. X（旧Twitter）シェア
+  const handleShareX = () => {
+    const { shareText, shareUrl } = getShareDetails();
     const tweetIntentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
       shareText
     )}&url=${encodeURIComponent(shareUrl)}`;
 
-    if (onShare) {
-      onShare();
-    }
+    if (onShare) onShare();
 
     if (typeof window !== 'undefined') {
       window.open(tweetIntentUrl, '_blank', 'noopener,noreferrer');
     }
 
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 3000);
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(`${shareText}\n${shareUrl}`).catch(() => {});
+    }
+
+    setExportSuccessMessage('X投稿画面を開きました！（文言をコピーしました🕊️）');
+    setTimeout(() => setExportSuccessMessage(null), 3500);
+  };
+
+  // 2. LINEで送る
+  const handleShareLine = () => {
+    const { shareUrl } = getShareDetails();
+    // LINE公式の共有URL
+    const lineShareUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(
+      shareUrl
+    )}`;
+
+    if (onShare) onShare();
+
+    if (typeof window !== 'undefined') {
+      window.open(lineShareUrl, '_blank', 'noopener,noreferrer');
+    }
+
+    setExportSuccessMessage('LINEの共有画面を開きました！💬');
+    setTimeout(() => setExportSuccessMessage(null), 3500);
+  };
+
+  // 4. スマホ標準の共有（Web Share API / その他）
+  const handleShareNative = async () => {
+    const { shareText, shareUrl, typeName } = getShareDetails();
+    if (onShare) onShare();
+
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({
+          title: `【ココロナビ】${userName}さんの診断結果: ${result.type}（${typeName}）`,
+          text: shareText,
+          url: shareUrl,
+        });
+        setExportSuccessMessage('診断結果を共有しました！✨');
+        setTimeout(() => setExportSuccessMessage(null), 3500);
+        return;
+      } catch (err: unknown) {
+        if (err instanceof Error && err.name === 'AbortError') {
+          return; // ユーザーキャンセル
+        }
+      }
+    }
+
+    // クリップボードへコピー（PCなど非対応環境）
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      try {
+        await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
+        setExportSuccessMessage('診断結果のリンクと文言をコピーしました！📋');
+        setTimeout(() => setExportSuccessMessage(null), 3500);
+      } catch {
+        setExportErrorMessage('クリップボードへのコピーに失敗しました');
+        setTimeout(() => setExportErrorMessage(null), 3500);
+      }
     }
   };
 
@@ -166,7 +378,7 @@ export default function ResultScreen({
   const executeCapture = async (): Promise<HTMLCanvasElement | null> => {
     if (!captureCardRef.current) return null;
 
-    // 動的インポート（SSR対策＆初期バンドルサイズ軽量化）
+    // 動的インポート（SSR対策＆バンドル軽量化）
     const html2canvas = (await import('html2canvas')).default;
 
     const element = captureCardRef.current;
@@ -174,7 +386,7 @@ export default function ResultScreen({
       scale: 2, // 高解像度（Retina）
       useCORS: true,
       logging: false,
-      backgroundColor: '#0C101C', // ダークテーマ背景色を確実にセット
+      backgroundColor: '#0C101C', // ダークテーマ背景色
       windowWidth: element.scrollWidth,
     });
 
@@ -188,7 +400,7 @@ export default function ResultScreen({
     return `kokoro-navi-${cleanName}-${result.type}-${dateStr}.${extension}`;
   };
 
-  // 画像（PNG）として保存
+  // 3. 画像（PNG）として保存（Instagram・TikTok・保存用）
   const handleSaveImage = async () => {
     if (exportingState !== 'idle') return;
     try {
@@ -209,7 +421,7 @@ export default function ResultScreen({
       link.click();
       document.body.removeChild(link);
 
-      setExportSuccessMessage('診断結果カード（PNG画像）を保存しました！');
+      setExportSuccessMessage('診断結果画像を保存しました！ストーリーやTikTokでシェアしてね📸');
       setTimeout(() => setExportSuccessMessage(null), 3500);
     } catch (err) {
       console.error('Failed to export image:', err);
@@ -252,7 +464,7 @@ export default function ResultScreen({
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
       pdf.save(getSafeFileName('pdf'));
 
-      setExportSuccessMessage('診断結果カード（PDF）をダウンロードしました！');
+      setExportSuccessMessage('診断結果カード（PDF）をダウンロードしました！📄');
       setTimeout(() => setExportSuccessMessage(null), 3500);
     } catch (err) {
       console.error('Failed to export PDF:', err);
@@ -262,8 +474,6 @@ export default function ResultScreen({
       setExportingState('idle');
     }
   };
-
-  const topDistortion = result.topDistortions[0];
 
   // 疲弊度ゲージのカラー設定 (1〜5)
   const GAUGE_COLORS = [
@@ -309,59 +519,20 @@ export default function ResultScreen({
 
       <main className="max-w-md mx-auto px-4 py-3 space-y-5">
         {/* ======================================================== */}
-        {/* ダウンロード ＆ 保存アクションカード (上部クイックアクセス) */}
+        {/* ダウンロード ＆ SNSシェアカード (上部クイックアクセス) */}
         {/* ======================================================== */}
-        <div className="rounded-3xl bg-gradient-to-b from-[#1C2339] to-[#121625] border border-slate-700/70 p-4 shadow-xl space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-amber-300" />
-              <span className="text-xs font-bold text-white tracking-wide">診断結果を保存・共有</span>
-            </div>
-            <span className="text-[10px] text-slate-400">画像・PDF出力対応</span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2.5">
-            {/* 画像として保存ボタン */}
-            <button
-              onClick={handleSaveImage}
-              disabled={exportingState !== 'idle'}
-              className="flex items-center justify-center gap-2 py-3 px-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-indigo-950/60 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer group"
-              title="診断結果カードをPNG画像として保存"
-            >
-              {exportingState === 'image' ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin text-indigo-200" />
-                  <span className="text-xs">作成中...</span>
-                </>
-              ) : (
-                <>
-                  <ImageIcon className="w-4 h-4 text-indigo-200 group-hover:scale-110 transition-transform shrink-0" />
-                  <span>画像として保存</span>
-                </>
-              )}
-            </button>
-
-            {/* PDFでダウンロードボタン */}
-            <button
-              onClick={handleSavePdf}
-              disabled={exportingState !== 'idle'}
-              className="flex items-center justify-center gap-2 py-3 px-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-emerald-950/60 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer group"
-              title="診断結果カードをPDF文書としてダウンロード"
-            >
-              {exportingState === 'pdf' ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin text-emerald-200" />
-                  <span className="text-xs">作成中...</span>
-                </>
-              ) : (
-                <>
-                  <FileDown className="w-4 h-4 text-emerald-200 group-hover:scale-110 transition-transform shrink-0" />
-                  <span>PDFでダウンロード</span>
-                </>
-              )}
-            </button>
-          </div>
-        </div>
+        <ShareButtonGroup
+          onShareX={handleShareX}
+          onShareLine={handleShareLine}
+          onSaveImage={handleSaveImage}
+          onShareNative={handleShareNative}
+          onSavePdf={handleSavePdf}
+          isExportingImage={exportingState === 'image'}
+          isExportingPdf={exportingState === 'pdf'}
+          isExportingAny={exportingState !== 'idle'}
+          title="診断結果をシェア・保存"
+          subtitle="SNS対応 ＆ 高画質保存"
+        />
 
         {/* ======================================================== */}
         {/* キャプチャ対象エリア (ユーザーの診断結果カード群) */}
@@ -457,34 +628,8 @@ export default function ResultScreen({
               ))}
             </div>
 
-            {/* シェアボタン (X / 旧Twitter) */}
-            <div className="mt-6">
-              <button
-                onClick={handleShare}
-                className="w-full relative group overflow-hidden rounded-2xl p-[1px] shadow-xl shadow-sky-950/60 transition-all duration-300 active:scale-[0.98] cursor-pointer"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-[#1D9BF0] via-[#6366F1] to-[#EC4899] rounded-2xl transition-all duration-300 group-hover:opacity-100 opacity-90 group-hover:scale-105" />
-                <div className="relative flex items-center justify-center gap-2.5 py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[#141b2d]/90 via-[#182038]/80 to-[#1b1c35]/90 group-hover:bg-opacity-40 text-white font-bold text-sm transition-all">
-                  {copied ? (
-                    <>
-                      <Check className="w-4 h-4 text-emerald-300 animate-bounce" />
-                      <span className="text-emerald-200">X投稿画面を開きました！（文言コピー完了🕊️）</span>
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-4 h-4 fill-white transition-transform group-hover:rotate-12 group-hover:scale-110 shrink-0" viewBox="0 0 24 24">
-                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                      </svg>
-                      <span className="tracking-wide">診断結果をX（旧Twitter）でシェアする</span>
-                      <Sparkles className="w-3.5 h-3.5 text-amber-300 opacity-80 group-hover:opacity-100 transition-opacity shrink-0" />
-                    </>
-                  )}
-                </div>
-              </button>
-            </div>
-
             {/* 4軸の内訳アコーディオン */}
-            <div className="mt-4 pt-4 border-t border-slate-800/80">
+            <div className="mt-5 pt-4 border-t border-slate-800/80">
               <button
                 onClick={() => setShowAxesDetail(!showAxesDetail)}
                 className="w-full flex items-center justify-between text-xs text-slate-400 hover:text-slate-200 transition-colors py-1 cursor-pointer"
@@ -674,52 +819,20 @@ export default function ResultScreen({
         </div>
 
         {/* ======================================================== */}
-        {/* ダウンロード ＆ 保存アクションカード (下部リピート) */}
+        {/* ダウンロード ＆ SNSシェアカード (下部リピート) */}
         {/* ======================================================== */}
-        <div className="rounded-3xl bg-gradient-to-b from-[#1C2339] to-[#121625] border border-slate-700/70 p-4 shadow-xl space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-white tracking-wide">診断カルテを保存</span>
-            <span className="text-[10px] text-slate-400">いつでも見返せます</span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2.5">
-            <button
-              onClick={handleSaveImage}
-              disabled={exportingState !== 'idle'}
-              className="flex items-center justify-center gap-2 py-3 px-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-indigo-950/60 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-            >
-              {exportingState === 'image' ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin text-indigo-200" />
-                  <span className="text-xs">作成中...</span>
-                </>
-              ) : (
-                <>
-                  <ImageIcon className="w-4 h-4 text-indigo-200 shrink-0" />
-                  <span>画像として保存</span>
-                </>
-              )}
-            </button>
-
-            <button
-              onClick={handleSavePdf}
-              disabled={exportingState !== 'idle'}
-              className="flex items-center justify-center gap-2 py-3 px-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-emerald-950/60 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-            >
-              {exportingState === 'pdf' ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin text-emerald-200" />
-                  <span className="text-xs">作成中...</span>
-                </>
-              ) : (
-                <>
-                  <FileDown className="w-4 h-4 text-emerald-200 shrink-0" />
-                  <span>PDFでダウンロード</span>
-                </>
-              )}
-            </button>
-          </div>
-        </div>
+        <ShareButtonGroup
+          onShareX={handleShareX}
+          onShareLine={handleShareLine}
+          onSaveImage={handleSaveImage}
+          onShareNative={handleShareNative}
+          onSavePdf={handleSavePdf}
+          isExportingImage={exportingState === 'image'}
+          isExportingPdf={exportingState === 'pdf'}
+          isExportingAny={exportingState !== 'idle'}
+          title="診断カルテを保存・友だちに送る"
+          subtitle="いつでも見返せます"
+        />
 
         {/* ======================================================== */}
         {/* 4. メンタルケア・行動アドバイス */}

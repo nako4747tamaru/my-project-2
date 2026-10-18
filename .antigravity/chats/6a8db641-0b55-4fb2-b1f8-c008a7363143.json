@@ -100,6 +100,30 @@
       "created_at": "2026-10-18T21:45:23.061Z",
       "sender": "ios",
       "is_cancelled": false
+    },
+    {
+      "id": "9ef026b0-63ec-4884-963f-6c54b3f6c6da",
+      "role": "agent",
+      "content": "診断結果画面（[`ResultScreen.tsx`](https://github.com/nako4747tamaru/my-project-2/blob/main/components/result/ResultScreen.tsx)）に、診断結果を**画像（PNG）**および**PDF**としてダウンロード・保存できる機能の実装が完了しました。\n\n---\n\n### 実装内容の概要\n\n#### 1. 機能・実装\n- **診断結果カルテのキャプチャ保存**:\n  - MBTI 16タイプ（診断名、フクロウマスコット、キャッチフレーズ、4軸バランス）\n  - メンタル疲弊度メーター（元気〜要休息 5段階）\n  - 新規実装した**認知の歪み7パターン レーダーチャート**（7角形SVG）およびスコア一覧\n  - 公式診断カルテのヘッダー・フッター\n  これらを1枚の整った診断シートとして高精細（2xスケール）でキャプチャし、ダウンロードできます。\n- **標準ライブラリの導入**:\n  - `html2canvas` および `jspdf` を導入し、クリック時に動的ロード（ダイナミックインポート）することでSSRエラーを防止し、初期読み込みパフォーマンスを維持しています。\n- **直感的なダウンロードボタン**:\n  - 「画像として保存（PNG）」と「PDFでダウンロード」の2つのボタンを、スマートフォン・PCのどちらでもタップしやすいサイズとアイコン付きグラデーションデザインで配置しました。\n\n#### 2. UI / UXの配慮\n- **連打防止・ローディング表示**:\n  - 処理中はボタンが自動的に `disabled` になり、スピナー（`Loader2`）と「作成中...」表示に切り替わります。\n  - 画面全体に「保存画像を作成中...」「PDFを生成中...」の半透明オーバーレイを表示し、レンダリング中の誤タップや連続クリックを防止します。\n  - 保存完了時には緑色の成功トースト通知（3.5秒間）を表示します。\n- **ダークテーマの最適化**:\n  - `html2canvas` 描画時に背景が白抜けしたり文字が読めなくなる問題を防ぐため、要素およびキャプチャオプションに背景色 `#0C101C` を明示。\n  - レーダーチャート（[`DistortionRadarChart.tsx`](https://github.com/nako4747tamaru/my-project-2/blob/main/components/result/DistortionRadarChart.tsx)）はhtml2canvasとの互換性を高めたSVG設計にしており、ダークモードのグラデーションやフォントが崩れず鮮明に出力されます。\n\n#### 3. 品質検証\n- 型チェック（`npx tsc --noEmit`）：**エラーゼロでパス**\n- プロダクションビルド（`next build`）：**正常完了**\n\n変更内容は自動的にGitHubリポジトリ（`nako4747tamaru/my-project-2`）へ保存・反映されます。",
+      "status": "completed",
+      "model": "auto",
+      "client_type": "gemini-bridge",
+      "parent_message_id": "0a9f567e-181f-4d68-a44f-2bd55668b176",
+      "created_at": "2026-10-18T21:51:13.202Z",
+      "sender": "macOS",
+      "is_cancelled": false
+    },
+    {
+      "id": "4359ffab-574d-4796-8a34-4292610f2fa2",
+      "role": "user",
+      "content": "`components/result/ResultScreen.tsx` のシェア・保存機能を、現代のSNSトレンド（X・LINE・Instagram・TikTok対応）に合わせて大幅に強化・実装してください。\n\n【1. シェア・保存機能の拡充】\n1. **X（旧Twitter）シェアボタン**:\n   - 診断結果（タイプ名、キャッチコピー、ハッシュタグ）が自動入力されるインテントリンク。\n2. **LINEで送るボタン**:\n   - LINE公式の共有URL（`https://social-plugins.line.me/lineit/share?url=...`）を使い、トークやタイムラインに一発でシェアできるボタン。\n3. **「結果カードを画像として保存」ボタン（Instagram・TikTok・保存用）**:\n   - 診断結果のメインカード部分を綺麗に画像（PNG）としてスマホやPCにダウンロードできる機能（`html2canvas`等を使用）。\n   - 「インスタのストーリーに載せる用」「TikTokや保存用に画像を保存！」ということが直感的に分かるラベルやアイコン（カメラ/ダウンロードアイコン）を配置。\n4. **スマホ標準の共有（Web Share API / その他）**:\n   - `navigator.share` を活用し、その他のSNSやクリップボードコピーへシームレスに繋げるボタン。\n\n【2. UI/UXのデザイン調整】\n- 各シェア・保存ボタンがスマホ画面で窮屈にならないよう、2×2のグリッド配置または綺麗に並んだボタングループにデザインしてください。\n- 押しやすさ（タップ領域の確保）と、ダークテーマに映えるグラデーションやカラーリング（LINEの緑、Xの黒/白など）を意識してください。\n- 保存処理中のローディング表示や、コピー完了時の「リンクをコピーしました！」といったトースト通知を実装してください。\n\n【3. 品質管理】\n- 変更適用後、型チェック（`npx tsc --noEmit`）およびビルド検証（`next build`）を実行し、エラーが出ない状態で自動保存・コミット（GitHubへプッシュ）してください。",
+      "status": "pending",
+      "model": "auto",
+      "client_type": "gemini-bridge",
+      "parent_message_id": null,
+      "created_at": "2026-10-18T21:55:31.994Z",
+      "sender": "ios",
+      "is_cancelled": false
     }
   ]
 }
