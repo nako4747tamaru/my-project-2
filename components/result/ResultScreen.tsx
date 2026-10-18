@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import {
   Lock,
   Sparkles,
@@ -20,6 +20,9 @@ import {
   ShieldCheck,
   CheckCircle2,
   BookOpen,
+  Image as ImageIcon,
+  FileDown,
+  Loader2,
 } from 'lucide-react';
 
 import { QUESTIONS as defaultQuestions } from '../../lib/questions';
@@ -31,6 +34,7 @@ import {
   Question,
 } from '../../lib/personality';
 import OwlMascot from '../common/OwlMascot';
+import DistortionRadarChart from './DistortionRadarChart';
 
 export interface ResultScreenProps {
   /** ユーザーのニックネーム */
@@ -103,7 +107,15 @@ export default function ResultScreen({
 
   const [unlocked, setUnlocked] = useState(isPremiumUnlocked);
   const [copied, setCopied] = useState(false);
-  const [showAxesDetail, setShowAxesDetail] = useState(false);
+  const [showAxesDetail, setShowAxesDetail] = useState(true);
+
+  // 画像 / PDF 保存用のステート
+  const [exportingState, setExportingState] = useState<'idle' | 'image' | 'pdf'>('idle');
+  const [exportSuccessMessage, setExportSuccessMessage] = useState<string | null>(null);
+  const [exportErrorMessage, setExportErrorMessage] = useState<string | null>(null);
+
+  // キャプチャ対象エリアの参照
+  const captureCardRef = useRef<HTMLDivElement>(null);
 
   // Stripe決済ボタンハンドラー
   const handleCheckout = () => {
@@ -150,6 +162,107 @@ export default function ResultScreen({
     }
   };
 
+  // キャプチャ実行ヘルパー関数
+  const executeCapture = async (): Promise<HTMLCanvasElement | null> => {
+    if (!captureCardRef.current) return null;
+
+    // 動的インポート（SSR対策＆初期バンドルサイズ軽量化）
+    const html2canvas = (await import('html2canvas')).default;
+
+    const element = captureCardRef.current;
+    const canvas = await html2canvas(element, {
+      scale: 2, // 高解像度（Retina）
+      useCORS: true,
+      logging: false,
+      backgroundColor: '#0C101C', // ダークテーマ背景色を確実にセット
+      windowWidth: element.scrollWidth,
+    });
+
+    return canvas;
+  };
+
+  // ファイル名生成（安全な文字列）
+  const getSafeFileName = (extension: string) => {
+    const cleanName = (userName || 'result').replace(/[/\\?%*:|"<>]/g, '_');
+    const dateStr = new Date().toISOString().slice(0, 10);
+    return `kokoro-navi-${cleanName}-${result.type}-${dateStr}.${extension}`;
+  };
+
+  // 画像（PNG）として保存
+  const handleSaveImage = async () => {
+    if (exportingState !== 'idle') return;
+    try {
+      setExportingState('image');
+      setExportErrorMessage(null);
+
+      // DOM更新とレンダリング準備のためのマイクロウェイト
+      await new Promise((r) => setTimeout(r, 120));
+
+      const canvas = await executeCapture();
+      if (!canvas) throw new Error('キャプチャ対象が見つかりませんでした');
+
+      const dataUrl = canvas.toDataURL('image/png', 1.0);
+      const link = document.createElement('a');
+      link.download = getSafeFileName('png');
+      link.href = dataUrl;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      setExportSuccessMessage('診断結果カード（PNG画像）を保存しました！');
+      setTimeout(() => setExportSuccessMessage(null), 3500);
+    } catch (err) {
+      console.error('Failed to export image:', err);
+      setExportErrorMessage('画像の保存に失敗しました。もう一度お試しください。');
+      setTimeout(() => setExportErrorMessage(null), 3500);
+    } finally {
+      setExportingState('idle');
+    }
+  };
+
+  // PDFとしてダウンロード
+  const handleSavePdf = async () => {
+    if (exportingState !== 'idle') return;
+    try {
+      setExportingState('pdf');
+      setExportErrorMessage(null);
+
+      // DOM更新とレンダリング準備のためのマイクロウェイト
+      await new Promise((r) => setTimeout(r, 120));
+
+      const canvas = await executeCapture();
+      if (!canvas) throw new Error('キャプチャ対象が見つかりませんでした');
+
+      const { jsPDF } = await import('jspdf');
+
+      const imgData = canvas.toDataURL('image/png');
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+
+      // A4幅 210mm を基準に、カードの縦横比に応じた高さを算出
+      const pdfWidth = 210;
+      const pdfHeight = (imgHeight * pdfWidth) / imgWidth;
+
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: [pdfWidth, pdfHeight],
+      });
+
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+      pdf.save(getSafeFileName('pdf'));
+
+      setExportSuccessMessage('診断結果カード（PDF）をダウンロードしました！');
+      setTimeout(() => setExportSuccessMessage(null), 3500);
+    } catch (err) {
+      console.error('Failed to export PDF:', err);
+      setExportErrorMessage('PDFの作成に失敗しました。もう一度お試しください。');
+      setTimeout(() => setExportErrorMessage(null), 3500);
+    } finally {
+      setExportingState('idle');
+    }
+  };
+
   const topDistortion = result.topDistortions[0];
 
   // 疲弊度ゲージのカラー設定 (1〜5)
@@ -177,7 +290,7 @@ export default function ResultScreen({
             {onRetest && (
               <button
                 onClick={onRetest}
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-slate-800/90 hover:bg-slate-700 text-xs text-slate-300 hover:text-white transition-colors border border-slate-700/60"
+                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-slate-800/90 hover:bg-slate-700 text-xs text-slate-300 hover:text-white transition-colors border border-slate-700/60 cursor-pointer"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>再診断</span>
@@ -194,208 +307,422 @@ export default function ResultScreen({
         </p>
       </div>
 
-      <main className="max-w-md mx-auto px-4 py-4 space-y-5">
+      <main className="max-w-md mx-auto px-4 py-3 space-y-5">
         {/* ======================================================== */}
-        {/* 1. MBTI 16タイプカード (Screenshot 4のメインカード) */}
+        {/* ダウンロード ＆ 保存アクションカード (上部クイックアクセス) */}
         {/* ======================================================== */}
-        <section className="relative rounded-3xl bg-gradient-to-b from-[#1C2339] via-[#161C2E] to-[#121625] border border-slate-700/60 shadow-2xl p-6 text-center overflow-hidden">
-          {/* 上部ヘッダー（グループバッジ ＆ スライドインジケータ） */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-1.5 text-xs text-slate-400 px-2 py-1 rounded-md bg-slate-800/50">
-              <Layers className="w-3.5 h-3.5 text-slate-400" />
-              <span>1 / 1</span>
+        <div className="rounded-3xl bg-gradient-to-b from-[#1C2339] to-[#121625] border border-slate-700/70 p-4 shadow-xl space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-amber-300" />
+              <span className="text-xs font-bold text-white tracking-wide">診断結果を保存・共有</span>
             </div>
-
-            <div className="inline-flex items-center px-3 py-1 rounded-full bg-[#3B2D6B] border border-purple-500/30 text-purple-200 text-xs font-semibold tracking-wide shadow-sm">
-              <span>{result.info.group || '分析家グループ'}</span>
-            </div>
-
-            <div className="w-8" />
+            <span className="text-[10px] text-slate-400">画像・PDF出力対応</span>
           </div>
 
-          {/* フクロウマスコット */}
-          <div className="flex justify-center my-2">
-            <div className="p-2 rounded-full bg-gradient-to-b from-[#2B3454] to-[#1B2238] border-2 border-indigo-400/40 shadow-lg shadow-indigo-950/50">
-              <OwlMascot size={72} />
-            </div>
-          </div>
-
-          {/* 診断タイプ表示 */}
-          <div className="mt-2 space-y-1">
-            <p className="text-xs text-slate-400 font-medium tracking-wide">
-              {userName}さんの診断タイプ
-            </p>
-            <h1 className="text-5xl font-black tracking-wider text-white">
-              {result.type}
-            </h1>
-            <p className="text-xl font-bold text-slate-200">
-              {result.info.shortName || result.title}
-            </p>
-          </div>
-
-          {/* キャッチフレーズ */}
-          <div className="mt-3.5 inline-block max-w-full">
-            <div className="px-4 py-1.5 rounded-full bg-[#242C44]/80 border border-slate-700/60 text-xs sm:text-sm text-slate-300 font-medium">
-              {result.catchphrase}
-            </div>
-          </div>
-
-          {/* 説明文 */}
-          <p className="mt-4 text-xs sm:text-sm text-slate-300 leading-relaxed text-left bg-slate-900/40 p-4 rounded-2xl border border-slate-800/60">
-            {result.description}
-          </p>
-
-          {/* タグリスト */}
-          <div className="mt-4 flex flex-wrap gap-2 justify-center">
-            {(result.info.tags || ['#分析力', '#独創性', '#客観性']).map((tag, idx) => (
-              <span
-                key={idx}
-                className="text-xs px-3 py-1 rounded-full bg-[#20273D] text-slate-300 border border-slate-700/70 font-medium"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-
-          {/* シェアボタン (X / 旧Twitter) */}
-          <div className="mt-6">
+          <div className="grid grid-cols-2 gap-2.5">
+            {/* 画像として保存ボタン */}
             <button
-              onClick={handleShare}
-              className="w-full relative group overflow-hidden rounded-2xl p-[1px] shadow-xl shadow-sky-950/60 transition-all duration-300 active:scale-[0.98] cursor-pointer"
+              onClick={handleSaveImage}
+              disabled={exportingState !== 'idle'}
+              className="flex items-center justify-center gap-2 py-3 px-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-indigo-950/60 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer group"
+              title="診断結果カードをPNG画像として保存"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-[#1D9BF0] via-[#6366F1] to-[#EC4899] rounded-2xl transition-all duration-300 group-hover:opacity-100 opacity-90 group-hover:scale-105" />
-              <div className="relative flex items-center justify-center gap-2.5 py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[#141b2d]/90 via-[#182038]/80 to-[#1b1c35]/90 group-hover:bg-opacity-40 text-white font-bold text-sm transition-all">
-                {copied ? (
-                  <>
-                    <Check className="w-4 h-4 text-emerald-300 animate-bounce" />
-                    <span className="text-emerald-200">X投稿画面を開きました！（文言コピー完了🕊️）</span>
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-4 h-4 fill-white transition-transform group-hover:rotate-12 group-hover:scale-110" viewBox="0 0 24 24">
-                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                    </svg>
-                    <span className="tracking-wide">診断結果をX（旧Twitter）でシェアする</span>
-                    <Sparkles className="w-3.5 h-3.5 text-amber-300 opacity-80 group-hover:opacity-100 transition-opacity" />
-                  </>
-                )}
+              {exportingState === 'image' ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin text-indigo-200" />
+                  <span className="text-xs">作成中...</span>
+                </>
+              ) : (
+                <>
+                  <ImageIcon className="w-4 h-4 text-indigo-200 group-hover:scale-110 transition-transform shrink-0" />
+                  <span>画像として保存</span>
+                </>
+              )}
+            </button>
+
+            {/* PDFでダウンロードボタン */}
+            <button
+              onClick={handleSavePdf}
+              disabled={exportingState !== 'idle'}
+              className="flex items-center justify-center gap-2 py-3 px-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-emerald-950/60 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer group"
+              title="診断結果カードをPDF文書としてダウンロード"
+            >
+              {exportingState === 'pdf' ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin text-emerald-200" />
+                  <span className="text-xs">作成中...</span>
+                </>
+              ) : (
+                <>
+                  <FileDown className="w-4 h-4 text-emerald-200 group-hover:scale-110 transition-transform shrink-0" />
+                  <span>PDFでダウンロード</span>
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* ======================================================== */}
+        {/* キャプチャ対象エリア (ユーザーの診断結果カード群) */}
+        {/* MBTIタイプ、認知の歪みスコア、レーダーチャート、疲弊度等を含む */}
+        {/* ======================================================== */}
+        <div
+          ref={captureCardRef}
+          id="diagnostic-result-capture-area"
+          className="space-y-5 rounded-3xl bg-[#0C101C] p-0.5"
+          style={{ backgroundColor: '#0C101C', color: '#F1F5F9' }}
+        >
+          {/* キャプチャ画像用公式ヘッダーバナー */}
+          <div className="rounded-2xl bg-gradient-to-r from-[#1E1B4B]/95 via-[#2A164D]/90 to-[#181F33]/95 border border-indigo-500/40 p-3.5 flex items-center justify-between text-xs shadow-md">
+            <div className="flex items-center gap-2.5">
+              <div className="p-1.5 rounded-xl bg-indigo-950 border border-indigo-400/50 shadow-inner">
+                <OwlMascot size={28} />
               </div>
-            </button>
+              <div>
+                <p className="font-extrabold text-white text-xs tracking-wide flex items-center gap-1.5">
+                  ココロナビ 診断カルテ
+                  <span className="text-[10px] px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-300 font-normal">公式</span>
+                </p>
+                <p className="text-[10px] text-indigo-300/90">100問の対話で導く心と性格の取扱説明書</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <span className="inline-block px-2.5 py-0.5 rounded-full bg-indigo-950 text-indigo-200 border border-indigo-700/80 text-[10px] font-bold">
+                {userName} さん
+              </span>
+              <p className="text-[9px] text-slate-400 mt-0.5">100問回答完了済み</p>
+            </div>
           </div>
 
-          {/* 4軸の内訳アコーディオン */}
-          <div className="mt-4 pt-4 border-t border-slate-800/80">
-            <button
-              onClick={() => setShowAxesDetail(!showAxesDetail)}
-              className="w-full flex items-center justify-between text-xs text-slate-400 hover:text-slate-200 transition-colors py-1 cursor-pointer"
-            >
-              <span className="flex items-center gap-1.5 font-medium">
-                <Compass className="w-3.5 h-3.5 text-indigo-400" />
-                4軸のバランス詳細を表示
-              </span>
-              {showAxesDetail ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-            </button>
+          {/* ======================================================== */}
+          {/* 1. MBTI 16タイプカード */}
+          {/* ======================================================== */}
+          <section className="relative rounded-3xl bg-gradient-to-b from-[#1C2339] via-[#161C2E] to-[#121625] border border-slate-700/60 shadow-2xl p-6 text-center overflow-hidden">
+            {/* 上部ヘッダー（グループバッジ ＆ スライドインジケータ） */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-1.5 text-xs text-slate-400 px-2 py-1 rounded-md bg-slate-800/50">
+                <Layers className="w-3.5 h-3.5 text-slate-400" />
+                <span>1 / 1</span>
+              </div>
 
-            {showAxesDetail && (
-              <div className="mt-3 space-y-3 pt-2 text-left animate-fadeIn">
-                {[
-                  { key: 'EI', labelL: 'E 外向', labelR: 'I 内向', data: result.axes.EI },
-                  { key: 'SN', labelL: 'S 感覚', labelR: 'N 直観', data: result.axes.SN },
-                  { key: 'TF', labelL: 'T 思考', labelR: 'F 感情', data: result.axes.TF },
-                  { key: 'JP', labelL: 'J 判断', labelR: 'P 知覚', data: result.axes.JP },
-                ].map(({ key, labelL, labelR, data }) => (
-                  <div key={key} className="space-y-1">
-                    <div className="flex justify-between text-[11px] font-semibold text-slate-300">
-                      <span>{labelL} ({data.percentageA}%)</span>
-                      <span className="text-indigo-400 font-bold">{data.primary}型</span>
-                      <span>{labelR} ({data.percentageB}%)</span>
+              <div className="inline-flex items-center px-3 py-1 rounded-full bg-[#3B2D6B] border border-purple-500/30 text-purple-200 text-xs font-semibold tracking-wide shadow-sm">
+                <span>{result.info.group || '分析家グループ'}</span>
+              </div>
+
+              <div className="w-8" />
+            </div>
+
+            {/* フクロウマスコット */}
+            <div className="flex justify-center my-2">
+              <div className="p-2 rounded-full bg-gradient-to-b from-[#2B3454] to-[#1B2238] border-2 border-indigo-400/40 shadow-lg shadow-indigo-950/50">
+                <OwlMascot size={72} />
+              </div>
+            </div>
+
+            {/* 診断タイプ表示 */}
+            <div className="mt-2 space-y-1">
+              <p className="text-xs text-slate-400 font-medium tracking-wide">
+                {userName}さんの診断タイプ
+              </p>
+              <h1 className="text-5xl font-black tracking-wider text-white">
+                {result.type}
+              </h1>
+              <p className="text-xl font-bold text-slate-200">
+                {result.info.shortName || result.title}
+              </p>
+            </div>
+
+            {/* キャッチフレーズ */}
+            <div className="mt-3.5 inline-block max-w-full">
+              <div className="px-4 py-1.5 rounded-full bg-[#242C44]/80 border border-slate-700/60 text-xs sm:text-sm text-slate-300 font-medium">
+                {result.catchphrase}
+              </div>
+            </div>
+
+            {/* 説明文 */}
+            <p className="mt-4 text-xs sm:text-sm text-slate-300 leading-relaxed text-left bg-slate-900/40 p-4 rounded-2xl border border-slate-800/60">
+              {result.description}
+            </p>
+
+            {/* タグリスト */}
+            <div className="mt-4 flex flex-wrap gap-2 justify-center">
+              {(result.info.tags || ['#分析力', '#独創性', '#客観性']).map((tag, idx) => (
+                <span
+                  key={idx}
+                  className="text-xs px-3 py-1 rounded-full bg-[#20273D] text-slate-300 border border-slate-700/70 font-medium"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+
+            {/* シェアボタン (X / 旧Twitter) */}
+            <div className="mt-6">
+              <button
+                onClick={handleShare}
+                className="w-full relative group overflow-hidden rounded-2xl p-[1px] shadow-xl shadow-sky-950/60 transition-all duration-300 active:scale-[0.98] cursor-pointer"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-[#1D9BF0] via-[#6366F1] to-[#EC4899] rounded-2xl transition-all duration-300 group-hover:opacity-100 opacity-90 group-hover:scale-105" />
+                <div className="relative flex items-center justify-center gap-2.5 py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[#141b2d]/90 via-[#182038]/80 to-[#1b1c35]/90 group-hover:bg-opacity-40 text-white font-bold text-sm transition-all">
+                  {copied ? (
+                    <>
+                      <Check className="w-4 h-4 text-emerald-300 animate-bounce" />
+                      <span className="text-emerald-200">X投稿画面を開きました！（文言コピー完了🕊️）</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4 fill-white transition-transform group-hover:rotate-12 group-hover:scale-110 shrink-0" viewBox="0 0 24 24">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                      </svg>
+                      <span className="tracking-wide">診断結果をX（旧Twitter）でシェアする</span>
+                      <Sparkles className="w-3.5 h-3.5 text-amber-300 opacity-80 group-hover:opacity-100 transition-opacity shrink-0" />
+                    </>
+                  )}
+                </div>
+              </button>
+            </div>
+
+            {/* 4軸の内訳アコーディオン */}
+            <div className="mt-4 pt-4 border-t border-slate-800/80">
+              <button
+                onClick={() => setShowAxesDetail(!showAxesDetail)}
+                className="w-full flex items-center justify-between text-xs text-slate-400 hover:text-slate-200 transition-colors py-1 cursor-pointer"
+              >
+                <span className="flex items-center gap-1.5 font-medium">
+                  <Compass className="w-3.5 h-3.5 text-indigo-400" />
+                  4軸のバランス詳細（MBTI）
+                </span>
+                {showAxesDetail ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </button>
+
+              {showAxesDetail && (
+                <div className="mt-3 space-y-3 pt-2 text-left animate-fadeIn">
+                  {[
+                    { key: 'EI', labelL: 'E 外向', labelR: 'I 内向', data: result.axes.EI },
+                    { key: 'SN', labelL: 'S 感覚', labelR: 'N 直観', data: result.axes.SN },
+                    { key: 'TF', labelL: 'T 思考', labelR: 'F 感情', data: result.axes.TF },
+                    { key: 'JP', labelL: 'J 判断', labelR: 'P 知覚', data: result.axes.JP },
+                  ].map(({ key, labelL, labelR, data }) => (
+                    <div key={key} className="space-y-1">
+                      <div className="flex justify-between text-[11px] font-semibold text-slate-300">
+                        <span>{labelL} ({data.percentageA}%)</span>
+                        <span className="text-indigo-400 font-bold">{data.primary}型</span>
+                        <span>{labelR} ({data.percentageB}%)</span>
+                      </div>
+                      <div className="h-2 rounded-full bg-slate-800 overflow-hidden flex">
+                        <div
+                          className="h-full bg-gradient-to-r from-indigo-500 to-purple-500"
+                          style={{ width: `${data.percentageA}%` }}
+                        />
+                        <div
+                          className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
+                          style={{ width: `${data.percentageB}%` }}
+                        />
+                      </div>
                     </div>
-                    <div className="h-2 rounded-full bg-slate-800 overflow-hidden flex">
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* ======================================================== */}
+          {/* 2. メンタル疲弊度メーターカード */}
+          {/* ======================================================== */}
+          <section className="rounded-3xl bg-gradient-to-b from-[#181F33] to-[#121625] border border-slate-700/60 p-5 sm:p-6 shadow-xl space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs font-bold text-slate-300">
+                <Activity className="w-4 h-4 text-emerald-400" />
+                <span>メンタル疲弊度</span>
+              </div>
+              <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-medium">
+                充電状態チェック
+              </span>
+            </div>
+
+            {/* タイトル ＆ スコア */}
+            <div className="flex items-baseline justify-between pt-1">
+              <h2 className="text-2xl font-black text-white tracking-tight">
+                {result.fatigue.title}
+              </h2>
+              <div className="flex items-baseline gap-1">
+                <span className="text-2xl font-black text-slate-100">{result.fatigue.level}</span>
+                <span className="text-sm text-slate-400 font-bold">/ 5</span>
+              </div>
+            </div>
+
+            {/* 5分割カラーゲージ */}
+            <div className="space-y-1.5 pt-1">
+              <div className="grid grid-cols-5 gap-2">
+                {GAUGE_COLORS.map((g) => {
+                  const isSelected = g.level === result.fatigue.level;
+                  const isPassed = g.level <= result.fatigue.level;
+                  return (
+                    <div key={g.level} className="flex flex-col items-center gap-1.5">
                       <div
-                        className="h-full bg-gradient-to-r from-indigo-500 to-purple-500"
-                        style={{ width: `${data.percentageA}%` }}
+                        className={`w-full h-3 rounded-full transition-all duration-300 ${g.bg} ${
+                          isSelected
+                            ? 'ring-2 ring-white ring-offset-2 ring-offset-[#181F33] scale-105 opacity-100'
+                            : isPassed
+                            ? 'opacity-80'
+                            : 'opacity-25'
+                        }`}
                       />
+                      <span
+                        className={`text-[10px] font-bold ${
+                          isSelected ? 'text-white' : 'text-slate-500'
+                        }`}
+                      >
+                        {g.level}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* 左右ラベル */}
+              <div className="flex justify-between text-[11px] text-slate-400 font-medium px-1">
+                <span>元気</span>
+                <span>要休息</span>
+              </div>
+            </div>
+
+            {/* メッセージバブル */}
+            <div className="mt-3 p-3.5 rounded-2xl bg-slate-900/60 border border-slate-800/80 text-xs sm:text-sm text-slate-300 leading-relaxed">
+              {result.fatigue.message}
+            </div>
+          </section>
+
+          {/* ======================================================== */}
+          {/* 3. 認知の歪みスコア ＆ レーダーチャートカード */}
+          {/* ======================================================== */}
+          <section className="rounded-3xl bg-gradient-to-b from-[#181F33] to-[#121625] border border-slate-700/60 p-5 sm:p-6 shadow-xl space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs font-bold text-slate-300">
+                <Sparkles className="w-4 h-4 text-purple-400" />
+                <span>認知の歪みスコア ＆ レーダーチャート</span>
+              </div>
+              <span className="text-[11px] px-2 py-0.5 rounded-full bg-purple-950 text-purple-300 border border-purple-800/60 font-medium">
+                7パターン総合分析
+              </span>
+            </div>
+
+            <p className="text-xs text-slate-300 leading-relaxed">
+              日常生活で無意識に発動している「思考の癖」のバランスです。偏りが大きい項目ほどストレスの引き金になりやすい傾向があります。
+            </p>
+
+            {/* レーダーチャート描画エリア */}
+            <div className="py-2.5 px-1 bg-slate-900/50 rounded-2xl border border-slate-800/80 flex justify-center">
+              <DistortionRadarChart distortions={result.distortions} size={300} />
+            </div>
+
+            {/* 最も顕著な思考癖のピックアップ */}
+            {topDistortion && (
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-[#291E3B] to-[#191D33] border border-rose-500/40 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-rose-300 uppercase tracking-wide flex items-center gap-1.5">
+                    <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
+                    最も出やすい思考の癖
+                  </span>
+                  <span className="text-xs font-mono font-bold text-amber-300 px-2 py-0.5 rounded-full bg-slate-900/60 border border-amber-500/30">
+                    スコア {topDistortion.percentage}%
+                  </span>
+                </div>
+                <h3 className="text-sm font-bold text-white">
+                  {topDistortion.name}
+                </h3>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  {topDistortion.explanation}
+                </p>
+              </div>
+            )}
+
+            {/* 7パターンのスコア一覧ミニバー */}
+            <div className="space-y-2 pt-1">
+              <div className="flex items-center justify-between text-[11px] font-bold text-slate-400">
+                <span>思考癖パターン</span>
+                <span>傾向スコア</span>
+              </div>
+              <div className="space-y-2">
+                {result.distortions.map((d) => (
+                  <div key={d.type} className="flex items-center gap-2 text-xs">
+                    <span className="w-24 text-[11px] text-slate-300 truncate font-medium">
+                      {d.shortName || d.name}
+                    </span>
+                    <div className="flex-1 h-2 rounded-full bg-slate-800 overflow-hidden">
                       <div
-                        className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
-                        style={{ width: `${data.percentageB}%` }}
+                        className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-rose-500"
+                        style={{ width: `${d.percentage}%` }}
                       />
                     </div>
+                    <span className="w-10 text-right font-mono text-[11px] text-amber-300 font-bold">
+                      {d.percentage}%
+                    </span>
                   </div>
                 ))}
               </div>
-            )}
+            </div>
+          </section>
+
+          {/* キャプチャ画像用公式フッタークレジット */}
+          <div className="pt-2 pb-1 text-center text-[10px] text-slate-500 flex items-center justify-between px-3 border-t border-slate-800/60">
+            <span>🦉 ココロナビ KokoroNavi</span>
+            <span>https://kokoronavi.com</span>
+            <span>#ココロナビ #MBTI</span>
           </div>
-        </section>
+        </div>
 
         {/* ======================================================== */}
-        {/* 2. メンタル疲弊度メーターカード (Screenshot 4の下部カード) */}
+        {/* ダウンロード ＆ 保存アクションカード (下部リピート) */}
         {/* ======================================================== */}
-        <section className="rounded-3xl bg-gradient-to-b from-[#181F33] to-[#121625] border border-slate-700/60 p-5 sm:p-6 shadow-xl space-y-4">
+        <div className="rounded-3xl bg-gradient-to-b from-[#1C2339] to-[#121625] border border-slate-700/70 p-4 shadow-xl space-y-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs font-bold text-slate-300">
-              <Activity className="w-4 h-4 text-emerald-400" />
-              <span>メンタル疲弊度</span>
-            </div>
-            <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-medium">
-              無料
-            </span>
+            <span className="text-xs font-bold text-white tracking-wide">診断カルテを保存</span>
+            <span className="text-[10px] text-slate-400">いつでも見返せます</span>
           </div>
 
-          {/* タイトル ＆ スコア */}
-          <div className="flex items-baseline justify-between pt-1">
-            <h2 className="text-2xl font-black text-white tracking-tight">
-              {result.fatigue.title}
-            </h2>
-            <div className="flex items-baseline gap-1">
-              <span className="text-2xl font-black text-slate-100">{result.fatigue.level}</span>
-              <span className="text-sm text-slate-400 font-bold">/ 5</span>
-            </div>
-          </div>
+          <div className="grid grid-cols-2 gap-2.5">
+            <button
+              onClick={handleSaveImage}
+              disabled={exportingState !== 'idle'}
+              className="flex items-center justify-center gap-2 py-3 px-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-indigo-950/60 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            >
+              {exportingState === 'image' ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin text-indigo-200" />
+                  <span className="text-xs">作成中...</span>
+                </>
+              ) : (
+                <>
+                  <ImageIcon className="w-4 h-4 text-indigo-200 shrink-0" />
+                  <span>画像として保存</span>
+                </>
+              )}
+            </button>
 
-          {/* 5分割カラーゲージ */}
-          <div className="space-y-1.5 pt-1">
-            <div className="grid grid-cols-5 gap-2">
-              {GAUGE_COLORS.map((g) => {
-                const isSelected = g.level === result.fatigue.level;
-                const isPassed = g.level <= result.fatigue.level;
-                return (
-                  <div key={g.level} className="flex flex-col items-center gap-1.5">
-                    <div
-                      className={`w-full h-3 rounded-full transition-all duration-300 ${g.bg} ${
-                        isSelected
-                          ? 'ring-2 ring-white ring-offset-2 ring-offset-[#181F33] scale-105 opacity-100'
-                          : isPassed
-                          ? 'opacity-80'
-                          : 'opacity-25'
-                      }`}
-                    />
-                    <span
-                      className={`text-[10px] font-bold ${
-                        isSelected ? 'text-white' : 'text-slate-500'
-                      }`}
-                    >
-                      {g.level}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* 左右ラベル */}
-            <div className="flex justify-between text-[11px] text-slate-400 font-medium px-1">
-              <span>元気</span>
-              <span>要休息</span>
-            </div>
+            <button
+              onClick={handleSavePdf}
+              disabled={exportingState !== 'idle'}
+              className="flex items-center justify-center gap-2 py-3 px-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-emerald-950/60 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            >
+              {exportingState === 'pdf' ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin text-emerald-200" />
+                  <span className="text-xs">作成中...</span>
+                </>
+              ) : (
+                <>
+                  <FileDown className="w-4 h-4 text-emerald-200 shrink-0" />
+                  <span>PDFでダウンロード</span>
+                </>
+              )}
+            </button>
           </div>
-
-          {/* メッセージバブル */}
-          <div className="mt-3 p-3.5 rounded-2xl bg-slate-900/60 border border-slate-800/80 text-xs sm:text-sm text-slate-300 leading-relaxed">
-            {result.fatigue.message}
-          </div>
-        </section>
+        </div>
 
         {/* ======================================================== */}
-        {/* 3. メンタルケア・行動アドバイス (Screenshot 3のカード) */}
+        {/* 4. メンタルケア・行動アドバイス */}
         {/* ======================================================== */}
         <section className="rounded-3xl bg-gradient-to-b from-[#181F33] to-[#121625] border border-slate-700/60 p-5 sm:p-6 shadow-xl space-y-5">
           {/* ヘッダー */}
@@ -498,7 +825,7 @@ export default function ResultScreen({
         </section>
 
         {/* ======================================================== */}
-        {/* 4. 有料エリア（認知の歪み7パターン詳細分析 ＆ モザイク・ロック） */}
+        {/* 5. 有料エリア（認知の歪み7パターン詳細分析 ＆ モザイク・ロック） */}
         {/* ======================================================== */}
         <section className="relative rounded-3xl bg-gradient-to-b from-[#181F33] to-[#121625] border border-slate-700/60 p-5 sm:p-6 shadow-xl overflow-hidden">
           <div className="flex items-center justify-between mb-3">
@@ -711,6 +1038,48 @@ export default function ResultScreen({
           )}
         </section>
       </main>
+
+      {/* ======================================================== */}
+      {/* 処理中ローディング表示（連打・誤操作防止オーバーレイ） */}
+      {/* ======================================================== */}
+      {exportingState !== 'idle' && (
+        <div className="fixed inset-0 z-50 bg-[#0C101C]/85 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-gradient-to-b from-[#1E2538] to-[#141A29] border border-indigo-500/40 rounded-3xl p-6 max-w-xs w-full text-center shadow-2xl space-y-4 animate-fadeIn">
+            <div className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-900/50">
+              <Loader2 className="w-7 h-7 text-white animate-spin" />
+            </div>
+            <div className="space-y-1.5">
+              <h4 className="text-sm font-bold text-white">
+                {exportingState === 'image' ? '保存画像を作成中...' : 'PDFを生成中...'}
+              </h4>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                診断結果カードを高画質でレンダリングしています。完了まで少々お待ちください。
+              </p>
+            </div>
+            <div className="pt-1">
+              <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 animate-pulse w-4/5 rounded-full" />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* 完了・エラートースト通知 */}
+      {/* ======================================================== */}
+      {exportSuccessMessage && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-full bg-emerald-950/95 border border-emerald-500/80 text-emerald-200 text-xs font-bold shadow-xl shadow-emerald-950/50 flex items-center gap-2 animate-fadeIn max-w-[90vw]">
+          <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+          <span className="truncate">{exportSuccessMessage}</span>
+        </div>
+      )}
+      {exportErrorMessage && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-full bg-rose-950/95 border border-rose-500/80 text-rose-200 text-xs font-bold shadow-xl shadow-rose-950/50 flex items-center gap-2 animate-fadeIn max-w-[90vw]">
+          <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+          <span className="truncate">{exportErrorMessage}</span>
+        </div>
+      )}
     </div>
   );
 }
