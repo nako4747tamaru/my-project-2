@@ -280,6 +280,11 @@ export default function ResultScreen({
   const getShareDetails = () => {
     const typeName = result.info.shortName || result.info.name || result.title;
     const distortionSnippet = topDistortion?.name ? `\n🧠 思考の癖傾向: ${topDistortion.name}` : '';
+    const shareUrl =
+      typeof window !== 'undefined'
+        ? window.location.origin || window.location.href
+        : 'https://kokoronavi.com';
+
     const shareText = `＼ ココロナビで心と性格を診断したよ 🦉✨ ／
 
 【${userName}さんの診断結果】
@@ -288,14 +293,10 @@ export default function ResultScreen({
 🌿 メンタル疲弊度: ${result.fatigue.title} (Lv.${result.fatigue.level}/5)${distortionSnippet}
 
 100問の対話で、自分だけの取扱説明書と心の処方箋が届きました💌
-あなたのタイプも診断してみてね👇
+あなたは何タイプ？ここから無料で診断できるよ👇
+${shareUrl}
 
 #ココロナビ #性格診断 #MBTI`;
-
-    const shareUrl =
-      typeof window !== 'undefined'
-        ? window.location.origin || window.location.href
-        : 'https://kokoronavi.com';
 
     return { shareText, shareUrl, typeName };
   };
@@ -365,7 +366,7 @@ export default function ResultScreen({
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
       try {
         await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
-        setExportSuccessMessage('診断結果のリンクと文言をコピーしました！📋');
+        setExportSuccessMessage('診断URLと結果をコピーしました！プロフィールのURLやメッセージに貼ってね📋');
         setTimeout(() => setExportSuccessMessage(null), 3500);
       } catch {
         setExportErrorMessage('クリップボードへのコピーに失敗しました');
@@ -810,11 +811,32 @@ export default function ResultScreen({
             </div>
           </section>
 
-          {/* キャプチャ画像用公式フッタークレジット */}
-          <div className="pt-2 pb-1 text-center text-[10px] text-slate-500 flex items-center justify-between px-3 border-t border-slate-800/60">
-            <span>🦉 ココロナビ KokoroNavi</span>
-            <span>https://kokoronavi.com</span>
-            <span>#ココロナビ #MBTI</span>
+          {/* ======================================================== */}
+          {/* キャプチャ画像用バイラル流入バナー（インスタストーリー・TikTok対応） */}
+          {/* ======================================================== */}
+          <div className="rounded-2xl bg-gradient-to-r from-[#211638] via-[#1A1D33] to-[#121B35] border border-pink-500/40 p-4 text-center shadow-lg space-y-2">
+            <div className="flex items-center justify-center gap-2">
+              <div className="p-1 rounded-lg bg-indigo-950 border border-indigo-400/50 shadow-inner">
+                <OwlMascot size={26} />
+              </div>
+              <span className="text-xs font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-300 via-purple-200 to-indigo-300">
+                ココロナビ KokoroNavi
+              </span>
+            </div>
+
+            <div className="space-y-0.5">
+              <p className="text-xs sm:text-sm font-black text-white tracking-wide">
+                ＼ あなたは何タイプ？ 🦉💭 ／
+              </p>
+              <p className="text-xs text-pink-200 font-bold">
+                プロフィールのURLから診断してみてね！
+              </p>
+            </div>
+
+            <div className="pt-1 flex items-center justify-between text-[10px] text-slate-400 px-1 border-t border-slate-700/50">
+              <span className="font-mono text-indigo-300">kokoronavi.com</span>
+              <span className="font-bold text-slate-300">#ココロナビ #性格診断</span>
+            </div>
           </div>
         </div>
 
