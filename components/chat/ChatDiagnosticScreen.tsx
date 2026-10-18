@@ -25,6 +25,7 @@ interface ChatMessage {
   text: string;
   type?: 'text' | 'question';
   questionIndex?: number;
+  isMilestone?: boolean;
 }
 
 const STORAGE_KEY_ANSWERS = 'kokoro_navi_answers_v2';
@@ -71,12 +72,12 @@ export default function ChatDiagnosticScreen({
         {
           id: 'welcome-1',
           sender: 'mascot',
-          text: 'こんにちは！ ココロナビの案内役、フクロウの「ナビ」だよ🦉',
+          text: 'こんにちは！ ココロナビの案内役、フクロウの「ナビ」だよ🦉✨',
         },
         {
           id: 'welcome-2',
           sender: 'mascot',
-          text: `お帰りなさい、${savedName}さん！ 前回の続き（${safeIdx + 1}問目）から再開するね。肩の力を抜いて、リラックスして進めていこうね🍀`,
+          text: `お帰りなさい、${savedName}さん！待ってたよ🌿\n前回の続き（${safeIdx + 1}問目）から再開するね。焦らず肩の力を抜いて、あなたのペースでゆったり進めていこうね🍀`,
         },
         {
           id: 'welcome-user',
@@ -89,17 +90,17 @@ export default function ChatDiagnosticScreen({
         {
           id: 'welcome-1',
           sender: 'mascot',
-          text: 'こんにちは！ ココロナビの案内役、フクロウの「ナビ」だよ🦉',
+          text: 'こんにちは！ ココロナビへようこそ🦉✨ 案内役のフクロウ「ナビ」だよ。会えて嬉しいな！',
         },
         {
           id: 'welcome-2',
           sender: 'mascot',
-          text: '今日は来てくれてありがとう！ 100問の対話を通して、あなたの16タイプ性格や心のエネルギー、無意識の思考の癖を一緒に解き明かしていくね🌿',
+          text: 'ここでは誰にも気兼ねせず、ありのままのあなたでいて大丈夫だよ。\n100問のやさしい対話を通して、あなたの16タイプ性格や心のエネルギー、無意識の「思考の癖」を一緒に紐解いていこうね🌿',
         },
         {
           id: 'welcome-3',
           sender: 'mascot',
-          text: '途中で画面を閉じても自動で保存されるから安心してね。まずは、あなたのお名前（ニックネーム）を教えてもらえるかな？✨',
+          text: '途中でひと息ついたり画面を閉じても、自動でちゃんと保存されるから安心してね🍵\nまずは、なんて呼んだらいいかニックネームを教えてもらえるかな？✨',
         },
       ]);
     }
@@ -132,7 +133,7 @@ export default function ChatDiagnosticScreen({
       {
         id: `mascot-greeting-${Date.now()}`,
         sender: 'mascot',
-        text: `${trimmed}さん、よろしくね！お話しできてすごく嬉しいな🦉✨\n質問には正解・不正解はないよ。深く考え込みすぎず、「直感」でピンときたものをぽちっと選んでみてね！ さあ、始めよう🌿`,
+        text: `${trimmed}さん、教えてくれてありがとう！お話しできてすごく嬉しいな🦉🎈\n\n質問には正解も不正解もないよ。「こうあるべき」は手放して、直感で「今の自分に近いな」と感じるものをぽちっと選んでみてね。\n\nそれじゃあ、心の探検に出発しよう！🌿`,
       },
     ]);
   };
@@ -165,25 +166,29 @@ export default function ChatDiagnosticScreen({
       newMessages.push({
         id: `milestone-25-${Date.now()}`,
         sender: 'mascot',
-        text: `🎉 25問クリア！ ${targetName}さん、とっても順調だよ！\nまずは1/4達成だね。深呼吸して肩の力を抜いて、あなたのペースでゆったり進めていこうね🍵✨`,
+        isMilestone: true,
+        text: `🎉 25問クリア！ ${targetName}さん、とっても順調だよ！\n\nまずは全体の1/4達成だね。ここまで丁寧に自分と向き合ってくれた自分を、いっぱい褒めてあげよう👏✨\n肩の力を抜いて、温かい飲み物でも飲みながらあなたのペースでゆったり進めていこうね🍵`,
       });
     } else if (nextIndex === 50) {
       newMessages.push({
         id: `milestone-50-${Date.now()}`,
         sender: 'mascot',
-        text: `🌟 50問突破！ ちょうど折り返しの中間地点だよ、すごい集中力だね👏\n${targetName}さんの心の輪郭や個性がだんだん見えてきたよ！ 少し首を回してリフレッシュしながらいこうね🕊️`,
+        isMilestone: true,
+        text: `🌟 50問突破！ わあ、ちょうど折り返しのハーフタイムだよ！すごい集中力だね🦉💫\n\n${targetName}さんの豊かな個性や心のエネルギーが、少しずつ見えてきたよ…！\n軽く深呼吸して、首や肩をぐるっと回してリフレッシュしてみてね。後半もナビがずっとそばで見守っているよ🌿`,
       });
     } else if (nextIndex === 75) {
       newMessages.push({
         id: `milestone-75-${Date.now()}`,
         sender: 'mascot',
-        text: `🎈 75問クリア！ あと1/4でゴールだよ、本当にえらいっ！✨\n${targetName}さんの大切な個性と思考の癖が、もうすぐ詳細レポートになるよ。ラストスパート、楽しんでいこうね🦉🌈`,
+        isMilestone: true,
+        text: `🎈 75問クリア！ いよいよあと25問、ラストスパートだね！本当にえらいっ✨\n\n${targetName}さんの思考の癖や心のコンディションも、かなり深く分析できているよ。\nあなただけの特別な診断レポートまであと一息！最後まで楽しんでいこうね🦉🌈`,
       });
     } else if (nextIndex >= QUESTIONS.length) {
       newMessages.push({
         id: `milestone-100-${Date.now()}`,
         sender: 'mascot',
-        text: `🎊 100問完走お疲れさま！！ 最後まで答えてくれて本当にありがとう💐✨\nいま${targetName}さんの心の状態と16タイプをじっくり分析中だよ…結果レポートを開くね！`,
+        isMilestone: true,
+        text: `🎊 100問完走、本当にお疲れさまでした！！最後までナビとお話ししてくれてありがとう💐✨\n\n${targetName}さんが一生懸命自分と向き合ってくれたこと、ナビはすっごく誇らしいよ。\nいま心の状態と16タイプ、思考の癖を丁寧に紐解いているからね…！さあ、分析結果レポートをお届けするよ🕊️`,
       });
     }
 
@@ -225,17 +230,17 @@ export default function ChatDiagnosticScreen({
         {
           id: 'welcome-1',
           sender: 'mascot',
-          text: 'こんにちは！ ココロナビの案内役、フクロウの「ナビ」だよ🦉',
+          text: 'こんにちは！ ココロナビの案内役、フクロウの「ナビ」だよ🦉✨',
         },
         {
           id: 'welcome-2',
           sender: 'mascot',
-          text: '100問の質問で、あなたの性格タイプと心のコンディションを分析するよ。途中で閉じても続きから再開できるから安心してね。',
+          text: '100問の質問を通して、あなたの16タイプ性格や心のコンディションを一緒に探検しよう！途中で閉じても続きから再開できるから安心してね🌿',
         },
         {
           id: 'welcome-3',
           sender: 'mascot',
-          text: 'まずはニックネームを教えてね✨',
+          text: 'まずは、あなたのお名前（ニックネーム）を教えてね✨',
         },
       ]);
     }
@@ -309,9 +314,20 @@ export default function ChatDiagnosticScreen({
                 ? `進捗: ${currentIndex} / ${QUESTIONS.length} 問回答`
                 : 'READY ニックネーム入力'}
             </span>
-            <span className="font-bold text-purple-300">
-              {isStarted ? `${progressPercent}%` : '0%'}
-            </span>
+            <div className="flex items-center gap-1.5">
+              {isStarted && currentIndex >= 25 && currentIndex < 50 && (
+                <span className="text-[10px] text-amber-300 font-semibold animate-pulse">🌱 順調！</span>
+              )}
+              {isStarted && currentIndex >= 50 && currentIndex < 75 && (
+                <span className="text-[10px] text-emerald-300 font-semibold animate-pulse">🌟 半分突破！</span>
+              )}
+              {isStarted && currentIndex >= 75 && currentIndex < 100 && (
+                <span className="text-[10px] text-purple-300 font-semibold animate-pulse">🎈 あと少し！</span>
+              )}
+              <span className="font-bold text-purple-300">
+                {isStarted ? `${progressPercent}%` : '0%'}
+              </span>
+            </div>
           </div>
           <div className="h-1.5 rounded-full bg-slate-800/80 overflow-hidden">
             <div
@@ -326,6 +342,7 @@ export default function ChatDiagnosticScreen({
       <main className="flex-1 max-w-md w-full mx-auto px-4 py-4 space-y-4 overflow-y-auto">
         {messages.map((m) => {
           const isMascot = m.sender === 'mascot';
+          const isMilestone = Boolean(m.isMilestone);
           return (
             <div
               key={m.id}
@@ -333,15 +350,32 @@ export default function ChatDiagnosticScreen({
                 isMascot ? 'justify-start' : 'justify-end'
               }`}
             >
-              {isMascot && <OwlMascot size={32} className="mt-1" />}
+              {isMascot && (
+                <div className="relative shrink-0">
+                  <OwlMascot size={32} className="mt-1" />
+                  {isMilestone && (
+                    <span className="absolute -top-1 -right-1 text-xs animate-bounce">
+                      ✨
+                    </span>
+                  )}
+                </div>
+              )}
 
               <div
-                className={`max-w-[80%] rounded-2xl px-4 py-3 text-xs sm:text-sm leading-relaxed ${
-                  isMascot
-                    ? 'bg-[#181F33] text-slate-200 border border-slate-700/60 rounded-tl-sm shadow-md'
-                    : 'bg-gradient-to-r from-[#6366F1] to-[#7C3AED] text-white rounded-tr-sm shadow-md font-medium'
+                className={`max-w-[85%] rounded-2xl px-4 py-3 text-xs sm:text-sm leading-relaxed whitespace-pre-line shadow-md ${
+                  isMilestone
+                    ? 'bg-gradient-to-br from-[#25284A] via-[#1D213B] to-[#15192C] text-slate-100 border-2 border-amber-400/50 rounded-tl-sm shadow-amber-950/40 relative overflow-hidden'
+                    : isMascot
+                    ? 'bg-[#181F33] text-slate-200 border border-slate-700/60 rounded-tl-sm'
+                    : 'bg-gradient-to-r from-[#6366F1] to-[#7C3AED] text-white rounded-tr-sm font-medium'
                 }`}
               >
+                {isMilestone && (
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold text-amber-300 mb-1.5 border-b border-amber-400/20 pb-1">
+                    <Sparkles className="w-3 h-3 text-amber-400" />
+                    <span>ナビからの応援メッセージ</span>
+                  </div>
+                )}
                 {m.text}
               </div>
             </div>

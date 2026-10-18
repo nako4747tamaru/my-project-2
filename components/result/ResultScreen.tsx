@@ -116,10 +116,21 @@ export default function ResultScreen({
 
   // シェア機能（X / 旧Twitter 投稿 & クリップボード）
   const handleShare = () => {
-    const typeName = result.info.name || result.info.shortName || result.title;
-    const shareText = `🕊️ ココロナビ 16タイプ性格診断 🕊️\n\n【${userName}さんの診断結果】\n✨ タイプ: ${result.type}（${typeName}）\n💬 「${result.catchphrase}」\n\n心のお疲れ度: ${result.fatigue.title} (Lv.${result.fatigue.level}/5) 🌿\n自分だけの取扱説明書とセルフケアのヒントが見つかりました🦉\n\n#ココロナビ #性格診断 #MBTI`;
+    const typeName = result.info.shortName || result.info.name || result.title;
+    const distortionSnippet = topDistortion?.name ? `\n🧠 思考の癖傾向: ${topDistortion.name}` : '';
+    const shareText = `＼ ココロナビで心と性格を診断したよ 🦉✨ ／
 
-    const shareUrl = typeof window !== 'undefined' ? window.location.href : 'https://kokoronavi.com';
+【${userName}さんの診断結果】
+🕊️ タイプ: ${result.type}（${typeName}）
+💬 「${result.catchphrase}」
+🌿 メンタル疲弊度: ${result.fatigue.title} (Lv.${result.fatigue.level}/5)${distortionSnippet}
+
+100問の対話で、自分だけの取扱説明書と心の処方箋が届きました💌
+あなたのタイプも診断してみてね👇
+
+#ココロナビ #性格診断 #MBTI`;
+
+    const shareUrl = typeof window !== 'undefined' ? window.location.origin || window.location.href : 'https://kokoronavi.com';
     const tweetIntentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
       shareText
     )}&url=${encodeURIComponent(shareUrl)}`;
@@ -250,21 +261,25 @@ export default function ResultScreen({
           <div className="mt-6">
             <button
               onClick={handleShare}
-              className="w-full flex items-center justify-center gap-2.5 py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[#1D9BF0] via-[#6366F1] to-[#8B5CF6] hover:from-[#1A8CD8] hover:via-[#4F46E5] hover:to-[#7C3AED] active:scale-[0.98] text-white font-bold text-sm shadow-xl shadow-indigo-950/60 transition-all cursor-pointer group"
+              className="w-full relative group overflow-hidden rounded-2xl p-[1px] shadow-xl shadow-sky-950/60 transition-all duration-300 active:scale-[0.98] cursor-pointer"
             >
-              {copied ? (
-                <>
-                  <Check className="w-4 h-4 text-emerald-300 animate-bounce" />
-                  <span className="text-emerald-200">X投稿画面を開きました！（文言コピー完了）</span>
-                </>
-              ) : (
-                <>
-                  <svg className="w-4 h-4 fill-white transition-transform group-hover:scale-110" viewBox="0 0 24 24">
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                  </svg>
-                  <span>結果をX（旧Twitter）でシェアする</span>
-                </>
-              )}
+              <div className="absolute inset-0 bg-gradient-to-r from-[#1D9BF0] via-[#6366F1] to-[#EC4899] rounded-2xl transition-all duration-300 group-hover:opacity-100 opacity-90 group-hover:scale-105" />
+              <div className="relative flex items-center justify-center gap-2.5 py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[#141b2d]/90 via-[#182038]/80 to-[#1b1c35]/90 group-hover:bg-opacity-40 text-white font-bold text-sm transition-all">
+                {copied ? (
+                  <>
+                    <Check className="w-4 h-4 text-emerald-300 animate-bounce" />
+                    <span className="text-emerald-200">X投稿画面を開きました！（文言コピー完了🕊️）</span>
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4 fill-white transition-transform group-hover:rotate-12 group-hover:scale-110" viewBox="0 0 24 24">
+                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                    </svg>
+                    <span className="tracking-wide">診断結果をX（旧Twitter）でシェアする</span>
+                    <Sparkles className="w-3.5 h-3.5 text-amber-300 opacity-80 group-hover:opacity-100 transition-opacity" />
+                  </>
+                )}
+              </div>
             </button>
           </div>
 
@@ -492,8 +507,8 @@ export default function ResultScreen({
               <h3 className="text-sm font-bold text-white">認知の歪み7パターン詳細分析 ＆ 自分だけのメンタル処方箋</h3>
             </div>
             {!unlocked ? (
-              <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-500/20 to-purple-500/20 text-amber-300 border border-amber-500/40 font-bold flex items-center gap-1">
-                <Lock className="w-2.5 h-2.5" />
+              <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-500/20 to-purple-500/20 text-amber-300 border border-amber-500/40 font-bold flex items-center gap-1 shadow-sm">
+                <Lock className="w-2.5 h-2.5 text-amber-400" />
                 PREMIUM
               </span>
             ) : (
@@ -509,7 +524,7 @@ export default function ResultScreen({
           </p>
 
           {/* 歪みスコア一覧（ロック時はぼかし表示） */}
-          <div className={`space-y-3 transition-all ${!unlocked ? 'filter blur-[6px] select-none pointer-events-none' : ''}`}>
+          <div className={`space-y-3 transition-all ${!unlocked ? 'filter blur-[7px] opacity-75 select-none pointer-events-none' : ''}`}>
             {result.distortions.map((d: DistortionScoreItem, idx: number) => {
               const isTop = d.type === topDistortion?.type;
               return (
@@ -587,47 +602,68 @@ export default function ResultScreen({
           {!unlocked && (
             <div className="absolute inset-0 bg-[#0C101C]/88 backdrop-blur-md flex flex-col items-center justify-center p-5 sm:p-6 text-center z-20 overflow-y-auto">
               {/* 初月お試しキャンペーンバッジ */}
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500/20 via-rose-500/20 to-purple-500/20 border border-amber-400/50 text-amber-300 text-[11px] font-bold shadow-md shadow-amber-950/40 mb-3 animate-pulse">
-                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                <span>今なら初月お試しキャンペーン実施中！</span>
+              <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-gradient-to-r from-amber-500/25 via-rose-500/25 to-purple-500/25 border border-amber-400/60 text-amber-200 text-[11px] font-bold shadow-lg shadow-amber-950/50 mb-3 animate-pulse">
+                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                <span>✨ 今なら初月お試しキャンペーン実施中！</span>
               </div>
 
               {/* アイコン */}
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 flex items-center justify-center shadow-xl shadow-rose-950/50 mb-3">
+              <div className="w-13 h-13 rounded-2xl bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 flex items-center justify-center shadow-xl shadow-rose-950/60 mb-3 ring-4 ring-rose-500/20">
                 <Lock className="w-6 h-6 text-white" />
               </div>
 
-              {/* タイトル ＆ キャッチコピー */}
-              <h4 className="text-base sm:text-lg font-black text-white mb-1.5 tracking-tight">
+              {/* タイトル ＆ 温かみのあるキャッチコピー */}
+              <h4 className="text-base sm:text-lg font-black text-white mb-1 tracking-tight">
                 思考の癖をほどく、あなただけのメンタル処方箋
               </h4>
+              <p className="text-xs text-purple-200/90 font-medium mb-2">
+                もう、ひとりで抱え込まなくて大丈夫。
+              </p>
               <p className="text-xs text-slate-300 max-w-sm mb-4 leading-relaxed">
-                頑張りすぎてしまう{userName}さんへ。16タイプ×認知行動療法（CBT）で、モヤモヤ・自己否定をスーッと和らげる完全レポートを解放します。
+                いつも周りのために頑張りすぎてしまう{userName}さんへ。16タイプ×認知行動療法（CBT）のアプローチで、無意識のモヤモヤ・自己否定のループをすーっと和らげる完全レポートを解放します。
               </p>
 
               {/* 得られるメリットの箇条書きカード */}
-              <div className="w-full max-w-sm bg-slate-900/80 border border-slate-700/80 rounded-2xl p-3.5 mb-4 text-left space-y-2.5">
+              <div className="w-full max-w-sm bg-gradient-to-b from-[#182038]/90 to-[#121729]/95 border border-slate-700/80 rounded-2xl p-4 mb-4 text-left space-y-3 shadow-inner">
                 <div className="flex items-start gap-2.5 text-xs text-slate-200">
-                  <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                  <div className="w-5 h-5 rounded-full bg-amber-500/20 border border-amber-400/40 flex items-center justify-center shrink-0 mt-0.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-amber-400" />
+                  </div>
                   <div>
-                    <span className="font-bold text-white">認知の歪み7パターン詳細分析</span>
-                    <p className="text-[11px] text-slate-400">「白黒思考」「心の読みすぎ」など無意識の思考癖を数値化して根本特定</p>
+                    <span className="font-bold text-white text-xs block mb-0.5">
+                      認知の歪み7パターン詳細分析
+                    </span>
+                    <p className="text-[11px] text-slate-400 leading-relaxed">
+                      「白黒思考」「すべき思考」「心の読みすぎ」など無意識の思考癖を精密スコア化。なぜ落ち込んでしまうのか、心のつまずきポイントを根本から特定します。
+                    </p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-2.5 text-xs text-slate-200">
-                  <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                  <div className="w-5 h-5 rounded-full bg-rose-500/20 border border-rose-400/40 flex items-center justify-center shrink-0 mt-0.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-rose-400" />
+                  </div>
                   <div>
-                    <span className="font-bold text-white">1日3分のCBTセルフケアワーク（メンタル処方箋）</span>
-                    <p className="text-[11px] text-slate-400">{result.type}型に特化した専用処方箋で、不安やイライラをその場でリセット</p>
+                    <span className="font-bold text-white text-xs block mb-0.5">
+                      1日3分のCBTセルフケアワーク（メンタル処方箋）
+                    </span>
+                    <p className="text-[11px] text-slate-400 leading-relaxed">
+                      {result.type}型（{result.info.shortName || result.title}）専用の「リフレーミングの問い」と「今日できるアクション」。不安や焦りを感じたその場でサッと心をリセット。
+                    </p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-2.5 text-xs text-slate-200">
-                  <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                  <div className="w-5 h-5 rounded-full bg-purple-500/20 border border-purple-400/40 flex items-center justify-center shrink-0 mt-0.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-purple-400" />
+                  </div>
                   <div>
-                    <span className="font-bold text-white">スキマ時間でできる一生モノの心の取扱説明書</span>
-                    <p className="text-[11px] text-slate-400">スマホでいつでも読み返せて、心が疲れたときの安心のセーフティネットに</p>
+                    <span className="font-bold text-white text-xs block mb-0.5">
+                      一生使えるあなただけの心の取扱説明書
+                    </span>
+                    <p className="text-[11px] text-slate-400 leading-relaxed">
+                      スマホでいつでも読み返せる安心のセーフティネット。人間関係や仕事で疲れたときの心強いお守りになります。
+                    </p>
                   </div>
                 </div>
               </div>
@@ -635,37 +671,39 @@ export default function ResultScreen({
               {/* 高輝度グラデーションCTAボタン */}
               <button
                 onClick={handleCheckout}
-                className="w-full max-w-sm relative group overflow-hidden rounded-2xl p-[1px] shadow-2xl shadow-rose-950/70 transition-transform active:scale-[0.98] cursor-pointer"
+                className="w-full max-w-sm relative group overflow-hidden rounded-2xl p-[2px] shadow-2xl shadow-rose-500/30 hover:shadow-rose-500/50 transition-all duration-300 active:scale-[0.98] cursor-pointer"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-amber-400 via-rose-500 to-indigo-600 rounded-2xl transition-all duration-300 group-hover:scale-105" />
-                <div className="relative px-5 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-rose-600 to-purple-600 text-white font-black flex flex-col items-center justify-center gap-0.5 transition-all group-hover:bg-opacity-90">
+                {/* 背景のアニメーショングラデーション */}
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-400 via-rose-500 to-purple-600 rounded-2xl transition-all duration-300 group-hover:scale-105" />
+                
+                <div className="relative px-5 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-rose-600 to-purple-600 text-white font-black flex flex-col items-center justify-center gap-0.5 transition-all group-hover:bg-opacity-95">
                   <div className="flex items-center gap-2 text-xs sm:text-sm tracking-wide">
-                    <Sparkles className="w-4 h-4 text-amber-200" />
+                    <Sparkles className="w-4 h-4 text-amber-200 animate-pulse" />
                     <span>今すぐ初月お試しで完全レポートを解放する</span>
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                   </div>
                   <span className="text-[10px] text-rose-100 font-medium">
-                    月額980円（初月お試し価格） ・ いつでも解約可能
+                    初月限定 ¥980（1日たった32円） ・ 縛りなし / いつでも解約可能
                   </span>
                 </div>
               </button>
 
               {/* 安心バッジ */}
-              <div className="mt-3 flex items-center justify-center gap-4 text-[10px] text-slate-400">
-                <span className="flex items-center gap-1">
-                  <ShieldCheck className="w-3 h-3 text-emerald-400" />
+              <div className="mt-3 flex items-center justify-center gap-3 text-[10px] text-slate-400 flex-wrap">
+                <span className="flex items-center gap-1 text-slate-300">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
                   いつでも解約OK
                 </span>
                 <span className="text-slate-600">•</span>
-                <span>Stripeセキュア決済</span>
+                <span className="text-slate-300">🔒 Stripeセキュア決済</span>
                 <span className="text-slate-600">•</span>
-                <span>1日約32円</span>
+                <span className="text-slate-300">☕ 1日カフェ1杯以下の自己投資</span>
               </div>
 
               {/* プレビューボタン */}
               <button
                 onClick={() => setUnlocked(true)}
-                className="mt-2.5 text-[10px] text-slate-500 hover:text-slate-300 underline cursor-pointer transition-colors"
+                className="mt-3 text-[11px] text-slate-400 hover:text-slate-200 underline underline-offset-2 cursor-pointer transition-colors"
               >
                 プレビュー（デモ解放で中身を確認）
               </button>
