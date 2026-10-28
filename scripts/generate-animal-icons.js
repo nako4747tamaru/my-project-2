@@ -41,20 +41,15 @@ async function generate() {
         <!-- Inner Decorative Ring -->
         <circle cx="128" cy="128" r="106" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-dasharray="6 6" />
         
-        <!-- Emoji Icon -->
-        <text x="128" y="112" font-size="64" text-anchor="middle" dominant-baseline="central">
+        <!-- Large Animal Emoji Icon (タイプ名は完全削除し、中央の絵文字を拡大) -->
+        <text x="128" y="118" font-size="96" text-anchor="middle" dominant-baseline="central">
           ${item.emoji}
         </text>
         
-        <!-- Type Code -->
-        <text x="128" y="166" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="28" font-weight="900" fill="#FFFFFF" text-anchor="middle" letter-spacing="1.5">
-          ${item.type}
-        </text>
-        
-        <!-- Animal Label Badge -->
+        <!-- Animal Label Badge (下部の動物名ラベルを維持) -->
         <g transform="translate(128, 202)">
-          <rect x="-46" y="-12" width="92" height="24" rx="12" fill="rgba(0,0,0,0.35)" stroke="rgba(255,255,255,0.25)" stroke-width="1" />
-          <text x="0" y="4" font-family="'Hiragino Sans', 'Meiryo', 'Yu Gothic', sans-serif" font-size="13" font-weight="bold" fill="#E2E8F0" text-anchor="middle">
+          <rect x="-48" y="-13" width="96" height="26" rx="13" fill="rgba(0,0,0,0.38)" stroke="rgba(255,255,255,0.25)" stroke-width="1.2" />
+          <text x="0" y="5" font-family="'Hiragino Sans', 'Meiryo', 'Yu Gothic', sans-serif" font-size="14" font-weight="bold" fill="#F1F5F9" text-anchor="middle">
             ${item.label}
           </text>
         </g>
@@ -68,7 +63,7 @@ async function generate() {
 }
 
 generate()
-  .then(() => console.log('Successfully generated all 16 animal icon images!'))
+  .then(() => console.log('Successfully regenerated all 16 animal icon images!'))
   .catch((err) => {
     console.error('Error generating animal icons:', err);
     process.exit(1);
