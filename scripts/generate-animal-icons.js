@@ -41,8 +41,8 @@ async function generate() {
         <!-- Inner Decorative Ring -->
         <circle cx="128" cy="128" r="106" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-dasharray="6 6" />
         
-        <!-- Large Animal Emoji Icon (タイプ名は完全削除し、中央の絵文字を拡大) -->
-        <text x="128" y="118" font-size="96" text-anchor="middle" dominant-baseline="central">
+        <!-- Large Animal Emoji Icon (アイコン真中心に配置) -->
+        <text x="128" y="127" font-size="96" text-anchor="middle" dominant-baseline="central">
           ${item.emoji}
         </text>
         
