@@ -34,6 +34,7 @@ import {
   Question,
 } from '../../lib/personality';
 import OwlMascot from '../common/OwlMascot';
+import TypeAnimalIcon from './TypeAnimalIcon';
 import DistortionRadarChart from './DistortionRadarChart';
 import LegalModal, { LegalTab } from '../common/LegalModal';
 import LegalFooter from '../common/LegalFooter';
@@ -591,24 +592,25 @@ ${shareUrl}
           {/* 1. MBTI 16タイプカード */}
           {/* ======================================================== */}
           <section className="relative rounded-3xl bg-gradient-to-b from-[#1C2339] via-[#161C2E] to-[#121625] border border-slate-700/60 shadow-2xl p-6 text-center overflow-hidden">
-            {/* 上部ヘッダー（グループバッジ ＆ スライドインジケータ） */}
-            <div className="flex items-center justify-between mb-4">
+            {/* 上部ヘッダー（ページインジケータのみ） */}
+            <div className="flex items-center mb-4">
               <div className="flex items-center gap-1.5 text-xs text-slate-400 px-2 py-1 rounded-md bg-slate-800/50">
                 <Layers className="w-3.5 h-3.5 text-slate-400" />
                 <span>1 / 1</span>
               </div>
+            </div>
 
+            {/* グループバッジ（アイコン直上・中央揃え） */}
+            <div className="flex justify-center mb-2">
               <div className="inline-flex items-center px-3 py-1 rounded-full bg-[#3B2D6B] border border-purple-500/30 text-purple-200 text-xs font-semibold tracking-wide shadow-sm">
                 <span>{result.info.group || '分析家グループ'}</span>
               </div>
-
-              <div className="w-8" />
             </div>
 
-            {/* フクロウマスコット */}
+            {/* アイコン（動物アイコン or フクロウフォールバック） */}
             <div className="flex justify-center my-2">
               <div className="p-2 rounded-full bg-gradient-to-b from-[#2B3454] to-[#1B2238] border-2 border-indigo-400/40 shadow-lg shadow-indigo-950/50">
-                <OwlMascot size={72} />
+                <TypeAnimalIcon type={result.type} size={72} />
               </div>
             </div>
 
