@@ -67,11 +67,11 @@ async function generate() {
         <path d="M190 60 Q190 70 200 70 Q190 70 190 80 Q190 70 180 70 Q190 70 190 60 Z" fill="#FFFFFF" opacity="0.8" />
 
         <!-- ほんのりピンクのほっぺチーク（愛嬌アップ） -->
-        <ellipse cx="68" cy="138" rx="14" ry="8" fill="#FFB7B2" opacity="0.35" />
-        <ellipse cx="188" cy="138" rx="14" ry="8" fill="#FFB7B2" opacity="0.35" />
+        <ellipse cx="68" cy="148" rx="14" ry="8" fill="#FFB7B2" opacity="0.35" />
+        <ellipse cx="188" cy="148" rx="14" ry="8" fill="#FFB7B2" opacity="0.35" />
 
-        <!-- 中央の動物絵文字（真中心・上下左右センター・特大サイズ104px） -->
-        <text x="128" y="128" font-size="104" text-anchor="middle" dominant-baseline="central">
+        <!-- 中央の動物絵文字（上下余白均等の真中心に調整: y=138） -->
+        <text x="128" y="138" font-size="104" text-anchor="middle" dominant-baseline="central">
           ${item.emoji}
         </text>
         
