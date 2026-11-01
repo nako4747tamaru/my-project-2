@@ -66,17 +66,17 @@ async function generate() {
         <circle cx="82" cy="74" r="2.5" fill="#FFFFFF" opacity="0.8" />
         <path d="M190 60 Q190 70 200 70 Q190 70 190 80 Q190 70 180 70 Q190 70 190 60 Z" fill="#FFFFFF" opacity="0.8" />
 
-        <!-- ほんのりピンクのほっぺチーク（愛嬌アップ） -->
-        <ellipse cx="68" cy="148" rx="14" ry="8" fill="#FFB7B2" opacity="0.35" />
-        <ellipse cx="188" cy="148" rx="14" ry="8" fill="#FFB7B2" opacity="0.35" />
+        <!-- ほんのりピンクのほっぺチーク（イラスト位置に合わせて下方向へオフセット） -->
+        <ellipse cx="68" cy="160" rx="14" ry="8" fill="#FFB7B2" opacity="0.35" />
+        <ellipse cx="188" cy="160" rx="14" ry="8" fill="#FFB7B2" opacity="0.35" />
 
-        <!-- 中央の動物絵文字（上下余白均等の真中心に調整: y=138） -->
-        <text x="128" y="138" font-size="104" text-anchor="middle" dominant-baseline="central">
+        <!-- 中央の動物絵文字（視覚的な上下余白が完全に均等になるよう y=156 へ大きく下方オフセット） -->
+        <text x="128" y="156" font-size="98" text-anchor="middle" dominant-baseline="central">
           ${item.emoji}
         </text>
         
         <!-- ゆるかわ下部ラベルバッジ（マシュマロ・もっちりピルバッジ） -->
-        <g transform="translate(128, 204)" filter="url(#soft-shadow)">
+        <g transform="translate(128, 206)" filter="url(#soft-shadow)">
           <rect x="-45" y="-13" width="90" height="26" rx="13" fill="${item.badgeBg}" stroke="${item.border}" stroke-width="1.5" />
           <text x="0" y="5" font-family="'Hiragino Maru Gothic ProN', 'Rounded Mplus 1c', 'Meiryo', sans-serif" font-size="13" font-weight="900" fill="${item.badgeText}" text-anchor="middle" letter-spacing="1">
             ${item.label}
@@ -92,7 +92,7 @@ async function generate() {
 }
 
 generate()
-  .then(() => console.log('Successfully generated all 16 pastel-pop animal icon images!'))
+  .then(() => console.log('Successfully regenerated all 16 pastel-pop animal icon images!'))
   .catch((err) => {
     console.error('Error generating pastel-pop animal icons:', err);
     process.exit(1);
