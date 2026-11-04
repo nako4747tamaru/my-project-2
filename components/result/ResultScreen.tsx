@@ -38,6 +38,8 @@ import TypeAnimalIcon from './TypeAnimalIcon';
 import DistortionRadarChart from './DistortionRadarChart';
 import LegalModal, { LegalTab } from '../common/LegalModal';
 import LegalFooter from '../common/LegalFooter';
+import AdContainer from '../common/AdContainer';
+import ComingSoonSection from './ComingSoonSection';
 
 export interface ResultScreenProps {
   /** ユーザーのニックネーム */
@@ -879,6 +881,12 @@ ${shareUrl}
         />
 
         {/* ======================================================== */}
+        {/* ======================================================== */}
+        {/* 診断結果画面 中央〜下部 広告表示枠 */}
+        {/* ======================================================== */}
+        <AdContainer format="horizontal" className="!my-3" />
+
+        {/* ======================================================== */}
         {/* 4. メンタルケア・行動アドバイス */}
         {/* ======================================================== */}
         <section className="rounded-3xl bg-gradient-to-b from-[#181F33] to-[#121625] border border-slate-700/60 p-5 sm:p-6 shadow-xl space-y-5">
@@ -1194,6 +1202,11 @@ ${shareUrl}
             </div>
           )}
         </section>
+      
+        {/* ======================================================== */}
+        {/* 近日公開（Coming Soon）機能エリア */}
+        {/* ======================================================== */}
+        <ComingSoonSection />
       </main>
 
       {/* 法務・規約フッター */}
