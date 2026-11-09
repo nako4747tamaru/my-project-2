@@ -604,15 +604,23 @@ ${shareUrl}
 
             {/* グループバッジ（アイコン直上・中央揃え） */}
             <div className="flex justify-center mb-2">
-              <div className="inline-flex items-center px-3 py-1 rounded-full bg-[#3B2D6B] border border-purple-500/30 text-purple-200 text-xs font-semibold tracking-wide shadow-sm">
+              <div className={`inline-flex items-center px-3.5 py-1 rounded-full border text-xs font-bold tracking-wide shadow-sm ${
+                (result.info.group || '').includes('外交官')
+                  ? 'bg-emerald-950/90 border-emerald-400/40 text-emerald-200'
+                  : (result.info.group || '').includes('番人')
+                  ? 'bg-sky-950/90 border-sky-400/40 text-sky-200'
+                  : (result.info.group || '').includes('探検家')
+                  ? 'bg-amber-950/90 border-amber-400/40 text-amber-200'
+                  : 'bg-purple-950/90 border-purple-400/40 text-purple-200'
+              }`}>
                 <span>{result.info.group || '分析家グループ'}</span>
               </div>
             </div>
 
-            {/* アイコン（動物アイコン or フクロウフォールバック） */}
-            <div className="flex justify-center my-2">
-              <div className="p-2 rounded-full bg-gradient-to-b from-[#2B3454] to-[#1B2238] border-2 border-indigo-400/40 shadow-lg shadow-indigo-950/50">
-                <TypeAnimalIcon type={result.type} size={72} />
+            {/* 動物アイコン（最新パステル・影絵シルエット画像） */}
+            <div className="flex justify-center my-3">
+              <div className="relative transition-transform duration-300 hover:scale-105 filter drop-shadow-xl">
+                <TypeAnimalIcon type={result.type} size={96} priority />
               </div>
             </div>
 
