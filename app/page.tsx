@@ -87,6 +87,7 @@ function HomeContent() {
         <ResultScreen
           userName={userName}
           answers={userAnswers}
+          initialType={typeParam}
           onRetest={handleRetest}
         />
       )}

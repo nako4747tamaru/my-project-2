@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 
 import { QUESTIONS as defaultQuestions } from '../../lib/questions';
+import { PERSONALITY_TYPES } from '../../lib/analytics';
 import {
   calculatePersonality,
   PersonalityResult,
@@ -50,6 +51,8 @@ export interface ResultScreenProps {
   questions?: Question[];
   /** 事前計算済みの結果（指定があれば計算をスキップ） */
   initialResult?: PersonalityResult;
+  /** 明示的なタイプ指定（例: 'ENFJ'） */
+  initialType?: string;
   /** 有料プラン解放時のコールバック（Stripe決済URL遷移など） */
   onUnlockPremium?: () => void;
   /** 再診断ボタン押下時のコールバック */
@@ -70,13 +73,13 @@ function createSampleAnswers(questionsList: Question[] = defaultQuestions): Answ
     const key = q.id ?? idx + 1;
     let val = 3;
     if (q.dim === 'EI') {
-      val = q.pole === 'I' ? 4 : 2; // I高め
+      val = q.pole === 'I' ? 5 : 1; // Iを強く
     } else if (q.dim === 'SN') {
-      val = q.pole === 'N' ? 4 : 2; // N高め
+      val = q.pole === 'N' ? 5 : 1; // Nを強く
     } else if (q.dim === 'TF') {
-      val = q.pole === 'T' ? 5 : 2; // T高め -> INTP
+      val = q.pole === 'T' ? 5 : 1; // Tを強く -> INTP
     } else if (q.dim === 'JP') {
-      val = q.pole === 'P' ? 4 : 2; // P高め
+      val = q.pole === 'P' ? 5 : 1; // Pを強く
     } else if (q.dim === 'fatigue') {
       val = 5; // 要休息 (レベル5)
     } else if (q.dim === 'all-or-nothing' || q.dim === 'should') {
@@ -244,6 +247,7 @@ export default function ResultScreen({
   answers,
   questions = defaultQuestions,
   initialResult,
+  initialType,
   onUnlockPremium,
   onRetest,
   onShare,
@@ -256,8 +260,27 @@ export default function ResultScreen({
       answers && Object.keys(answers).length > 0
         ? answers
         : createSampleAnswers(questions);
-    return calculatePersonality(questions, finalAnswers);
-  }, [answers, questions, initialResult]);
+    const calculated = calculatePersonality(questions, finalAnswers);
+
+    if (initialType && PERSONALITY_TYPES[initialType.toUpperCase().trim()]) {
+      const targetType = initialType.toUpperCase().trim();
+      const info = PERSONALITY_TYPES[targetType];
+      return {
+        ...calculated,
+        type: targetType,
+        info,
+        title: info.name,
+        catchphrase: info.catchphrase,
+        description: info.description,
+        strengths: info.strengths,
+        weaknesses: info.weaknesses,
+        stressSignals: info.stressSignals,
+        growthAdvice: info.growthAdvice,
+      };
+    }
+
+    return calculated;
+  }, [answers, questions, initialResult, initialType]);
 
   const [unlocked, setUnlocked] = useState(isPremiumUnlocked);
   const [showAxesDetail, setShowAxesDetail] = useState(true);

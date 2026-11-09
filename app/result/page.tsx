@@ -57,6 +57,7 @@ function ResultContent() {
       <ResultScreen
         userName={userName}
         answers={answers}
+        initialType={typeParam}
         onRetest={() => router.push('/')}
       />
     </main>
