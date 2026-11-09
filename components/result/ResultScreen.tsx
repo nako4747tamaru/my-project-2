@@ -35,9 +35,6 @@ import {
   Question,
 } from '../../lib/personality';
 import OwlMascot from '../common/OwlMascot';
-// import TypeAnimalIcon from './TypeAnimalIcon';
-// import AdContainer from '../common/AdContainer';
-// import ComingSoonSection from './ComingSoonSection';
 import DistortionRadarChart from './DistortionRadarChart';
 import LegalModal, { LegalTab } from '../common/LegalModal';
 import LegalFooter from '../common/LegalFooter';
