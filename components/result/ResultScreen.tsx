@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import {
   Lock,
   Sparkles,
@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 
 import { QUESTIONS as defaultQuestions } from '../../lib/questions';
+import { PERSONALITY_TYPES } from '../../lib/analytics';
 import {
   calculatePersonality,
   PersonalityResult,
@@ -34,9 +35,12 @@ import {
   Question,
 } from '../../lib/personality';
 import OwlMascot from '../common/OwlMascot';
+import TypeAnimalIcon from './TypeAnimalIcon';
 import DistortionRadarChart from './DistortionRadarChart';
 import LegalModal, { LegalTab } from '../common/LegalModal';
 import LegalFooter from '../common/LegalFooter';
+import AdContainer from '../common/AdContainer';
+import ComingSoonSection from './ComingSoonSection';
 
 export interface ResultScreenProps {
   /** ユーザーのニックネーム */
@@ -47,6 +51,8 @@ export interface ResultScreenProps {
   questions?: Question[];
   /** 事前計算済みの結果（指定があれば計算をスキップ） */
   initialResult?: PersonalityResult;
+  /** 明示的なタイプ指定（例: 'ENFJ'） */
+  initialType?: string;
   /** 有料プラン解放時のコールバック（Stripe決済URL遷移など） */
   onUnlockPremium?: () => void;
   /** 再診断ボタン押下時のコールバック */
@@ -67,13 +73,13 @@ function createSampleAnswers(questionsList: Question[] = defaultQuestions): Answ
     const key = q.id ?? idx + 1;
     let val = 3;
     if (q.dim === 'EI') {
-      val = q.pole === 'I' ? 4 : 2; // I高め
+      val = q.pole === 'I' ? 5 : 1; // Iを強く
     } else if (q.dim === 'SN') {
-      val = q.pole === 'N' ? 4 : 2; // N高め
+      val = q.pole === 'N' ? 5 : 1; // Nを強く
     } else if (q.dim === 'TF') {
-      val = q.pole === 'T' ? 5 : 2; // T高め -> INTP
+      val = q.pole === 'T' ? 5 : 1; // Tを強く -> INTP
     } else if (q.dim === 'JP') {
-      val = q.pole === 'P' ? 4 : 2; // P高め
+      val = q.pole === 'P' ? 5 : 1; // Pを強く
     } else if (q.dim === 'fatigue') {
       val = 5; // 要休息 (レベル5)
     } else if (q.dim === 'all-or-nothing' || q.dim === 'should') {
@@ -241,6 +247,7 @@ export default function ResultScreen({
   answers,
   questions = defaultQuestions,
   initialResult,
+  initialType,
   onUnlockPremium,
   onRetest,
   onShare,
@@ -253,10 +260,31 @@ export default function ResultScreen({
       answers && Object.keys(answers).length > 0
         ? answers
         : createSampleAnswers(questions);
-    return calculatePersonality(questions, finalAnswers);
-  }, [answers, questions, initialResult]);
+    const calculated = calculatePersonality(questions, finalAnswers);
 
+    if (initialType && PERSONALITY_TYPES[initialType.toUpperCase().trim()]) {
+      const targetType = initialType.toUpperCase().trim();
+      const info = PERSONALITY_TYPES[targetType];
+      return {
+        ...calculated,
+        type: targetType,
+        info,
+        title: info.name,
+        catchphrase: info.catchphrase,
+        description: info.description,
+        strengths: info.strengths,
+        weaknesses: info.weaknesses,
+        stressSignals: info.stressSignals,
+        growthAdvice: info.growthAdvice,
+      };
+    }
+
+    return calculated;
+  }, [answers, questions, initialResult, initialType]);
+
+  const STORAGE_KEY_PREMIUM = 'kokoro_navi_premium_unlocked_v1';
   const [unlocked, setUnlocked] = useState(isPremiumUnlocked);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [showAxesDetail, setShowAxesDetail] = useState(true);
 
   // 画像 / PDF 保存用のステート
@@ -273,17 +301,67 @@ export default function ResultScreen({
     setLegalModalOpen(true);
   };
 
+  // 購入状態の自動復元 ＆ Stripe決済リダイレクト結果の検知
+  useEffect(() => {
+    try {
+      const isSaved = localStorage.getItem(STORAGE_KEY_PREMIUM) === 'true';
+      if (isSaved) {
+        setUnlocked(true);
+      }
+
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('unlocked') === 'true' || params.get('success') === 'true') {
+          setUnlocked(true);
+          localStorage.setItem(STORAGE_KEY_PREMIUM, 'true');
+          setExportSuccessMessage('🎉 決済が完了し、完全レポートがアンロックされました！');
+        } else if (params.get('canceled') === 'true') {
+          setExportErrorMessage('決済がキャンセルされました。いつでも再度お試しいただけます。');
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
   // キャプチャ対象エリアの参照
   const captureCardRef = useRef<HTMLDivElement>(null);
 
   const topDistortion = result.topDistortions[0];
 
-  // Stripe決済ボタンハンドラー
-  const handleCheckout = () => {
+// Stripe決済ボタンハンドラー（実決済API連携）
+  const handleCheckout = async () => {
     if (onUnlockPremium) {
       onUnlockPremium();
-    } else {
-      setUnlocked(true);
+      return;
+    }
+
+    setIsCheckingOut(true);
+    setExportErrorMessage(null);
+
+    try {
+      const returnPath = typeof window !== 'undefined' ? window.location.pathname : '/result';
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userName,
+          type: result.type,
+          returnPath,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.url) {
+        throw new Error(data.error || '決済セッションの作成に失敗しました。');
+      }
+
+      // Stripe決済ページ（またはシミュレーション完了URL）へリダイレクト
+      window.location.href = data.url;
+    } catch (err: any) {
+      console.error('Checkout error:', err);
+      setExportErrorMessage(err.message || '決済画面の起動に失敗しました。時間をおいて再試行してください。');
+      setIsCheckingOut(false);
     }
   };
 
@@ -591,24 +669,33 @@ ${shareUrl}
           {/* 1. MBTI 16タイプカード */}
           {/* ======================================================== */}
           <section className="relative rounded-3xl bg-gradient-to-b from-[#1C2339] via-[#161C2E] to-[#121625] border border-slate-700/60 shadow-2xl p-6 text-center overflow-hidden">
-            {/* 上部ヘッダー（グループバッジ ＆ スライドインジケータ） */}
-            <div className="flex items-center justify-between mb-4">
+            {/* 上部ヘッダー（ページインジケータのみ） */}
+            <div className="flex items-center mb-4">
               <div className="flex items-center gap-1.5 text-xs text-slate-400 px-2 py-1 rounded-md bg-slate-800/50">
                 <Layers className="w-3.5 h-3.5 text-slate-400" />
                 <span>1 / 1</span>
               </div>
-
-              <div className="inline-flex items-center px-3 py-1 rounded-full bg-[#3B2D6B] border border-purple-500/30 text-purple-200 text-xs font-semibold tracking-wide shadow-sm">
-                <span>{result.info.group || '分析家グループ'}</span>
-              </div>
-
-              <div className="w-8" />
             </div>
 
-            {/* フクロウマスコット */}
-            <div className="flex justify-center my-2">
-              <div className="p-2 rounded-full bg-gradient-to-b from-[#2B3454] to-[#1B2238] border-2 border-indigo-400/40 shadow-lg shadow-indigo-950/50">
-                <OwlMascot size={72} />
+            {/* グループバッジ（アイコン直上・中央揃え） */}
+            <div className="flex justify-center mb-2">
+              <div className={`inline-flex items-center px-3.5 py-1 rounded-full border text-xs font-bold tracking-wide shadow-sm ${
+                (result.info.group || '').includes('外交官')
+                  ? 'bg-emerald-950/90 border-emerald-400/40 text-emerald-200'
+                  : (result.info.group || '').includes('番人')
+                  ? 'bg-sky-950/90 border-sky-400/40 text-sky-200'
+                  : (result.info.group || '').includes('探検家')
+                  ? 'bg-amber-950/90 border-amber-400/40 text-amber-200'
+                  : 'bg-purple-950/90 border-purple-400/40 text-purple-200'
+              }`}>
+                <span>{result.info.group || '分析家グループ'}</span>
+              </div>
+            </div>
+
+            {/* 動物アイコン（最新パステル・影絵シルエット画像） */}
+            <div className="flex justify-center my-3">
+              <div className="relative transition-transform duration-300 hover:scale-105 filter drop-shadow-xl">
+                <TypeAnimalIcon type={result.type} size={96} priority />
               </div>
             </div>
 
@@ -875,6 +962,12 @@ ${shareUrl}
           title="診断カルテを保存・友だちに送る"
           subtitle="いつでも見返せます"
         />
+
+        {/* ======================================================== */}
+        {/* ======================================================== */}
+        {/* 診断結果画面 中央〜下部 広告表示枠 */}
+        {/* ======================================================== */}
+        <AdContainer format="horizontal" className="!my-3" />
 
         {/* ======================================================== */}
         {/* 4. メンタルケア・行動アドバイス */}
@@ -1153,16 +1246,26 @@ ${shareUrl}
               {/* 高輝度グラデーションCTAボタン */}
               <button
                 onClick={handleCheckout}
-                className="w-full max-w-sm relative group overflow-hidden rounded-2xl p-[2px] shadow-2xl shadow-rose-500/30 hover:shadow-rose-500/50 transition-all duration-300 active:scale-[0.98] cursor-pointer"
+                disabled={isCheckingOut}
+                className="w-full max-w-sm relative group overflow-hidden rounded-2xl p-[2px] shadow-2xl shadow-rose-500/30 hover:shadow-rose-500/50 transition-all duration-300 active:scale-[0.98] cursor-pointer disabled:opacity-75 disabled:cursor-wait"
               >
                 {/* 背景のアニメーショングラデーション */}
                 <div className="absolute inset-0 bg-gradient-to-r from-amber-400 via-rose-500 to-purple-600 rounded-2xl transition-all duration-300 group-hover:scale-105" />
                 
                 <div className="relative px-5 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-rose-600 to-purple-600 text-white font-black flex flex-col items-center justify-center gap-0.5 transition-all group-hover:bg-opacity-95">
                   <div className="flex items-center gap-2 text-xs sm:text-sm tracking-wide">
-                    <Sparkles className="w-4 h-4 text-amber-200 animate-pulse" />
-                    <span>今すぐ初月お試しで完全レポートを解放する</span>
-                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                    {isCheckingOut ? (
+                      <>
+                        <Loader2 className="w-4 h-4 text-white animate-spin" />
+                        <span>Stripe決済画面へ移動中...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4 text-amber-200 animate-pulse" />
+                        <span>今すぐ初月お試しで完全レポートを解放する</span>
+                        <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                      </>
+                    )}
                   </div>
                   <span className="text-[10px] text-rose-100 font-medium">
                     初月限定 ¥980（1日たった32円） ・ 縛りなし / いつでも解約可能
@@ -1182,16 +1285,24 @@ ${shareUrl}
                 <span className="text-slate-300">☕ 1日カフェ1杯以下の自己投資</span>
               </div>
 
-              {/* プレビューボタン */}
-              <button
-                onClick={() => setUnlocked(true)}
-                className="mt-3 text-[11px] text-slate-400 hover:text-slate-200 underline underline-offset-2 cursor-pointer transition-colors"
-              >
-                プレビュー（デモ解放で中身を確認）
-              </button>
+              {/* 開発環境専用プレビュー（本番では非表示） */}
+              {process.env.NODE_ENV !== 'production' && (
+                <button
+                  type="button"
+                  onClick={() => setUnlocked(true)}
+                  className="mt-3 text-[10px] text-slate-500 hover:text-slate-300 underline underline-offset-2 cursor-pointer transition-colors"
+                >
+                  [DEV] デモ解放プレビュー
+                </button>
+              )}
             </div>
           )}
         </section>
+      
+        {/* ======================================================== */}
+        {/* 近日公開（Coming Soon）機能エリア */}
+        {/* ======================================================== */}
+        <ComingSoonSection />
       </main>
 
       {/* 法務・規約フッター */}
