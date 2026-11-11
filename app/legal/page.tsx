@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { ShieldCheck, FileText, Scale, Lock, ArrowLeft, AlertCircle } from 'lucide-react';
 import OwlMascot from '../../components/common/OwlMascot';
 import { LegalTab } from '../../components/common/LegalModal';
+import AdContainer from '../../components/common/AdContainer';
 
 function LegalContent() {
   const searchParams = useSearchParams();
@@ -321,6 +322,8 @@ function LegalContent() {
         </div>
 
         {/* --- フッター --- */}
+        <AdContainer format="horizontal" className="!my-4" />
+
         <footer className="text-center text-xs text-slate-500 pt-4">
           <p>© 2026 ココロナビ（KokoroNavi） All rights reserved.</p>
         </footer>
