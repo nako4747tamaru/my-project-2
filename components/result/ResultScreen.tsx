@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import {
   Lock,
   Sparkles,
@@ -282,7 +282,9 @@ export default function ResultScreen({
     return calculated;
   }, [answers, questions, initialResult, initialType]);
 
+  const STORAGE_KEY_PREMIUM = 'kokoro_navi_premium_unlocked_v1';
   const [unlocked, setUnlocked] = useState(isPremiumUnlocked);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [showAxesDetail, setShowAxesDetail] = useState(true);
 
   // 画像 / PDF 保存用のステート
@@ -299,17 +301,67 @@ export default function ResultScreen({
     setLegalModalOpen(true);
   };
 
+  // 購入状態の自動復元 ＆ Stripe決済リダイレクト結果の検知
+  useEffect(() => {
+    try {
+      const isSaved = localStorage.getItem(STORAGE_KEY_PREMIUM) === 'true';
+      if (isSaved) {
+        setUnlocked(true);
+      }
+
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('unlocked') === 'true' || params.get('success') === 'true') {
+          setUnlocked(true);
+          localStorage.setItem(STORAGE_KEY_PREMIUM, 'true');
+          setExportSuccessMessage('🎉 決済が完了し、完全レポートがアンロックされました！');
+        } else if (params.get('canceled') === 'true') {
+          setExportErrorMessage('決済がキャンセルされました。いつでも再度お試しいただけます。');
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
   // キャプチャ対象エリアの参照
   const captureCardRef = useRef<HTMLDivElement>(null);
 
   const topDistortion = result.topDistortions[0];
 
-  // Stripe決済ボタンハンドラー
-  const handleCheckout = () => {
+// Stripe決済ボタンハンドラー（実決済API連携）
+  const handleCheckout = async () => {
     if (onUnlockPremium) {
       onUnlockPremium();
-    } else {
-      setUnlocked(true);
+      return;
+    }
+
+    setIsCheckingOut(true);
+    setExportErrorMessage(null);
+
+    try {
+      const returnPath = typeof window !== 'undefined' ? window.location.pathname : '/result';
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userName,
+          type: result.type,
+          returnPath,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || !data.url) {
+        throw new Error(data.error || '決済セッションの作成に失敗しました。');
+      }
+
+      // Stripe決済ページ（またはシミュレーション完了URL）へリダイレクト
+      window.location.href = data.url;
+    } catch (err: any) {
+      console.error('Checkout error:', err);
+      setExportErrorMessage(err.message || '決済画面の起動に失敗しました。時間をおいて再試行してください。');
+      setIsCheckingOut(false);
     }
   };
 
@@ -1194,16 +1246,26 @@ ${shareUrl}
               {/* 高輝度グラデーションCTAボタン */}
               <button
                 onClick={handleCheckout}
-                className="w-full max-w-sm relative group overflow-hidden rounded-2xl p-[2px] shadow-2xl shadow-rose-500/30 hover:shadow-rose-500/50 transition-all duration-300 active:scale-[0.98] cursor-pointer"
+                disabled={isCheckingOut}
+                className="w-full max-w-sm relative group overflow-hidden rounded-2xl p-[2px] shadow-2xl shadow-rose-500/30 hover:shadow-rose-500/50 transition-all duration-300 active:scale-[0.98] cursor-pointer disabled:opacity-75 disabled:cursor-wait"
               >
                 {/* 背景のアニメーショングラデーション */}
                 <div className="absolute inset-0 bg-gradient-to-r from-amber-400 via-rose-500 to-purple-600 rounded-2xl transition-all duration-300 group-hover:scale-105" />
                 
                 <div className="relative px-5 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-rose-600 to-purple-600 text-white font-black flex flex-col items-center justify-center gap-0.5 transition-all group-hover:bg-opacity-95">
                   <div className="flex items-center gap-2 text-xs sm:text-sm tracking-wide">
-                    <Sparkles className="w-4 h-4 text-amber-200 animate-pulse" />
-                    <span>今すぐ初月お試しで完全レポートを解放する</span>
-                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                    {isCheckingOut ? (
+                      <>
+                        <Loader2 className="w-4 h-4 text-white animate-spin" />
+                        <span>Stripe決済画面へ移動中...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4 text-amber-200 animate-pulse" />
+                        <span>今すぐ初月お試しで完全レポートを解放する</span>
+                        <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                      </>
+                    )}
                   </div>
                   <span className="text-[10px] text-rose-100 font-medium">
                     初月限定 ¥980（1日たった32円） ・ 縛りなし / いつでも解約可能
@@ -1223,13 +1285,16 @@ ${shareUrl}
                 <span className="text-slate-300">☕ 1日カフェ1杯以下の自己投資</span>
               </div>
 
-              {/* プレビューボタン */}
-              <button
-                onClick={() => setUnlocked(true)}
-                className="mt-3 text-[11px] text-slate-400 hover:text-slate-200 underline underline-offset-2 cursor-pointer transition-colors"
-              >
-                プレビュー（デモ解放で中身を確認）
-              </button>
+              {/* 開発環境専用プレビュー（本番では非表示） */}
+              {process.env.NODE_ENV !== 'production' && (
+                <button
+                  type="button"
+                  onClick={() => setUnlocked(true)}
+                  className="mt-3 text-[10px] text-slate-500 hover:text-slate-300 underline underline-offset-2 cursor-pointer transition-colors"
+                >
+                  [DEV] デモ解放プレビュー
+                </button>
+              )}
             </div>
           )}
         </section>
