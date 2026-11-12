@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useRef, useEffect } from 'react';
+import Link from 'next/link';
 import {
   Lock,
   Sparkles,
@@ -23,6 +24,7 @@ import {
   Camera,
   FileDown,
   Loader2,
+  CreditCard,
 } from 'lucide-react';
 
 import { QUESTIONS as defaultQuestions } from '../../lib/questions';
@@ -311,10 +313,28 @@ export default function ResultScreen({
 
       if (typeof window !== 'undefined') {
         const params = new URLSearchParams(window.location.search);
+        const sessionIdParam = params.get('session_id');
+
         if (params.get('unlocked') === 'true' || params.get('success') === 'true') {
           setUnlocked(true);
           localStorage.setItem(STORAGE_KEY_PREMIUM, 'true');
           setExportSuccessMessage('🎉 決済が完了し、完全レポートがアンロックされました！');
+
+          if (sessionIdParam) {
+            localStorage.setItem('kokoro_navi_stripe_session_id', sessionIdParam);
+            // サーバーから顧客情報を取得して保存（ポータル連携をスムーズにするため）
+            fetch(`/api/verify-session?session_id=${encodeURIComponent(sessionIdParam)}`)
+              .then((res) => res.json())
+              .then((data) => {
+                if (data.customerId) {
+                  localStorage.setItem('kokoro_navi_stripe_customer_id', data.customerId);
+                }
+                if (data.customerEmail) {
+                  localStorage.setItem('kokoro_navi_stripe_customer_email', data.customerEmail);
+                }
+              })
+              .catch(() => {});
+          }
         } else if (params.get('canceled') === 'true') {
           setExportErrorMessage('決済がキャンセルされました。いつでも再度お試しいただけます。');
         }
@@ -587,13 +607,22 @@ ${shareUrl}
           </div>
 
           <div className="flex items-center gap-2">
+            <Link
+              href="/account"
+              title="マイページ・定期課金の確認と解約"
+              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-800/90 hover:bg-slate-700 text-xs text-slate-300 hover:text-white transition-colors border border-slate-700/60 cursor-pointer"
+            >
+              <CreditCard className="w-3.5 h-3.5 text-indigo-400" />
+              <span className="hidden sm:inline">マイページ</span>
+            </Link>
+
             <button
               onClick={() => handleOpenLegal('privacy')}
               title="プライバシーポリシー・利用規約"
               className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-800/90 hover:bg-slate-700 text-xs text-slate-400 hover:text-white transition-colors border border-slate-700/60 cursor-pointer"
             >
               <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
-              <span className="hidden sm:inline">規約・ポリシー</span>
+              <span className="hidden sm:inline">規約</span>
             </button>
 
             {onRetest && (
@@ -1282,7 +1311,13 @@ ${shareUrl}
                 <span className="text-slate-600">•</span>
                 <span className="text-slate-300">🔒 Stripeセキュア決済</span>
                 <span className="text-slate-600">•</span>
-                <span className="text-slate-300">☕ 1日カフェ1杯以下の自己投資</span>
+                <Link
+                  href="/account"
+                  className="text-indigo-400 hover:text-indigo-300 underline underline-offset-2 flex items-center gap-1"
+                >
+                  <CreditCard className="w-3 h-3" />
+                  <span>解約・マイページはこちら</span>
+                </Link>
               </div>
 
               {/* 開発環境専用プレビュー（本番では非表示） */}

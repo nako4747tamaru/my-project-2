@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { ShieldCheck, Scale, FileText } from 'lucide-react';
+import Link from 'next/link';
+import { ShieldCheck, Scale, FileText, CreditCard } from 'lucide-react';
 import { LegalTab } from './LegalModal';
 import AdContainer from './AdContainer';
 
@@ -46,6 +47,14 @@ export default function LegalFooter({
             >
               利用規約
             </button>
+            <span className="text-slate-700 hidden sm:inline">•</span>
+            <Link
+              href="/account"
+              className="inline-flex items-center gap-1 hover:text-indigo-300 text-indigo-400/90 transition-colors underline underline-offset-4 decoration-indigo-800/80 hover:decoration-indigo-400 cursor-pointer"
+            >
+              <CreditCard className="w-3 h-3 text-indigo-400" />
+              <span>定期課金の確認・解約</span>
+            </Link>
           </div>
 
           {/* 免責ミニテキスト */}

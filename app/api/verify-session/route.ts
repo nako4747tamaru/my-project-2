@@ -23,9 +23,19 @@ export async function GET(req: NextRequest) {
     const stripe = new Stripe(stripeSecretKey);
     const session = await stripe.checkout.sessions.retrieve(sessionId);
 
+    const customerId =
+      typeof session.customer === 'string'
+        ? session.customer
+        : session.customer?.id || null;
+
     return NextResponse.json({
-      paid: session.payment_status === 'paid',
+      paid: session.payment_status === 'paid' || session.status === 'complete',
+      customerId,
       customerEmail: session.customer_details?.email,
+      subscriptionId:
+        typeof session.subscription === 'string'
+          ? session.subscription
+          : session.subscription?.id || null,
       metadata: session.metadata,
     });
   } catch (error: any) {
