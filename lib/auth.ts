@@ -1,0 +1,172 @@
+import crypto from 'crypto';
+
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  createdAt: number;
+  isPremium?: boolean;
+  stripeCustomerId?: string;
+  stripeSubscriptionId?: string;
+}
+
+export interface UserWithPassword extends User {
+  passwordHash: string;
+  salt: string;
+}
+
+export interface SessionData {
+  user: User;
+  token: string;
+  expiresAt: number;
+}
+
+const JWT_SECRET = process.env.AUTH_SECRET || 'kokoro-navi-secure-auth-secret-key-2026';
+
+// サーバーインメモリ保持（Vercelサーバーレス等でもインスタンス単位でセッション照合可能）
+// 本格運用時のDB（Supabase / Neon / Prisma等）への移行も同一インターフェースで容易
+declare global {
+  // eslint-disable-next-line no-var
+  var __KOKORO_USERS_STORE__: Map<string, UserWithPassword> | undefined;
+}
+
+if (!global.__KOKORO_USERS_STORE__) {
+  global.__KOKORO_USERS_STORE__ = new Map<string, UserWithPassword>();
+}
+
+const usersStore = global.__KOKORO_USERS_STORE__;
+
+/**
+ * パスワードのハッシュ化（PBKDF2）
+ */
+export function hashPassword(password: string): { hash: string; salt: string } {
+  const salt = crypto.randomBytes(16).toString('hex');
+  const hash = crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex');
+  return { hash, salt };
+}
+
+/**
+ * パスワードの検証
+ */
+export function verifyPassword(password: string, hash: string, salt: string): boolean {
+  const verifyHash = crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex');
+  return hash === verifyHash;
+}
+
+/**
+ * 簡易JWTライクな安全なセッショントークン生成
+ */
+export function generateSessionToken(user: User): string {
+  const payload = {
+    userId: user.id,
+    email: user.email,
+    name: user.name,
+    exp: Date.now() + 7 * 24 * 60 * 60 * 1000, // 7日間有効
+  };
+  const payloadB64 = Buffer.from(JSON.stringify(payload)).toString('base64url');
+  const signature = crypto.createHmac('sha256', JWT_SECRET).update(payloadB64).digest('base64url');
+  return `${payloadB64}.${signature}`;
+}
+
+/**
+ * セッショントークンの検証とユーザー復元
+ */
+export function verifySessionToken(token: string): { userId: string; email: string; name: string } | null {
+  try {
+    const [payloadB64, signature] = token.split('.');
+    if (!payloadB64 || !signature) return null;
+
+    const expectedSig = crypto.createHmac('sha256', JWT_SECRET).update(payloadB64).digest('base64url');
+    if (signature !== expectedSig) return null;
+
+    const payload = JSON.parse(Buffer.from(payloadB64, 'base64url').toString('utf-8'));
+    if (Date.now() > payload.exp) return null;
+
+    return { userId: payload.userId, email: payload.email, name: payload.name };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * ユーザー登録
+ */
+export function registerUser(email: string, password: string, name: string): { user: User; token: string } {
+  const normalizedEmail = email.trim().toLowerCase();
+  if (usersStore.has(normalizedEmail)) {
+    throw new Error('既にこのメールアドレスは登録されています。');
+  }
+
+  const { hash, salt } = hashPassword(password);
+  const userRecord: UserWithPassword = {
+    id: `usr_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`,
+    email: normalizedEmail,
+    name: name.trim() || 'ゲスト',
+    createdAt: Date.now(),
+    passwordHash: hash,
+    salt,
+  };
+
+  usersStore.set(normalizedEmail, userRecord);
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { passwordHash, salt: _, ...safeUser } = userRecord;
+  const token = generateSessionToken(safeUser);
+
+  return { user: safeUser, token };
+}
+
+/**
+ * ユーザーログイン
+ */
+export function loginUser(email: string, password: string): { user: User; token: string } {
+  const normalizedEmail = email.trim().toLowerCase();
+  const userRecord = usersStore.get(normalizedEmail);
+
+  if (!userRecord) {
+    throw new Error('メールアドレスまたはパスワードが正しくありません。');
+  }
+
+  const isValid = verifyPassword(password, userRecord.passwordHash, userRecord.salt);
+  if (!isValid) {
+    throw new Error('メールアドレスまたはパスワードが正しくありません。');
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { passwordHash, salt: _, ...safeUser } = userRecord;
+  const token = generateSessionToken(safeUser);
+
+  return { user: safeUser, token };
+}
+
+/**
+ * ユーザー情報の取得（Emailから）
+ */
+export function getUserByEmail(email: string): User | null {
+  const normalizedEmail = email.trim().toLowerCase();
+  const userRecord = usersStore.get(normalizedEmail);
+  if (!userRecord) return null;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { passwordHash, salt: _, ...safeUser } = userRecord;
+  return safeUser;
+}
+
+/**
+ * ユーザーのStripe購入状態更新
+ */
+export function updateUserSubscription(
+  email: string,
+  data: { isPremium?: boolean; stripeCustomerId?: string; stripeSubscriptionId?: string }
+): User | null {
+  const normalizedEmail = email.trim().toLowerCase();
+  const userRecord = usersStore.get(normalizedEmail);
+  if (!userRecord) return null;
+
+  if (data.isPremium !== undefined) userRecord.isPremium = data.isPremium;
+  if (data.stripeCustomerId) userRecord.stripeCustomerId = data.stripeCustomerId;
+  if (data.stripeSubscriptionId) userRecord.stripeSubscriptionId = data.stripeSubscriptionId;
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { passwordHash, salt: _, ...safeUser } = userRecord;
+  return safeUser;
+}

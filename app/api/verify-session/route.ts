@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { sendPaymentThanksEmail } from '@/lib/mailer';
+import { updateUserSubscription } from '@/lib/auth';
 
 /**
  * Stripe Checkout セッション検証 API
  * GET /api/verify-session?session_id=cs_test_...
+ * 
+ * 決済完了画面から呼び出され、決済が有効であることを確認すると同時に
+ * サンクスメール送信トリガーとしてもフォールバック動作します。
  */
 export async function GET(req: NextRequest) {
   try {
@@ -23,19 +28,47 @@ export async function GET(req: NextRequest) {
     const stripe = new Stripe(stripeSecretKey);
     const session = await stripe.checkout.sessions.retrieve(sessionId);
 
+    const isPaid = session.payment_status === 'paid' || session.status === 'complete';
     const customerId =
       typeof session.customer === 'string'
         ? session.customer
         : session.customer?.id || null;
+    const customerEmail = session.customer_details?.email || (typeof session.customer_email === 'string' ? session.customer_email : null);
+    const customerName = session.customer_details?.name || session.metadata?.userName || 'お客様';
+    const subscriptionId =
+      typeof session.subscription === 'string'
+        ? session.subscription
+        : session.subscription?.id || null;
+
+    // 決済完了時、Webhook未到達の場合のフォールバックとしてメール送信
+    if (isPaid && customerEmail) {
+      updateUserSubscription(customerEmail, {
+        isPremium: true,
+        stripeCustomerId: customerId || undefined,
+        stripeSubscriptionId: subscriptionId || undefined,
+      });
+
+      const origin =
+        req.headers.get('origin') ||
+        req.headers.get('referer')?.split('/').slice(0, 3).join('/') ||
+        process.env.NEXT_PUBLIC_APP_URL ||
+        'http://localhost:3000';
+
+      sendPaymentThanksEmail({
+        toEmail: customerEmail,
+        userName: customerName,
+        amount: session.amount_total || 980,
+        currency: session.currency || 'jpy',
+        portalUrl: `${origin}/account`,
+        reportUrl: `${origin}/result`,
+      }).catch((e) => console.warn('Thanks email trigger error in verify-session:', e));
+    }
 
     return NextResponse.json({
-      paid: session.payment_status === 'paid' || session.status === 'complete',
+      paid: isPaid,
       customerId,
-      customerEmail: session.customer_details?.email,
-      subscriptionId:
-        typeof session.subscription === 'string'
-          ? session.subscription
-          : session.subscription?.id || null,
+      customerEmail,
+      subscriptionId,
       metadata: session.metadata,
     });
   } catch (error: any) {

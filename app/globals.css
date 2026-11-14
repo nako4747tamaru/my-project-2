@@ -27,3 +27,47 @@ body {
 .animate-fadeIn {
   animation: fadeIn 0.25s ease-out forwards;
 }
+
+/* 印刷・PDF出力用スタイル */
+@media print {
+  body {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* 印刷時に非表示にする要素 */
+  .no-print,
+  nav,
+  button,
+  footer,
+  .print-hidden {
+    display: none !important;
+  }
+
+  /* 印刷時のコンテナ調整 */
+  .print-area {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    box-shadow: none !important;
+    border: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .print-break-inside-avoid {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .print-text-dark {
+    color: #0f172a !important;
+  }
+
+  .print-border {
+    border-color: #cbd5e1 !important;
+  }
+}

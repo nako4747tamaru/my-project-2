@@ -23,9 +23,11 @@ import {
   BookOpen,
   Camera,
   FileDown,
+  Printer,
   Loader2,
   CreditCard,
 } from 'lucide-react';
+import { saveDiagnosticHistory } from '../../lib/history';
 
 import { QUESTIONS as defaultQuestions } from '../../lib/questions';
 import { PERSONALITY_TYPES } from '../../lib/analytics';
@@ -311,6 +313,32 @@ export default function ResultScreen({
         setUnlocked(true);
       }
 
+      // 診断結果を過去の診断履歴（マイページ用）へ自動保存
+      if (result && result.type) {
+        saveDiagnosticHistory({
+          userName,
+          type: result.type,
+          title: result.title || result.info?.name || '性格診断結果',
+          shortName: result.info?.shortName || result.type,
+          fatigueScore: result.fatigue?.score || 0,
+          fatigueLevel: result.fatigue?.level || 1,
+          fatigueStatus: result.fatigue?.status || '良好',
+          topDistortions: (result.distortions || []).slice(0, 3).map((d) => ({
+            type: d.type,
+            name: d.name,
+            percentage: d.percentage,
+            severity: d.severity,
+          })),
+          axes: {
+            EI: { label: result.axes.EI.primary, strength: result.axes.EI.strength },
+            SN: { label: result.axes.SN.primary, strength: result.axes.SN.strength },
+            TF: { label: result.axes.TF.primary, strength: result.axes.TF.strength },
+            JP: { label: result.axes.JP.primary, strength: result.axes.JP.strength },
+          },
+          answersCount: Object.keys(answers || {}).length,
+        });
+      }
+
       if (typeof window !== 'undefined') {
         const params = new URLSearchParams(window.location.search);
         const sessionIdParam = params.get('session_id');
@@ -503,7 +531,12 @@ ${shareUrl}
     return canvas;
   };
 
-  // ファイル名生成（安全な文字列）
+  // ブラウザ印刷・PDF出力
+  const handlePrint = () => {
+    if (typeof window !== 'undefined') {
+      window.print();
+    }
+  };
   const getSafeFileName = (extension: string) => {
     const cleanName = (userName || 'result').replace(/[/\\?%*:|"<>]/g, '_');
     const dateStr = new Date().toISOString().slice(0, 10);
@@ -1187,10 +1220,19 @@ ${shareUrl}
 
             {/* 解放時専用：メンタル処方箋サマリーカード */}
             {unlocked && (
-              <div className="mt-6 p-4 rounded-2xl bg-gradient-to-br from-indigo-950/60 via-purple-950/60 to-slate-900 border border-purple-500/40 space-y-3">
-                <div className="flex items-center gap-2 text-xs font-bold text-purple-300">
-                  <BookOpen className="w-4 h-4 text-purple-400" />
-                  <span>あなた専用のメンタル処方箋シート</span>
+              <div className="mt-6 p-4 rounded-2xl bg-gradient-to-br from-indigo-950/60 via-purple-950/60 to-slate-900 border border-purple-500/40 space-y-3 print-break-inside-avoid">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-xs font-bold text-purple-300">
+                    <BookOpen className="w-4 h-4 text-purple-400" />
+                    <span>あなた専用のメンタル処方箋シート</span>
+                  </div>
+                  <button
+                    onClick={handlePrint}
+                    className="no-print inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-900/60 hover:bg-purple-800/80 border border-purple-400/40 text-purple-100 text-xs font-medium cursor-pointer transition-all active:scale-95"
+                  >
+                    <Printer className="w-3.5 h-3.5 text-purple-300" />
+                    <span>処方箋を印刷 / PDF保存</span>
+                  </button>
                 </div>
                 <h4 className="text-sm font-bold text-white">
                   {userName}さん（{result.type}型）の心の回復ステップ
