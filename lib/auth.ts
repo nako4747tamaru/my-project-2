@@ -1,5 +1,7 @@
 import crypto from 'crypto';
 
+export type OAuthProvider = 'google' | 'twitter' | 'apple';
+
 export interface User {
   id: string;
   email: string;
@@ -8,6 +10,8 @@ export interface User {
   isPremium?: boolean;
   stripeCustomerId?: string;
   stripeSubscriptionId?: string;
+  provider?: OAuthProvider | 'credentials';
+  avatarUrl?: string;
 }
 
 export interface UserWithPassword extends User {
@@ -23,8 +27,6 @@ export interface SessionData {
 
 const JWT_SECRET = process.env.AUTH_SECRET || 'kokoro-navi-secure-auth-secret-key-2026';
 
-// サーバーインメモリ保持（Vercelサーバーレス等でもインスタンス単位でセッション照合可能）
-// 本格運用時のDB（Supabase / Neon / Prisma等）への移行も同一インターフェースで容易
 declare global {
   // eslint-disable-next-line no-var
   var __KOKORO_USERS_STORE__: Map<string, UserWithPassword> | undefined;
@@ -89,7 +91,7 @@ export function verifySessionToken(token: string): { userId: string; email: stri
 }
 
 /**
- * ユーザー登録
+ * 通常のメールアドレス・パスワードによる新規登録
  */
 export function registerUser(email: string, password: string, name: string): { user: User; token: string } {
   const normalizedEmail = email.trim().toLowerCase();
@@ -103,6 +105,7 @@ export function registerUser(email: string, password: string, name: string): { u
     email: normalizedEmail,
     name: name.trim() || 'ゲスト',
     createdAt: Date.now(),
+    provider: 'credentials',
     passwordHash: hash,
     salt,
   };
@@ -117,7 +120,7 @@ export function registerUser(email: string, password: string, name: string): { u
 }
 
 /**
- * ユーザーログイン
+ * 通常のログイン
  */
 export function loginUser(email: string, password: string): { user: User; token: string } {
   const normalizedEmail = email.trim().toLowerCase();
@@ -130,6 +133,47 @@ export function loginUser(email: string, password: string): { user: User; token:
   const isValid = verifyPassword(password, userRecord.passwordHash, userRecord.salt);
   if (!isValid) {
     throw new Error('メールアドレスまたはパスワードが正しくありません。');
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { passwordHash, salt: _, ...safeUser } = userRecord;
+  const token = generateSessionToken(safeUser);
+
+  return { user: safeUser, token };
+}
+
+/**
+ * ソーシャルログイン（Google / X / Apple）用のユーザー作成または取得
+ */
+export function findOrCreateOAuthUser(params: {
+  email: string;
+  name: string;
+  provider: OAuthProvider;
+  avatarUrl?: string;
+}): { user: User; token: string } {
+  const normalizedEmail = params.email.trim().toLowerCase();
+  let userRecord = usersStore.get(normalizedEmail);
+
+  if (!userRecord) {
+    // 初回ソーシャル登録時はランダムなパスワードハッシュを割り当て
+    const randomPassword = crypto.randomBytes(32).toString('hex');
+    const { hash, salt } = hashPassword(randomPassword);
+
+    userRecord = {
+      id: `usr_oauth_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`,
+      email: normalizedEmail,
+      name: params.name.trim() || `${params.provider}ユーザー`,
+      createdAt: Date.now(),
+      provider: params.provider,
+      avatarUrl: params.avatarUrl,
+      passwordHash: hash,
+      salt,
+    };
+    usersStore.set(normalizedEmail, userRecord);
+  } else {
+    // 既存アカウントがあればプロバイダーやアバター情報を更新
+    if (!userRecord.provider) userRecord.provider = params.provider;
+    if (params.avatarUrl) userRecord.avatarUrl = params.avatarUrl;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -214,11 +258,21 @@ export function changePassword(email: string, oldPassword: string, newPassword: 
 /**
  * アカウント削除（退会処理）
  */
-export function deleteAccount(email: string, password: string): boolean {
+export function deleteAccount(email: string, password?: string): boolean {
   const normalizedEmail = email.trim().toLowerCase();
   const userRecord = usersStore.get(normalizedEmail);
   if (!userRecord) {
     throw new Error('ユーザーが見つかりません。');
+  }
+
+  // ソーシャル認証のみでパスワード未設定の場合はパスワードなしでも退会可能
+  if (userRecord.provider && userRecord.provider !== 'credentials' && !password) {
+    usersStore.delete(normalizedEmail);
+    return true;
+  }
+
+  if (!password) {
+    throw new Error('パスワードを入力してください。');
   }
 
   const isValid = verifyPassword(password, userRecord.passwordHash, userRecord.salt);
