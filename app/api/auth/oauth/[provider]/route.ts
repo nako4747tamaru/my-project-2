@@ -26,9 +26,8 @@ export async function GET(
   if (provider === 'google') {
     const clientId = process.env.GOOGLE_CLIENT_ID;
     if (!clientId) {
-      // 開発・設定前テスト用のシミュレーションリダイレクト
-      console.warn('⚠️ GOOGLE_CLIENT_ID not configured. Simulating OAuth flow.');
-      return NextResponse.redirect(`${redirectUri}?code=mock_google_code&state=${state}&simulated=true`);
+      console.error('❌ GOOGLE_CLIENT_ID is not configured in environment variables.');
+      return NextResponse.redirect(`${origin}/account?tab=auth&error=google_not_configured`);
     }
 
     const scope = encodeURIComponent('openid email profile');
@@ -38,8 +37,8 @@ export async function GET(
   } else if (provider === 'twitter') {
     const clientId = process.env.TWITTER_CLIENT_ID;
     if (!clientId) {
-      console.warn('⚠️ TWITTER_CLIENT_ID not configured. Simulating OAuth flow.');
-      return NextResponse.redirect(`${redirectUri}?code=mock_twitter_code&state=${state}&simulated=true`);
+      console.error('❌ TWITTER_CLIENT_ID is not configured in environment variables.');
+      return NextResponse.redirect(`${origin}/account?tab=auth&error=twitter_not_configured`);
     }
 
     const scope = encodeURIComponent('users.read tweet.read');
@@ -49,8 +48,8 @@ export async function GET(
   } else if (provider === 'apple') {
     const clientId = process.env.APPLE_CLIENT_ID;
     if (!clientId) {
-      console.warn('⚠️ APPLE_CLIENT_ID not configured. Simulating OAuth flow.');
-      return NextResponse.redirect(`${redirectUri}?code=mock_apple_code&state=${state}&simulated=true`);
+      console.error('❌ APPLE_CLIENT_ID is not configured in environment variables.');
+      return NextResponse.redirect(`${origin}/account?tab=auth&error=apple_not_configured`);
     }
 
     authUrl = `https://appleid.apple.com/auth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(

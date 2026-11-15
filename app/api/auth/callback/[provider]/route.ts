@@ -16,7 +16,6 @@ export async function GET(
   const { provider } = await params;
   const { searchParams } = new URL(req.url);
   const code = searchParams.get('code');
-  const isSimulated = searchParams.get('simulated') === 'true';
 
   const origin =
     req.headers.get('origin') ||
@@ -35,90 +34,112 @@ export async function GET(
       const clientId = process.env.GOOGLE_CLIENT_ID;
       const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
 
-      if (clientId && clientSecret && !isSimulated) {
-        // Google トークンエンドポイントへ code を送信してアクセストークン取得
-        const redirectUri = `${origin}/api/auth/callback/google`;
-        const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams({
-            code,
-            client_id: clientId,
-            client_secret: clientSecret,
-            redirect_uri: redirectUri,
-            grant_type: 'authorization_code',
-          }),
-        });
-
-        const tokenData = await tokenRes.json();
-        if (!tokenRes.ok || !tokenData.access_token) {
-          throw new Error(tokenData.error_description || 'Googleトークンの取得に失敗しました');
-        }
-
-        // ユーザープロファイル取得
-        const userRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-          headers: { Authorization: `Bearer ${tokenData.access_token}` },
-        });
-        const userData = await userRes.json();
-
-        userProfile = {
-          email: userData.email,
-          name: userData.name || 'Googleユーザー',
-          avatarUrl: userData.picture,
-        };
-      } else {
-        // 開発環境または環境変数未設定時のフォールバックモック
-        userProfile = {
-          email: 'google-user@example.com',
-          name: 'Googleテストユーザー',
-        };
+      if (!clientId || !clientSecret) {
+        throw new Error('Google OAuthの設定が未完了です（GOOGLE_CLIENT_IDまたはGOOGLE_CLIENT_SECRETが設定されていません）。');
       }
+
+      // Google トークンエンドポイントへ code を送信してアクセストークン取得
+      const redirectUri = `${origin}/api/auth/callback/google`;
+      const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          code,
+          client_id: clientId,
+          client_secret: clientSecret,
+          redirect_uri: redirectUri,
+          grant_type: 'authorization_code',
+        }),
+      });
+
+      const tokenData = await tokenRes.json();
+      if (!tokenRes.ok || !tokenData.access_token) {
+        throw new Error(tokenData.error_description || 'Googleトークンの取得に失敗しました');
+      }
+
+      // ユーザープロファイル取得
+      const userRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+        headers: { Authorization: `Bearer ${tokenData.access_token}` },
+      });
+      const userData = await userRes.json();
+
+      userProfile = {
+        email: userData.email,
+        name: userData.name || 'Googleユーザー',
+        avatarUrl: userData.picture,
+      };
     } else if (provider === 'twitter') {
       const clientId = process.env.TWITTER_CLIENT_ID;
       const clientSecret = process.env.TWITTER_CLIENT_SECRET;
 
-      if (clientId && clientSecret && !isSimulated) {
-        const redirectUri = `${origin}/api/auth/callback/twitter`;
-        const basicAuth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
-
-        const tokenRes = await fetch('https://api.twitter.com/2/oauth2/token', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            Authorization: `Basic ${basicAuth}`,
-          },
-          body: new URLSearchParams({
-            code,
-            grant_type: 'authorization_code',
-            redirect_uri: redirectUri,
-            code_verifier: 'challenge',
-          }),
-        });
-
-        const tokenData = await tokenRes.json();
-        if (!tokenRes.ok || !tokenData.access_token) {
-          throw new Error('X(Twitter)トークンの取得に失敗しました');
-        }
-
-        const userRes = await fetch('https://api.twitter.com/2/users/me?user.fields=profile_image_url', {
-          headers: { Authorization: `Bearer ${tokenData.access_token}` },
-        });
-        const userData = await userRes.json();
-
-        userProfile = {
-          email: `${userData.data?.username || 'user'}@x-oauth.com`,
-          name: userData.data?.name || userData.data?.username || 'Xユーザー',
-          avatarUrl: userData.data?.profile_image_url,
-        };
-      } else {
-        userProfile = {
-          email: 'twitter-user@example.com',
-          name: 'X(Twitter)テストユーザー',
-        };
+      if (!clientId || !clientSecret) {
+        throw new Error('X(Twitter) OAuthの設定が未完了です（TWITTER_CLIENT_IDまたはTWITTER_CLIENT_SECRETが設定されていません）。');
       }
-    } else if (provider === 'apple') {
+
+      const redirectUri = `${origin}/api/auth/callback/twitter`;
+      const basicAuth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
+
+      const tokenRes = await fetch('https://api.twitter.com/2/oauth2/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          Authorization: `Basic ${basicAuth}`,
+        },
+        body: new URLSearchParams({
+          code,
+          grant_type: 'authorization_code',
+          redirect_uri: redirectUri,
+          code_verifier: 'challenge',
+        }),
+      });
+
+      const tokenData = await tokenRes.json();
+      if (!tokenRes.ok || !tokenData.access_token) {
+        throw new Error('X(Twitter)トークンの取得に失敗しました');
+      }
+
+      const userRes = await fetch('https://api.twitter.com/2/users/me?user.fields=profile_image_url', {
+        headers: { Authorization: `Bearer ${tokenData.access_token}` },
+      });
+      const userData = await userRes.json();
+
       userProfile = {
-        email: 'apple-user@privaterelay.appleid.com',
+        email: `${userData.data?.username || 'user'}@x-oauth.com`,
+        name: userData.data?.name || userData.data?.username || 'Xユーザー',
+        avatarUrl: userData.data?.profile_image_url,
+      };
+    } else if (provider === 'apple') {
+      const clientId = process.env.APPLE_CLIENT_ID;
+      const clientSecret = process.env.APPLE_CLIENT_SECRET;
+
+      if (!clientId || !clientSecret) {
+        throw new Error('Apple OAuthの設定が未完了です（APPLE_CLIENT_IDまたはAPPLE_CLIENT_SECRETが設定されていません）。');
+      }
+
+      // Apple トークン検証
+      const redirectUri = `${origin}/api/auth/callback/apple`;
+      const tokenRes = await fetch('https://appleid.apple.com/auth/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          client_id: clientId,
+          client_secret: clientSecret,
+          code,
+          grant_type: 'authorization_code',
+          redirect_uri: redirectUri,
+        }),
+      });
+      const tokenData = await tokenRes.json();
+      if (!tokenRes.ok || !tokenData.id_token) {
+        throw new Error('Appleトークンの検証に失敗しました');
+      }
+
+      // id_token のペイロードをデコード
+      const payloadBase64 = tokenData.id_token.split('.')[1];
+      const payload = JSON.parse(Buffer.from(payloadBase64, 'base64').toString('utf-8'));
+
+      userProfile = {
+        email: payload.email,
         name: 'Appleユーザー',
       };
     } else {
