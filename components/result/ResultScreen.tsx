@@ -374,6 +374,8 @@ export default function ResultScreen({
 
   // キャプチャ対象エリアの参照
   const captureCardRef = useRef<HTMLDivElement>(null);
+  // SNSシェアカード（専用プレビューボックス）の参照
+  const shareCardPreviewRef = useRef<HTMLDivElement>(null);
 
   const topDistortion = result.topDistortions[0];
 
@@ -513,13 +515,13 @@ ${shareUrl}
   };
 
   // キャプチャ実行ヘルパー関数
-  const executeCapture = async (): Promise<HTMLCanvasElement | null> => {
-    if (!captureCardRef.current) return null;
+  const executeCapture = async (targetElement?: HTMLElement | null): Promise<HTMLCanvasElement | null> => {
+    const element = targetElement || captureCardRef.current;
+    if (!element) return null;
 
     // 動的インポート（SSR対策＆バンドル軽量化）
     const html2canvas = (await import('html2canvas')).default;
 
-    const element = captureCardRef.current;
     const canvas = await html2canvas(element, {
       scale: 2, // 高解像度（Retina）
       useCORS: true,
@@ -543,8 +545,8 @@ ${shareUrl}
     return `kokoro-navi-${cleanName}-${result.type}-${dateStr}.${extension}`;
   };
 
-  // 3. 画像（PNG）として保存（Instagram・TikTok・保存用）
-  const handleSaveImage = async () => {
+  // 3. 画像（PNG）として保存（Instagram・TikTok・LINE・SNSシェア用）
+  const handleSaveImage = async (isShareCard = false) => {
     if (exportingState !== 'idle') return;
     try {
       setExportingState('image');
@@ -553,18 +555,22 @@ ${shareUrl}
       // DOM更新とレンダリング準備のためのマイクロウェイト
       await new Promise((r) => setTimeout(r, 120));
 
-      const canvas = await executeCapture();
+      const targetEl = isShareCard && shareCardPreviewRef.current 
+        ? shareCardPreviewRef.current 
+        : captureCardRef.current;
+
+      const canvas = await executeCapture(targetEl);
       if (!canvas) throw new Error('キャプチャ対象が見つかりませんでした');
 
       const dataUrl = canvas.toDataURL('image/png', 1.0);
       const link = document.createElement('a');
-      link.download = getSafeFileName('png');
+      link.download = getSafeFileName(isShareCard ? 'share.png' : 'png');
       link.href = dataUrl;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
 
-      setExportSuccessMessage('診断結果画像を保存しました！ストーリーやTikTokでシェアしてね📸');
+      setExportSuccessMessage('診断結果画像を保存しました！ストーリーやTikTok、LINEでシェアしてね📸');
       setTimeout(() => setExportSuccessMessage(null), 3500);
     } catch (err) {
       console.error('Failed to export image:', err);
@@ -685,7 +691,7 @@ ${shareUrl}
         <ShareButtonGroup
           onShareX={handleShareX}
           onShareLine={handleShareLine}
-          onSaveImage={handleSaveImage}
+          onSaveImage={() => handleSaveImage(false)}
           onShareNative={handleShareNative}
           onSavePdf={handleSavePdf}
           isExportingImage={exportingState === 'image'}
@@ -694,6 +700,123 @@ ${shareUrl}
           title="診断結果をシェア・保存"
           subtitle="SNS対応 ＆ 高画質保存"
         />
+
+        {/* ======================================================== */}
+        {/* SNS・LINEシェア用専用カード（プレビュー用デザインボックス） */}
+        {/* ======================================================== */}
+        <div className="rounded-3xl bg-gradient-to-b from-[#1E1B4B]/70 via-[#161C2E] to-[#121625] border border-indigo-500/40 p-4 sm:p-5 shadow-2xl space-y-3.5 relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="p-1 rounded-lg bg-pink-500/20 text-pink-300">
+                <Share2 className="w-3.5 h-3.5" />
+              </div>
+              <span className="text-xs font-bold text-white tracking-wide">SNS・LINEシェア用カード</span>
+            </div>
+            <span className="text-[10px] text-indigo-300/80 bg-indigo-950/60 px-2 py-0.5 rounded-full border border-indigo-800/60">
+              シェア専用画像
+            </span>
+          </div>
+
+          {/* シェア用カード本体（html2canvasキャプチャ対象） */}
+          <div
+            ref={shareCardPreviewRef}
+            className="rounded-2xl bg-gradient-to-br from-[#1C2339] via-[#121727] to-[#0A0D18] border border-indigo-400/30 p-4 sm:p-5 text-center shadow-lg relative overflow-hidden"
+            style={{ backgroundColor: '#0F1322', color: '#F1F5F9' }}
+          >
+            {/* 上部ヘッダーバッジ */}
+            <div className="flex items-center justify-between pb-2 mb-3 border-b border-slate-800/80">
+              <div className="flex items-center gap-1.5">
+                <OwlMascot size={20} />
+                <span className="text-[11px] font-black tracking-wider text-indigo-200">ココロナビ KokoroNavi</span>
+              </div>
+              <span className="text-[10px] text-slate-300 bg-slate-800/80 px-2 py-0.5 rounded-full border border-slate-700/60">
+                {userName}さんの診断結果
+              </span>
+            </div>
+
+            {/* キャラクターアイコン ＆ タイプ表示 */}
+            <div className="flex items-center justify-center gap-3 my-2">
+              <div className="p-1 rounded-2xl bg-indigo-950/80 border border-indigo-500/30 shadow-md">
+                <TypeAnimalIcon type={result.type} size={64} priority />
+              </div>
+              <div className="text-left space-y-0.5">
+                <span className="text-[10px] text-indigo-300 font-bold block">
+                  {result.info.group || '性格タイプ'}
+                </span>
+                <h3 className="text-2xl sm:text-3xl font-black text-white tracking-wider">
+                  {result.type}
+                </h3>
+                <p className="text-xs font-bold text-slate-200">
+                  {result.info.shortName || result.title}
+                </p>
+              </div>
+            </div>
+
+            {/* キャッチフレーズ */}
+            <div className="my-2.5 px-3 py-1.5 rounded-xl bg-purple-950/50 border border-purple-500/30 inline-block max-w-full">
+              <p className="text-xs font-medium text-purple-200 italic">
+                「{result.catchphrase}」
+              </p>
+            </div>
+
+            {/* 要約テキスト */}
+            <p className="text-[11px] text-slate-300 leading-relaxed text-left bg-black/30 p-2.5 rounded-xl border border-slate-800/80 line-clamp-3">
+              {result.description}
+            </p>
+
+            {/* 疲弊度 ＆ 最も出やすい思考の癖（要約バッジ） */}
+            <div className="grid grid-cols-2 gap-2 my-2.5 text-[10px]">
+              <div className="p-2 rounded-lg bg-slate-900/70 border border-slate-800 text-left">
+                <span className="text-slate-400 block">🌿 メンタル疲弊度</span>
+                <span className="font-bold text-amber-300">{result.fatigue.title} (Lv.{result.fatigue.level}/5)</span>
+              </div>
+              <div className="p-2 rounded-lg bg-slate-900/70 border border-slate-800 text-left">
+                <span className="text-slate-400 block">🧠 思考の癖傾向</span>
+                <span className="font-bold text-rose-300 truncate block">
+                  {topDistortion?.name || '良好・バランス型'}
+                </span>
+              </div>
+            </div>
+
+            {/* ハッシュタグ・フッター */}
+            <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] text-slate-400">
+              <span className="text-slate-300 font-bold">#ココロナビ #性格診断 #{result.type}</span>
+              <span className="font-mono text-indigo-400">kokoronavi.com</span>
+            </div>
+          </div>
+
+          {/* 専用アクションボタン（カード画像保存 ＆ LINEシェア） */}
+          <div className="flex items-center gap-2 pt-1">
+            <button
+              onClick={() => handleSaveImage(true)}
+              disabled={exportingState !== 'idle'}
+              className="flex-1 py-2.5 px-3 rounded-xl bg-gradient-to-r from-pink-600 via-rose-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold text-xs shadow-md shadow-rose-950/50 flex items-center justify-center gap-1.5 transition-all active:scale-[0.98] disabled:opacity-50 cursor-pointer"
+            >
+              {exportingState === 'image' ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
+                  <span>カード画像を作成中...</span>
+                </>
+              ) : (
+                <>
+                  <Camera className="w-3.5 h-3.5 text-white" />
+                  <span>シェア用画像を保存する</span>
+                </>
+              )}
+            </button>
+
+            <button
+              onClick={handleShareLine}
+              className="py-2.5 px-4 rounded-xl bg-[#06C755] hover:bg-[#05b34c] text-white font-bold text-xs shadow-md shadow-emerald-950/40 flex items-center justify-center gap-1.5 transition-all active:scale-[0.98] cursor-pointer"
+              title="LINEでこの結果をシェア"
+            >
+              <svg className="w-3.5 h-3.5 fill-white" viewBox="0 0 24 24">
+                <path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 4.269 8.846 10.019 9.576.39.085.922.259 1.057.595.121.304.08.779.039 1.085l-.171 1.026c-.053.303-.242 1.185 1.039.646 1.281-.54 6.911-4.069 9.428-6.967 1.739-1.907 2.589-3.864 2.589-5.965z"/>
+              </svg>
+              <span>LINEシェア</span>
+            </button>
+          </div>
+        </div>
 
         {/* ======================================================== */}
         {/* キャプチャ対象エリア (ユーザーの診断結果カード群) */}
@@ -1015,7 +1138,7 @@ ${shareUrl}
         <ShareButtonGroup
           onShareX={handleShareX}
           onShareLine={handleShareLine}
-          onSaveImage={handleSaveImage}
+          onSaveImage={() => handleSaveImage(false)}
           onShareNative={handleShareNative}
           onSavePdf={handleSavePdf}
           isExportingImage={exportingState === 'image'}
