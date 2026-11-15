@@ -230,6 +230,7 @@ function AccountContent() {
           email: emailAuth,
           password: passwordAuth,
           name: nameAuth || 'ゲスト',
+          customerId: customerId || undefined,
         }),
       });
 
