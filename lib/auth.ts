@@ -170,3 +170,62 @@ export function updateUserSubscription(
   const { passwordHash, salt: _, ...safeUser } = userRecord;
   return safeUser;
 }
+
+/**
+ * ユーザープロフィールの更新（名前の変更）
+ */
+export function updateProfile(email: string, name: string): User {
+  const normalizedEmail = email.trim().toLowerCase();
+  const userRecord = usersStore.get(normalizedEmail);
+  if (!userRecord) {
+    throw new Error('ユーザーが見つかりません。');
+  }
+  userRecord.name = name.trim() || 'ゲスト';
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { passwordHash, salt: _, ...safeUser } = userRecord;
+  return safeUser;
+}
+
+/**
+ * パスワード変更
+ */
+export function changePassword(email: string, oldPassword: string, newPassword: string): boolean {
+  const normalizedEmail = email.trim().toLowerCase();
+  const userRecord = usersStore.get(normalizedEmail);
+  if (!userRecord) {
+    throw new Error('ユーザーが見つかりません。');
+  }
+
+  const isValid = verifyPassword(oldPassword, userRecord.passwordHash, userRecord.salt);
+  if (!isValid) {
+    throw new Error('現在のパスワードが正しくありません。');
+  }
+
+  if (newPassword.length < 6) {
+    throw new Error('新しいパスワードは6文字以上で指定してください。');
+  }
+
+  const { hash, salt } = hashPassword(newPassword);
+  userRecord.passwordHash = hash;
+  userRecord.salt = salt;
+  return true;
+}
+
+/**
+ * アカウント削除（退会処理）
+ */
+export function deleteAccount(email: string, password: string): boolean {
+  const normalizedEmail = email.trim().toLowerCase();
+  const userRecord = usersStore.get(normalizedEmail);
+  if (!userRecord) {
+    throw new Error('ユーザーが見つかりません。');
+  }
+
+  const isValid = verifyPassword(password, userRecord.passwordHash, userRecord.salt);
+  if (!isValid) {
+    throw new Error('パスワードが正しくありません。');
+  }
+
+  usersStore.delete(normalizedEmail);
+  return true;
+}

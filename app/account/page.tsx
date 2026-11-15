@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import {
   CreditCard,
   ExternalLink,
@@ -22,9 +22,13 @@ import {
   Lock,
   KeyRound,
   CheckCircle2,
-  Activity,
-  Layers,
   Calendar,
+  Settings,
+  RefreshCw,
+  Clock,
+  Receipt,
+  UserX,
+  AlertTriangle,
 } from 'lucide-react';
 import OwlMascot from '../../components/common/OwlMascot';
 import LegalFooter from '../../components/common/LegalFooter';
@@ -43,8 +47,22 @@ interface UserState {
   isPremium?: boolean;
 }
 
+interface SubscriptionDetails {
+  isPremium: boolean;
+  status: string;
+  subscriptionId?: string;
+  customerId?: string;
+  planName?: string;
+  amount?: number;
+  currency?: string;
+  currentPeriodEnd?: number;
+  cancelAtPeriodEnd?: boolean;
+  isMock?: boolean;
+}
+
 function AccountContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   // 認証関連ステート
   const [user, setUser] = useState<UserState | null>(null);
@@ -57,9 +75,24 @@ function AccountContent() {
   const [authSuccess, setAuthSuccess] = useState<string | null>(null);
   const [isSubmittingAuth, setIsSubmittingAuth] = useState(false);
 
+  // タブ管理
+  const [activeTab, setActiveTab] = useState<'subscription' | 'history' | 'auth' | 'settings'>('subscription');
+
+  // サブスクリプション詳細ステート
+  const [subDetails, setSubDetails] = useState<SubscriptionDetails | null>(null);
+  const [isLoadingSubDetails, setIsLoadingSubDetails] = useState(false);
+
+  // 設定タブ用ステート（名前変更・パスワード変更・退会）
+  const [editName, setEditName] = useState('');
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [deleteConfirmPassword, setDeleteConfirmPassword] = useState('');
+  const [settingsMessage, setSettingsMessage] = useState<string | null>(null);
+  const [settingsError, setSettingsError] = useState<string | null>(null);
+  const [isUpdatingSettings, setIsUpdatingSettings] = useState(false);
+
   // 診断履歴ステート
   const [histories, setHistories] = useState<DiagnosticHistoryItem[]>([]);
-  const [activeTab, setActiveTab] = useState<'subscription' | 'history' | 'auth'>('subscription');
 
   // Stripe ポータル関連ステート
   const [emailInput, setEmailInput] = useState('');
@@ -80,6 +113,33 @@ function AccountContent() {
     setLegalModalOpen(true);
   };
 
+  // サブスクリプション詳細のフェッチ
+  const fetchSubscriptionDetails = async (email?: string, custId?: string) => {
+    setIsLoadingSubDetails(true);
+    try {
+      const q = new URLSearchParams();
+      if (email) q.set('email', email);
+      if (custId) q.set('customerId', custId);
+      const res = await fetch(`/api/subscription/details?${q.toString()}`);
+      if (res.ok) {
+        const data = await res.json();
+        setSubDetails(data);
+        if (data.isPremium) {
+          setIsUnlocked(true);
+          localStorage.setItem('kokoro_navi_premium_unlocked_v1', 'true');
+        }
+        if (data.customerId) {
+          setCustomerId(data.customerId);
+          localStorage.setItem('kokoro_navi_stripe_customer_id', data.customerId);
+        }
+      }
+    } catch (e) {
+      console.warn('Subscription details fetch failed:', e);
+    } finally {
+      setIsLoadingSubDetails(false);
+    }
+  };
+
   // 認証セッションの取得
   const checkAuthSession = async () => {
     setAuthLoading(true);
@@ -88,6 +148,7 @@ function AccountContent() {
       const data = await res.json();
       if (data.authenticated && data.user) {
         setUser(data.user);
+        setEditName(data.user.name);
         if (data.user.email) {
           setEmailInput(data.user.email);
           setCustomerEmail(data.user.email);
@@ -95,8 +156,13 @@ function AccountContent() {
         if (data.user.isPremium) {
           setIsUnlocked(true);
         }
+        fetchSubscriptionDetails(data.user.email, data.user.stripeCustomerId);
       } else {
         setUser(null);
+        // 未ログイン時もローカルストレージ情報からサブスク詳細取得
+        const storedEmail = localStorage.getItem('kokoro_navi_stripe_customer_email');
+        const storedCustId = localStorage.getItem('kokoro_navi_stripe_customer_id');
+        fetchSubscriptionDetails(storedEmail || undefined, storedCustId || undefined);
       }
     } catch (e) {
       console.error('Failed to check auth:', e);
@@ -105,7 +171,6 @@ function AccountContent() {
     }
   };
 
-  // 履歴のロード
   const refreshHistories = () => {
     setHistories(getDiagnosticHistories());
   };
@@ -140,9 +205,8 @@ function AccountContent() {
         setStatusMessage('ℹ️ 開発・テスト環境のため、ポータル遷移はデモ完了として処理されました。');
       }
 
-      // タブ指定クエリがあれば切り替え
       const tabParam = searchParams.get('tab');
-      if (tabParam === 'history' || tabParam === 'subscription' || tabParam === 'auth') {
+      if (tabParam === 'history' || tabParam === 'subscription' || tabParam === 'auth' || tabParam === 'settings') {
         setActiveTab(tabParam as any);
       }
     } catch {
@@ -175,12 +239,15 @@ function AccountContent() {
       }
 
       setUser(data.user);
+      setEditName(data.user.name);
       setAuthSuccess(data.message || '認証が成功しました！');
       setEmailInput(data.user.email);
       setCustomerEmail(data.user.email);
       setPasswordAuth('');
-      
-      // 成功後にタブをサブスクリプションへ戻す
+
+      // ログイン成功時にStripe会員権を再チェック＆同期
+      fetchSubscriptionDetails(data.user.email, data.user.stripeCustomerId);
+
       setTimeout(() => {
         setActiveTab('subscription');
       }, 1000);
@@ -200,6 +267,96 @@ function AccountContent() {
       setTimeout(() => setAuthSuccess(null), 3000);
     } catch (err) {
       console.error('Logout error:', err);
+    }
+  };
+
+  // プロフィール更新（名前）
+  const handleUpdateProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSettingsMessage(null);
+    setSettingsError(null);
+    setIsUpdatingSettings(true);
+
+    try {
+      const res = await fetch('/api/auth/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'update_profile',
+          name: editName,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || '更新に失敗しました。');
+      setUser(data.user);
+      setSettingsMessage('ニックネームを更新しました！');
+      setTimeout(() => setSettingsMessage(null), 3000);
+    } catch (err: any) {
+      setSettingsError(err.message);
+    } finally {
+      setIsUpdatingSettings(false);
+    }
+  };
+
+  // パスワード変更
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSettingsMessage(null);
+    setSettingsError(null);
+    setIsUpdatingSettings(true);
+
+    try {
+      const res = await fetch('/api/auth/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'change_password',
+          oldPassword,
+          newPassword,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || '変更に失敗しました。');
+      setSettingsMessage('パスワードを正常に変更しました！');
+      setOldPassword('');
+      setNewPassword('');
+      setTimeout(() => setSettingsMessage(null), 3500);
+    } catch (err: any) {
+      setSettingsError(err.message);
+    } finally {
+      setIsUpdatingSettings(false);
+    }
+  };
+
+  // アカウント削除（退会）
+  const handleDeleteAccount = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!confirm('本当にアカウントを削除しますか？\n※退会すると登録情報やセッションが破棄されます。')) {
+      return;
+    }
+    setSettingsMessage(null);
+    setSettingsError(null);
+    setIsUpdatingSettings(true);
+
+    try {
+      const res = await fetch('/api/auth/settings', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          password: deleteConfirmPassword,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || '退会処理に失敗しました。');
+      alert(data.message || 'アカウントを削除しました。');
+      setUser(null);
+      setIsUnlocked(false);
+      localStorage.removeItem('kokoro_navi_premium_unlocked_v1');
+      router.push('/');
+    } catch (err: any) {
+      setSettingsError(err.message);
+    } finally {
+      setIsUpdatingSettings(false);
     }
   };
 
@@ -239,7 +396,7 @@ function AccountContent() {
     }
   };
 
-  // 履歴個別削除
+  // 履歴削除
   const handleDeleteHistory = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (confirm('この診断履歴を削除しますか？')) {
@@ -248,12 +405,18 @@ function AccountContent() {
     }
   };
 
-  // 履歴全件削除
   const handleClearAllHistory = () => {
     if (confirm('すべての診断履歴をクリアしますか？（元に戻せません）')) {
       clearDiagnosticHistories();
       setHistories([]);
     }
+  };
+
+  // 更新日のフォーマット
+  const formatPeriodEnd = (timestamp?: number) => {
+    if (!timestamp) return '未定';
+    const date = new Date(timestamp * 1000);
+    return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
   };
 
   return (
@@ -335,51 +498,64 @@ function AccountContent() {
           )}
         </div>
 
-        {/* タブナビゲーション */}
+        {/* タブナビゲーション（4タブ） */}
         <div className="flex rounded-2xl bg-slate-900/90 p-1 border border-slate-800">
           <button
             onClick={() => setActiveTab('subscription')}
-            className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+            className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
               activeTab === 'subscription'
                 ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
             <CreditCard className="w-3.5 h-3.5" />
-            <span>契約・定期課金</span>
+            <span>契約・課金</span>
           </button>
 
           <button
             onClick={() => setActiveTab('history')}
-            className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+            className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
               activeTab === 'history'
                 ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
             <History className="w-3.5 h-3.5" />
-            <span>診断履歴 ({histories.length})</span>
+            <span>履歴 ({histories.length})</span>
           </button>
+
+          {user && (
+            <button
+              onClick={() => setActiveTab('settings')}
+              className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
+                activeTab === 'settings'
+                  ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Settings className="w-3.5 h-3.5" />
+              <span>設定</span>
+            </button>
+          )}
 
           <button
             onClick={() => setActiveTab('auth')}
-            className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+            className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
               activeTab === 'auth'
                 ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
             <KeyRound className="w-3.5 h-3.5" />
-            <span>アカウント認証</span>
+            <span>{user ? '認証管理' : 'ログイン'}</span>
           </button>
         </div>
 
         {/* ======================================================== */}
-        {/* タブ1: 定期課金・Stripeカスタマーポータル */}
+        {/* タブ1: サブスクリプション状態の詳細ダッシュボード表示 */}
         {/* ======================================================== */}
         {activeTab === 'subscription' && (
-          <div className="space-y-6 animate-fadeIn">
-            {/* ステータスメッセージ / エラーメッセージ */}
+          <div className="space-y-5 animate-fadeIn">
             {statusMessage && (
               <div className="p-3.5 rounded-2xl bg-indigo-950/60 border border-indigo-500/40 text-xs text-indigo-200 flex items-start gap-2.5">
                 <Sparkles className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
@@ -394,44 +570,79 @@ function AccountContent() {
               </div>
             )}
 
-            {/* 会員ステータスカード */}
-            <div className="p-5 rounded-3xl bg-gradient-to-b from-[#182033] to-[#121726] border border-slate-700/70 shadow-xl space-y-4">
+            {/* サブスクリプション状態詳細カード */}
+            <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-b from-[#182033] via-[#141A2B] to-[#101422] border border-slate-700/70 shadow-2xl space-y-4">
               <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-                <span className="text-xs font-bold text-slate-400">現在のステータス</span>
-                {isUnlocked ? (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-bold">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                    プレミアム会員（解放中）
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700 text-xs font-medium">
-                    無料プラン
-                  </span>
-                )}
-              </div>
-
-              <div className="space-y-2 text-xs text-slate-300">
-                <div className="flex justify-between items-center py-1">
-                  <span className="text-slate-400">プラン名:</span>
-                  <span className="font-semibold text-white">ココロナビ 完全レポート解放（月額会員）</span>
+                <div className="flex items-center gap-2">
+                  <CreditCard className="w-4 h-4 text-indigo-400" />
+                  <span className="text-xs font-bold text-white">ご契約プラン・請求ステータス</span>
                 </div>
-                <div className="flex justify-between items-center py-1">
-                  <span className="text-slate-400">月額料金:</span>
-                  <span className="font-semibold text-white">¥980 / 月（税込）</span>
-                </div>
-                {(customerEmail || user?.email) && (
-                  <div className="flex justify-between items-center py-1">
-                    <span className="text-slate-400">登録メールアドレス:</span>
-                    <span className="font-mono text-slate-200">{customerEmail || user?.email}</span>
-                  </div>
-                )}
-                <div className="flex justify-between items-center py-1">
-                  <span className="text-slate-400">解約制限:</span>
-                  <span className="text-emerald-400 font-medium">契約期間の縛りなし・いつでも即時解約可能</span>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={() => fetchSubscriptionDetails(user?.email || customerEmail || undefined, customerId || undefined)}
+                    disabled={isLoadingSubDetails}
+                    title="最新の状態に更新"
+                    className="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${isLoadingSubDetails ? 'animate-spin text-indigo-400' : ''}`} />
+                  </button>
+                  {isUnlocked ? (
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-xs font-bold">
+                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                      プレミアム会員（有効）
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700 text-xs font-medium">
+                      無料プラン
+                    </span>
+                  )}
                 </div>
               </div>
 
-              {/* Stripeカスタマーポータル遷移ボタン */}
+              {/* プラン詳細グリッド */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div className="p-3 rounded-2xl bg-black/30 border border-slate-800 space-y-1">
+                  <span className="text-slate-400 text-[10px]">プラン名称</span>
+                  <p className="font-bold text-white text-xs sm:text-sm">
+                    {subDetails?.planName || 'ココロナビ 完全レポート解放（月額会員）'}
+                  </p>
+                </div>
+
+                <div className="p-3 rounded-2xl bg-black/30 border border-slate-800 space-y-1">
+                  <span className="text-slate-400 text-[10px]">お支払い金額</span>
+                  <p className="font-bold text-amber-300 text-xs sm:text-sm">
+                    ¥{(subDetails?.amount || 980).toLocaleString()} / 月（税込）
+                  </p>
+                </div>
+
+                <div className="p-3 rounded-2xl bg-black/30 border border-slate-800 space-y-1">
+                  <span className="text-slate-400 text-[10px] flex items-center gap-1">
+                    <Clock className="w-3 h-3 text-indigo-400" />
+                    <span>次回更新日 / 請求予定</span>
+                  </span>
+                  <p className="font-bold text-slate-200 text-xs">
+                    {subDetails?.currentPeriodEnd ? formatPeriodEnd(subDetails.currentPeriodEnd) : '契約中（次回更新あり）'}
+                  </p>
+                </div>
+
+                <div className="p-3 rounded-2xl bg-black/30 border border-slate-800 space-y-1">
+                  <span className="text-slate-400 text-[10px] flex items-center gap-1">
+                    <Receipt className="w-3 h-3 text-indigo-400" />
+                    <span>更新ステータス</span>
+                  </span>
+                  <p className="font-bold text-xs">
+                    {subDetails?.cancelAtPeriodEnd ? (
+                      <span className="text-amber-400">期間終了時に解約予定</span>
+                    ) : isUnlocked ? (
+                      <span className="text-emerald-400">自動更新中（いつでも解約可）</span>
+                    ) : (
+                      <span className="text-slate-400">未登録</span>
+                    )}
+                  </p>
+                </div>
+              </div>
+
+              {/* Stripeカスタマーポータルへのダイレクトリンクボタン */}
               <div className="pt-2">
                 <button
                   onClick={() => handleOpenCustomerPortal()}
@@ -439,7 +650,7 @@ function AccountContent() {
                   className="w-full relative group overflow-hidden rounded-2xl p-[1px] shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 transition-all duration-300 active:scale-[0.98] cursor-pointer disabled:opacity-75 disabled:cursor-wait"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-2xl transition-all duration-300 group-hover:scale-105" />
-                  <div className="relative px-4 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold flex items-center justify-center gap-2 text-sm">
+                  <div className="relative px-4 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold flex items-center justify-center gap-2 text-xs sm:text-sm">
                     {isLoadingPortal ? (
                       <>
                         <Loader2 className="w-4 h-4 text-white animate-spin" />
@@ -448,13 +659,13 @@ function AccountContent() {
                     ) : (
                       <>
                         <CreditCard className="w-4 h-4 text-indigo-200" />
-                        <span>定期課金の解約・プラン管理（Stripe公式ポータル）へ</span>
+                        <span>Stripe公式ポータルを開く（解約・カード変更・領収書）</span>
                         <ExternalLink className="w-4 h-4 text-indigo-200 transition-transform group-hover:translate-x-0.5" />
                       </>
                     )}
                   </div>
                 </button>
-                <p className="mt-2 text-center text-[11px] text-slate-400">
+                <p className="mt-2 text-center text-[10px] text-slate-400">
                   ※Stripe公式の安全な暗号化画面に移動し、ワンクリックで解約・カード変更が可能です。
                 </p>
               </div>
@@ -464,10 +675,10 @@ function AccountContent() {
             <div className="p-5 rounded-3xl bg-[#141A29] border border-slate-800/80 space-y-3">
               <div className="flex items-center gap-2 text-xs font-bold text-slate-300">
                 <Mail className="w-4 h-4 text-purple-400" />
-                <span>決済時のメールアドレスからポータルを開く</span>
+                <span>メールアドレスからポータルを開く</span>
               </div>
               <p className="text-[11px] text-slate-400 leading-relaxed">
-                別の端末やブラウザから解約・確認される場合は、お支払い時にStripeに入力したメールアドレスを入力してください。
+                決済時にStripeに入力したメールアドレスを入力してポータル画面を開くこともできます。
               </p>
 
               <form onSubmit={handleOpenCustomerPortal} className="space-y-3 pt-1">
@@ -491,36 +702,18 @@ function AccountContent() {
                     </>
                   ) : (
                     <>
-                      <span>このメールアドレスでポータルを開く</span>
+                      <span>ポータル画面へ</span>
                       <ExternalLink className="w-3.5 h-3.5" />
                     </>
                   )}
                 </button>
               </form>
             </div>
-
-            {/* 解約ガイド */}
-            <div className="p-5 rounded-3xl bg-[#101524] border border-slate-800/80 space-y-3 text-xs">
-              <div className="flex items-center gap-2 font-bold text-slate-300">
-                <HelpCircle className="w-4 h-4 text-emerald-400" />
-                <span>解約・サブスクリプションに関するQ&A</span>
-              </div>
-              <div className="space-y-3 text-slate-400 text-[11px] leading-relaxed">
-                <div>
-                  <p className="font-semibold text-slate-200 mb-0.5">Q. いつ解約できますか？違約金はありますか？</p>
-                  <p>A. 契約期間の縛りは一切ございません。登録直後であっても手数料・違約金ゼロで即時解約いただけます。</p>
-                </div>
-                <div>
-                  <p className="font-semibold text-slate-200 mb-0.5">Q. 解約したらいつまでレポートを閲覧できますか？</p>
-                  <p>A. 次回更新日の前日まで、アンロック済みの詳細カルテやCBTワークを引き続き閲覧いただけます。</p>
-                </div>
-              </div>
-            </div>
           </div>
         )}
 
         {/* ======================================================== */}
-        {/* タブ2: 過去の診断履歴（履歴一覧・詳細閲覧） */}
+        {/* タブ2: 診断履歴 */}
         {/* ======================================================== */}
         {activeTab === 'history' && (
           <div className="space-y-4 animate-fadeIn">
@@ -596,22 +789,6 @@ function AccountContent() {
                       </div>
                     </div>
 
-                    {item.topDistortions && item.topDistortions.length > 0 && (
-                      <div className="mb-3">
-                        <div className="text-[10px] text-slate-400 mb-1">思考の癖（顕著な傾向）:</div>
-                        <div className="flex flex-wrap gap-1.5">
-                          {item.topDistortions.map((d, i) => (
-                            <span
-                              key={i}
-                              className="px-2 py-0.5 rounded-md bg-purple-950/60 border border-purple-800/50 text-purple-200 text-[10px]"
-                            >
-                              {d.name} ({d.percentage}%)
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
                     <div className="flex justify-end pt-1">
                       <Link
                         href={`/result?type=${item.type}&name=${encodeURIComponent(item.userName)}`}
@@ -629,7 +806,135 @@ function AccountContent() {
         )}
 
         {/* ======================================================== */}
-        {/* タブ3: 本格ログイン認証（メール & パスワード） */}
+        {/* タブ3: アカウント設定（名前変更・パスワード変更・退会） */}
+        {/* ======================================================== */}
+        {activeTab === 'settings' && user && (
+          <div className="space-y-6 animate-fadeIn">
+            {settingsMessage && (
+              <div className="p-3.5 rounded-2xl bg-emerald-950/70 border border-emerald-500/50 text-xs text-emerald-200 flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>{settingsMessage}</span>
+              </div>
+            )}
+
+            {settingsError && (
+              <div className="p-3.5 rounded-2xl bg-rose-950/70 border border-rose-500/50 text-xs text-rose-200 flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+                <span>{settingsError}</span>
+              </div>
+            )}
+
+            {/* プロフィール変更 */}
+            <div className="p-5 rounded-3xl bg-[#141A29] border border-slate-700/80 space-y-3">
+              <h3 className="text-xs font-bold text-white flex items-center gap-2">
+                <UserIcon className="w-4 h-4 text-indigo-400" />
+                <span>登録情報の変更</span>
+              </h3>
+              <form onSubmit={handleUpdateProfile} className="space-y-3">
+                <div>
+                  <label className="block text-[11px] text-slate-400 mb-1">メールアドレス（変更不可）</label>
+                  <input
+                    type="email"
+                    value={user.email}
+                    disabled
+                    className="w-full px-3.5 py-2 rounded-xl bg-slate-900/60 border border-slate-800 text-xs text-slate-400 cursor-not-allowed"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] text-slate-400 mb-1">お名前（ニックネーム）</label>
+                  <input
+                    type="text"
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    required
+                    className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white focus:outline-none focus:border-indigo-400"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={isUpdatingSettings}
+                  className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs cursor-pointer disabled:opacity-50"
+                >
+                  名前を変更する
+                </button>
+              </form>
+            </div>
+
+            {/* パスワード変更 */}
+            <div className="p-5 rounded-3xl bg-[#141A29] border border-slate-700/80 space-y-3">
+              <h3 className="text-xs font-bold text-white flex items-center gap-2">
+                <Lock className="w-4 h-4 text-indigo-400" />
+                <span>パスワードの変更</span>
+              </h3>
+              <form onSubmit={handleChangePassword} className="space-y-3">
+                <div>
+                  <label className="block text-[11px] text-slate-400 mb-1">現在のパスワード</label>
+                  <input
+                    type="password"
+                    value={oldPassword}
+                    onChange={(e) => setOldPassword(e.target.value)}
+                    required
+                    placeholder="••••••••"
+                    className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white focus:outline-none focus:border-indigo-400"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] text-slate-400 mb-1">新しいパスワード（6文字以上）</label>
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    required
+                    placeholder="••••••••"
+                    className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white focus:outline-none focus:border-indigo-400"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={isUpdatingSettings}
+                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white font-bold text-xs border border-slate-600 cursor-pointer disabled:opacity-50"
+                >
+                  パスワードを更新
+                </button>
+              </form>
+            </div>
+
+            {/* 退会処理（アカウント削除） */}
+            <div className="p-5 rounded-3xl bg-rose-950/20 border border-rose-900/40 space-y-3">
+              <h3 className="text-xs font-bold text-rose-300 flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-rose-400" />
+                <span>アカウント削除（退会）</span>
+              </h3>
+              <p className="text-[11px] text-slate-400 leading-relaxed">
+                退会すると登録アカウント情報が完全に削除されます。定期課金を契約中の場合は、事前にStripeポータルよりサブスクリプションを解約してください。
+              </p>
+              <form onSubmit={handleDeleteAccount} className="space-y-3 pt-1">
+                <div>
+                  <label className="block text-[11px] text-slate-400 mb-1">確認のためパスワードを入力</label>
+                  <input
+                    type="password"
+                    value={deleteConfirmPassword}
+                    onChange={(e) => setDeleteConfirmPassword(e.target.value)}
+                    required
+                    placeholder="パスワード"
+                    className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-rose-800/60 text-xs text-white focus:outline-none focus:border-rose-400"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={isUpdatingSettings}
+                  className="px-4 py-2 rounded-xl bg-rose-900/60 hover:bg-rose-800 text-rose-200 hover:text-white font-bold text-xs border border-rose-700 cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+                >
+                  <UserX className="w-3.5 h-3.5" />
+                  <span>アカウントを完全に削除する</span>
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* ======================================================== */}
+        {/* タブ4: ログイン / 新規登録 */}
         {/* ======================================================== */}
         {activeTab === 'auth' && (
           <div className="space-y-5 animate-fadeIn">
@@ -643,12 +948,20 @@ function AccountContent() {
                   <p>お名前: <strong className="text-white">{user.name}</strong></p>
                   <p>メールアドレス: <strong className="text-white">{user.email}</strong></p>
                 </div>
-                <button
-                  onClick={handleLogout}
-                  className="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-rose-300 text-xs font-bold transition-colors cursor-pointer border border-slate-700"
-                >
-                  ログアウトする
-                </button>
+                <div className="flex justify-center gap-2 pt-2">
+                  <button
+                    onClick={() => setActiveTab('settings')}
+                    className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-indigo-300 text-xs font-bold border border-slate-700 cursor-pointer"
+                  >
+                    アカウント設定へ
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-rose-300 text-xs font-bold border border-slate-700 cursor-pointer"
+                  >
+                    ログアウト
+                  </button>
+                </div>
               </div>
             ) : (
               <div className="p-6 rounded-3xl bg-[#141A29] border border-slate-700 shadow-xl space-y-4">
