@@ -41,18 +41,11 @@ export async function GET(req: NextRequest) {
 
     const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
     if (!stripeSecretKey) {
-      // 開発・未設定環境用モック
-      return NextResponse.json({
-        isPremium: true,
-        status: 'active',
-        planName: 'ココロナビ 完全レポート解放（月額会員）',
-        amount: 980,
-        currency: 'jpy',
-        currentPeriodEnd: Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60,
-        cancelAtPeriodEnd: false,
-        customerId: targetCustomerId || 'cus_demo_mock',
-        isMock: true,
-      });
+      console.error('❌ STRIPE_SECRET_KEY is not configured in environment variables.');
+      return NextResponse.json(
+        { error: 'STRIPE_SECRET_KEYが未設定です。' },
+        { status: 500 }
+      );
     }
 
     const stripe = new Stripe(stripeSecretKey);

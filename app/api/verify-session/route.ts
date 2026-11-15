@@ -21,8 +21,11 @@ export async function GET(req: NextRequest) {
 
     const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
     if (!stripeSecretKey) {
-      // 未設定時はデモモードとして有効扱い
-      return NextResponse.json({ paid: true, demo: true });
+      console.error('❌ STRIPE_SECRET_KEY is not configured in environment variables.');
+      return NextResponse.json(
+        { error: 'STRIPE_SECRET_KEYが未設定のためセッションを検証できません。' },
+        { status: 500 }
+      );
     }
 
     const stripe = new Stripe(stripeSecretKey);

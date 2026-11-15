@@ -1484,17 +1484,6 @@ ${shareUrl}
                   <span>解約・マイページはこちら</span>
                 </Link>
               </div>
-
-              {/* 開発環境専用プレビュー（本番では非表示） */}
-              {process.env.NODE_ENV !== 'production' && (
-                <button
-                  type="button"
-                  onClick={() => setUnlocked(true)}
-                  className="mt-3 text-[10px] text-slate-500 hover:text-slate-300 underline underline-offset-2 cursor-pointer transition-colors"
-                >
-                  [DEV] デモ解放プレビュー
-                </button>
-              )}
             </div>
           )}
         </section>

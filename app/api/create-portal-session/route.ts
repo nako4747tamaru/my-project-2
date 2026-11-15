@@ -25,12 +25,11 @@ export async function POST(req: NextRequest) {
     const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 
     if (!stripeSecretKey) {
-      // 開発・モック用: Stripe未設定時はマイページへメッセージ付きで戻る
-      return NextResponse.json({
-        url: `${origin}${returnPath}?portal=demo`,
-        isMock: true,
-        message: 'STRIPE_SECRET_KEYが未設定のため、デモモードで動作しています。',
-      });
+      console.error('❌ STRIPE_SECRET_KEY is not configured in environment variables.');
+      return NextResponse.json(
+        { error: '決済管理ポータルの構成に問題があります。管理者にSTRIPE_SECRET_KEYの設定をお問い合わせください。' },
+        { status: 500 }
+      );
     }
 
     const stripe = new Stripe(stripeSecretKey);

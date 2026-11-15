@@ -57,7 +57,6 @@ interface SubscriptionDetails {
   currency?: string;
   currentPeriodEnd?: number;
   cancelAtPeriodEnd?: boolean;
-  isMock?: boolean;
 }
 
 function AccountContent() {
@@ -199,10 +198,6 @@ function AccountContent() {
       if (urlSessionId) {
         setSessionId(urlSessionId);
         localStorage.setItem('kokoro_navi_stripe_session_id', urlSessionId);
-      }
-
-      if (searchParams.get('portal') === 'demo') {
-        setStatusMessage('ℹ️ 開発・テスト環境のため、ポータル遷移はデモ完了として処理されました。');
       }
 
       const tabParam = searchParams.get('tab');
