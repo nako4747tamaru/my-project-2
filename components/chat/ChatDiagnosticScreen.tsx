@@ -284,11 +284,24 @@ export default function ChatDiagnosticScreen({
       {/* --- ヘッダー (Screenshot 1 & 2参照) --- */}
       <header className="sticky top-0 z-40 bg-[#0C101C]/95 backdrop-blur-md border-b border-slate-800/80 px-4 py-3">
         <div className="max-w-md mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
+          <button
+            onClick={() => {
+              if (isStarted) {
+                if (window.confirm('最初の画面に戻りますか？現在の回答データは自動保存されています。')) {
+                  setIsStarted(false);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+              } else {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }
+            }}
+            className="flex items-center gap-2.5 text-left hover:opacity-85 transition-opacity group cursor-pointer"
+            title="トップへ戻る"
+          >
             <OwlMascot size={34} />
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="text-sm font-bold text-white tracking-tight">
+                <span className="text-sm font-bold text-white tracking-tight group-hover:text-indigo-300 transition-colors">
                   {isStarted ? '16タイプ診断ナビ' : 'ココロナビ'}
                 </span>
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -299,7 +312,7 @@ export default function ChatDiagnosticScreen({
                   : '16タイプ × メンタルケア'}
               </p>
             </div>
-          </div>
+          </button>
 
           <div className="flex items-center gap-2">
             <button

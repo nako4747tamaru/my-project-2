@@ -638,12 +638,21 @@ ${shareUrl}
       {/* --- ヘッダー / ナビバー --- */}
       <header className="sticky top-0 z-40 bg-[#0C101C]/90 backdrop-blur-md border-b border-slate-800/80 px-4 py-3">
         <div className="max-w-md mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-base font-bold text-slate-100 tracking-tight">分析結果</span>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-800/60 font-medium">
-              100問完了
-            </span>
-          </div>
+          <Link
+            href="/"
+            className="flex items-center gap-2 hover:opacity-85 transition-opacity group"
+            title="トップページ（再診断）へ戻る"
+          >
+            <OwlMascot size={26} />
+            <div className="flex items-center gap-1.5">
+              <span className="text-base font-bold text-slate-100 group-hover:text-indigo-300 transition-colors tracking-tight">
+                分析結果
+              </span>
+              <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-800/60 font-medium">
+                100問完了
+              </span>
+            </div>
+          </Link>
 
           <div className="flex items-center gap-2">
             <Link

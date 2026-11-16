@@ -34,10 +34,16 @@ function LegalContent() {
             <span>診断トップへ戻る</span>
           </Link>
 
-          <div className="flex items-center gap-2">
+          <Link
+            href="/"
+            className="flex items-center gap-2 hover:opacity-85 transition-opacity group"
+            title="トップページへ戻る"
+          >
             <OwlMascot size={26} />
-            <span className="text-sm font-bold text-white tracking-wide">ココロナビ 公式表記</span>
-          </div>
+            <span className="text-sm font-bold text-white tracking-wide group-hover:text-indigo-300 transition-colors">
+              ココロナビ 公式表記
+            </span>
+          </Link>
         </div>
       </header>
 

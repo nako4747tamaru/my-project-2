@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
+import ScrollToTopButton from '../components/common/ScrollToTopButton';
 import './globals.css';
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://kokoronavi.dev';
@@ -51,6 +52,7 @@ export default function RootLayout({
       </head>
       <body className="antialiased min-h-screen">
         {children}
+        <ScrollToTopButton />
       </body>
     </html>
   );

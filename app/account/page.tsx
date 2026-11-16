@@ -429,8 +429,18 @@ function AccountContent() {
           </Link>
 
           <div className="flex items-center gap-2">
-            <OwlMascot size={26} />
-            <span className="text-sm font-bold text-white tracking-wide">マイページ & 設定</span>
+            <Link
+              href="/"
+              className="flex items-center gap-2 hover:opacity-85 transition-opacity group"
+              title="トップページへ戻る"
+            >
+              <OwlMascot size={26} />
+              <span className="text-sm font-bold text-white tracking-wide group-hover:text-indigo-300 transition-colors">
+                ココロナビ
+              </span>
+            </Link>
+            <span className="text-slate-600">/</span>
+            <span className="text-xs text-slate-400 font-medium">マイページ</span>
           </div>
 
           <div>
