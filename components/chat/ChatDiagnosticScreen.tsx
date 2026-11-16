@@ -16,10 +16,12 @@ import { Answers } from '../../lib/personality';
 import OwlMascot from '../common/OwlMascot';
 import LegalModal, { LegalTab } from '../common/LegalModal';
 import LegalFooter from '../common/LegalFooter';
+import TypeLandingSection from '../landing/TypeLandingSection';
 
 interface ChatDiagnosticScreenProps {
   onComplete: (answers: Answers, nickname: string) => void;
   onPreviewSample?: () => void;
+  onPreviewType?: (typeCode: string) => void;
 }
 
 interface ChatMessage {
@@ -38,6 +40,7 @@ const STORAGE_KEY_INDEX = 'kokoro_navi_current_index_v2';
 export default function ChatDiagnosticScreen({
   onComplete,
   onPreviewSample,
+  onPreviewType,
 }: ChatDiagnosticScreenProps) {
   const [nickname, setNickname] = useState('');
   const [inputName, setInputName] = useState('');
@@ -46,6 +49,7 @@ export default function ChatDiagnosticScreen({
   const [answers, setAnswers] = useState<Answers>({});
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // 法務・規約モーダル用ステート
   const [legalModalOpen, setLegalModalOpen] = useState(false);
@@ -465,6 +469,7 @@ export default function ChatDiagnosticScreen({
           >
             <div className="flex items-center gap-2">
               <input
+                ref={inputRef}
                 type="text"
                 value={inputName}
                 onChange={(e) => setInputName(e.target.value)}
@@ -501,6 +506,19 @@ export default function ChatDiagnosticScreen({
             </p>
           </form>
         </footer>
+      )}
+
+      {/* 初期画面（ニックネーム入力前）でのランディング紹介セクション */}
+      {!isStarted && (
+        <div className="w-full border-t border-slate-800/80 bg-[#0C101C]">
+          <TypeLandingSection
+            onStartDiagnosis={() => {
+              inputRef.current?.focus();
+              inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }}
+            onPreviewType={onPreviewType}
+          />
+        </div>
       )}
 
       {/* 初期画面での法務・規約フッター */}

@@ -42,7 +42,9 @@ body {
   nav,
   button,
   footer,
-  .print-hidden {
+  .print-hidden,
+  .adsbygoogle,
+  .google-auto-placed {
     display: none !important;
   }
 

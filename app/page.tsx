@@ -76,12 +76,33 @@ function HomeContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // 特定タイプのサンプルプレビュー
+  const handlePreviewType = (typeCode: string) => {
+    const customSample: Answers = {};
+    defaultQuestions.forEach((q, idx) => {
+      const key = q.id ?? idx + 1;
+      let val = 3;
+      if (q.dim === 'EI') val = typeCode.includes('E') ? (q.pole === 'E' ? 5 : 1) : (q.pole === 'I' ? 5 : 1);
+      else if (q.dim === 'SN') val = typeCode.includes('S') ? (q.pole === 'S' ? 5 : 1) : (q.pole === 'N' ? 5 : 1);
+      else if (q.dim === 'TF') val = typeCode.includes('T') ? (q.pole === 'T' ? 5 : 1) : (q.pole === 'F' ? 5 : 1);
+      else if (q.dim === 'JP') val = typeCode.includes('J') ? (q.pole === 'J' ? 5 : 1) : (q.pole === 'P' ? 5 : 1);
+      else if (q.dim === 'fatigue') val = 3;
+      else val = 3;
+      customSample[key] = val;
+      customSample[idx] = val;
+    });
+    setUserAnswers(customSample);
+    setViewMode('result');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <main className="min-h-screen bg-[#0C101C]">
       {viewMode === 'chat' ? (
         <ChatDiagnosticScreen
           onComplete={handleComplete}
           onPreviewSample={handlePreviewSample}
+          onPreviewType={handlePreviewType}
         />
       ) : (
         <ResultScreen
