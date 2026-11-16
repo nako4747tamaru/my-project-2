@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
+import LandingView from '../components/landing/LandingView';
 import ChatDiagnosticScreen from '../components/chat/ChatDiagnosticScreen';
 import ResultScreen from '../components/result/ResultScreen';
 import { Answers } from '../lib/personality';
@@ -9,35 +10,52 @@ import { QUESTIONS as defaultQuestions } from '../lib/questions';
 
 function HomeContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const typeParam = searchParams.get('type')?.toUpperCase();
   const modeParam = searchParams.get('mode');
 
-  const [viewMode, setViewMode] = useState<'chat' | 'result'>(
-    modeParam === 'chat' ? 'chat' : 'result'
-  );
+  // 初期ビューモード:
+  // - mode=chat: 診断チャット画面
+  // - mode=result: 結果画面
+  // - typeParam指定時: そのタイプの結果画面
+  // - それ以外: ランディングトップ画面 ('landing')
+  const [viewMode, setViewMode] = useState<'landing' | 'chat' | 'result'>('landing');
   const [userAnswers, setUserAnswers] = useState<Answers | undefined>(undefined);
   const [userName, setUserName] = useState<string>('たか');
+  const [hasResumeData, setHasResumeData] = useState(false);
+  const [resumeIndex, setResumeIndex] = useState(0);
 
-  // クライアント側で保存された進捗やニックネームを確認
+  // 保存データの確認
   useEffect(() => {
     try {
       const savedAnswers = localStorage.getItem('kokoro_navi_answers_v2');
       const savedName = localStorage.getItem('kokoro_navi_nickname_v2');
+      const savedIdx = localStorage.getItem('kokoro_navi_current_index_v2');
+
       if (savedName) setUserName(savedName);
-      if (savedAnswers && !typeParam) {
+
+      if (savedAnswers) {
         const parsed = JSON.parse(savedAnswers);
-        if (Object.keys(parsed).length >= 100) {
+        const count = Object.keys(parsed).length;
+        if (count >= 100 && !modeParam && !typeParam) {
+          // 100問完了データがある場合はユーザーの履歴保持として記憶
           setUserAnswers(parsed);
-          setViewMode('result');
-          return;
+          setHasResumeData(true);
+        } else if (count > 0) {
+          setHasResumeData(true);
+          setResumeIndex(savedIdx ? parseInt(savedIdx, 10) : count);
         }
       }
     } catch {
       // ignore
     }
 
-    // typeクエリパラメータ（例: ?type=ENFJ でペンギン確認）指定時の動的回答生成
-    if (typeParam) {
+    if (modeParam === 'chat') {
+      setViewMode('chat');
+    } else if (modeParam === 'result') {
+      setViewMode('result');
+    } else if (typeParam) {
+      // typeクエリパラメータ（例: ?type=ENFJ でペンギン確認）指定時の動的回答生成
       const customSample: Answers = {};
       defaultQuestions.forEach((q, idx) => {
         const key = q.id ?? idx + 1;
@@ -53,10 +71,18 @@ function HomeContent() {
       });
       setUserAnswers(customSample);
       setViewMode('result');
+    } else {
+      setViewMode('landing');
     }
-  }, [typeParam]);
+  }, [typeParam, modeParam]);
 
-  // 100問回答完了時
+  // 診断開始（チャット画面へ切り替え）
+  const handleStartDiagnosis = () => {
+    setViewMode('chat');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // 100問回答完了時（結果画面へ切り替え）
   const handleComplete = (answers: Answers, nickname: string) => {
     setUserAnswers(answers);
     setUserName(nickname || 'たか');
@@ -64,7 +90,7 @@ function HomeContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // 再診断（チャットに戻る）
+  // 再診断（チャットへ切り替え）
   const handleRetest = () => {
     setViewMode('chat');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -96,15 +122,33 @@ function HomeContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // トップ（ランディング面）に戻る
+  const handleBackToLanding = () => {
+    setViewMode('landing');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <main className="min-h-screen bg-[#0C101C]">
-      {viewMode === 'chat' ? (
+      {viewMode === 'landing' && (
+        <LandingView
+          onStartDiagnosis={handleStartDiagnosis}
+          onPreviewType={handlePreviewType}
+          hasResumeData={hasResumeData}
+          resumeIndex={resumeIndex}
+          userName={userName}
+        />
+      )}
+
+      {viewMode === 'chat' && (
         <ChatDiagnosticScreen
           onComplete={handleComplete}
           onPreviewSample={handlePreviewSample}
-          onPreviewType={handlePreviewType}
+          onBackToLanding={handleBackToLanding}
         />
-      ) : (
+      )}
+
+      {viewMode === 'result' && (
         <ResultScreen
           userName={userName}
           answers={userAnswers}

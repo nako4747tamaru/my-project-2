@@ -16,12 +16,11 @@ import { Answers } from '../../lib/personality';
 import OwlMascot from '../common/OwlMascot';
 import LegalModal, { LegalTab } from '../common/LegalModal';
 import LegalFooter from '../common/LegalFooter';
-import TypeLandingSection from '../landing/TypeLandingSection';
 
 interface ChatDiagnosticScreenProps {
   onComplete: (answers: Answers, nickname: string) => void;
   onPreviewSample?: () => void;
-  onPreviewType?: (typeCode: string) => void;
+  onBackToLanding?: () => void;
 }
 
 interface ChatMessage {
@@ -40,7 +39,7 @@ const STORAGE_KEY_INDEX = 'kokoro_navi_current_index_v2';
 export default function ChatDiagnosticScreen({
   onComplete,
   onPreviewSample,
-  onPreviewType,
+  onBackToLanding,
 }: ChatDiagnosticScreenProps) {
   const [nickname, setNickname] = useState('');
   const [inputName, setInputName] = useState('');
@@ -286,10 +285,13 @@ export default function ChatDiagnosticScreen({
         <div className="max-w-md mx-auto flex items-center justify-between">
           <button
             onClick={() => {
-              if (isStarted) {
-                if (window.confirm('最初の画面に戻りますか？現在の回答データは自動保存されています。')) {
-                  setIsStarted(false);
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
+              if (onBackToLanding) {
+                if (isStarted) {
+                  if (window.confirm('トップ（紹介画面）に戻りますか？現在の回答データは自動保存されています。')) {
+                    onBackToLanding();
+                  }
+                } else {
+                  onBackToLanding();
                 }
               } else {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -519,19 +521,6 @@ export default function ChatDiagnosticScreen({
             </p>
           </form>
         </footer>
-      )}
-
-      {/* 初期画面（ニックネーム入力前）でのランディング紹介セクション */}
-      {!isStarted && (
-        <div className="w-full border-t border-slate-800/80 bg-[#0C101C]">
-          <TypeLandingSection
-            onStartDiagnosis={() => {
-              inputRef.current?.focus();
-              inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }}
-            onPreviewType={onPreviewType}
-          />
-        </div>
       )}
 
       {/* 初期画面での法務・規約フッター */}
