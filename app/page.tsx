@@ -7,6 +7,7 @@ import ChatDiagnosticScreen from '../components/chat/ChatDiagnosticScreen';
 import ResultScreen from '../components/result/ResultScreen';
 import { Answers } from '../lib/personality';
 import { QUESTIONS as defaultQuestions } from '../lib/questions';
+import { resetDiagnosticSession } from '../lib/session';
 
 function HomeContent() {
   const searchParams = useSearchParams();
@@ -128,12 +129,23 @@ function HomeContent() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // 診断データを初期化して最初から受ける
+  const handleResetAndStart = () => {
+    resetDiagnosticSession();
+    setUserAnswers(undefined);
+    setHasResumeData(false);
+    setResumeIndex(0);
+    setViewMode('chat');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <main className="min-h-screen bg-[#0C101C]">
       {viewMode === 'landing' && (
         <LandingView
           onStartDiagnosis={handleStartDiagnosis}
           onPreviewType={handlePreviewType}
+          onResetAndStart={handleResetAndStart}
           hasResumeData={hasResumeData}
           resumeIndex={resumeIndex}
           userName={userName}
@@ -153,7 +165,8 @@ function HomeContent() {
           userName={userName}
           answers={userAnswers}
           initialType={typeParam}
-          onRetest={handleRetest}
+          onRetest={handleResetAndStart}
+          onBackToHome={handleBackToLanding}
         />
       )}
     </main>

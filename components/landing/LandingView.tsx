@@ -23,6 +23,7 @@ import TypeLandingSection from './TypeLandingSection';
 interface LandingViewProps {
   onStartDiagnosis: () => void;
   onPreviewType?: (typeCode: string) => void;
+  onResetAndStart?: () => void;
   hasResumeData?: boolean;
   resumeIndex?: number;
   userName?: string;
@@ -31,6 +32,7 @@ interface LandingViewProps {
 export default function LandingView({
   onStartDiagnosis,
   onPreviewType,
+  onResetAndStart,
   hasResumeData,
   resumeIndex = 0,
   userName = '',
@@ -117,6 +119,16 @@ export default function LandingView({
               <span>{hasResumeData ? `前回の続き（${resumeIndex + 1}問目〜）から再開` : '今すぐ診断を始める（無料）'}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
+
+            {hasResumeData && onResetAndStart && (
+              <button
+                onClick={onResetAndStart}
+                className="w-full sm:w-auto px-5 py-3.5 rounded-2xl bg-[#141A29] hover:bg-slate-800 text-slate-300 hover:text-white text-xs font-bold border border-slate-700/80 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                title="前回のデータを初期化して最初から受ける"
+              >
+                <span>最初からやり直す（リセット）</span>
+              </button>
+            )}
 
             <Link
               href="/result"

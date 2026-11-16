@@ -26,6 +26,7 @@ import {
   Printer,
   Loader2,
   CreditCard,
+  Home,
 } from 'lucide-react';
 import { saveDiagnosticHistory } from '../../lib/history';
 
@@ -45,6 +46,7 @@ import LegalModal, { LegalTab } from '../common/LegalModal';
 import LegalFooter from '../common/LegalFooter';
 import AdContainer from '../common/AdContainer';
 import ComingSoonSection from './ComingSoonSection';
+import { resetDiagnosticSession } from '../../lib/session';
 
 export interface ResultScreenProps {
   /** ユーザーのニックネーム */
@@ -61,6 +63,8 @@ export interface ResultScreenProps {
   onUnlockPremium?: () => void;
   /** 再診断ボタン押下時のコールバック */
   onRetest?: () => void;
+  /** トップページへ戻るコールバック */
+  onBackToHome?: () => void;
   /** シェアボタン押下時のコールバック */
   onShare?: () => void;
   /** 既に有料会員であるかどうかのフラグ */
@@ -254,6 +258,7 @@ export default function ResultScreen({
   initialType,
   onUnlockPremium,
   onRetest,
+  onBackToHome,
   onShare,
   isPremiumUnlocked = false,
 }: ResultScreenProps) {
@@ -303,6 +308,27 @@ export default function ResultScreen({
   const handleOpenLegal = (tab: LegalTab) => {
     setLegalModalTab(tab);
     setLegalModalOpen(true);
+  };
+
+  // 診断を最初からやり直す（ゲストデータのクリーンリセット）
+  const handleTriggerRetest = () => {
+    if (window.confirm('回答データを初期化して、最初から診断をやり直しますか？')) {
+      resetDiagnosticSession();
+      if (onRetest) {
+        onRetest();
+      } else if (typeof window !== 'undefined') {
+        window.location.href = '/?mode=chat';
+      }
+    }
+  };
+
+  // トップページに戻る
+  const handleTriggerBackToHome = () => {
+    if (onBackToHome) {
+      onBackToHome();
+    } else if (typeof window !== 'undefined') {
+      window.location.href = '/';
+    }
   };
 
   // 購入状態の自動復元 ＆ Stripe決済リダイレクト結果の検知
@@ -673,15 +699,14 @@ ${shareUrl}
               <span className="hidden sm:inline">規約</span>
             </button>
 
-            {onRetest && (
-              <button
-                onClick={onRetest}
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-slate-800/90 hover:bg-slate-700 text-xs text-slate-300 hover:text-white transition-colors border border-slate-700/60 cursor-pointer"
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-                <span>再診断</span>
-              </button>
-            )}
+            <button
+              onClick={handleTriggerRetest}
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-slate-800/90 hover:bg-slate-700 text-xs text-slate-300 hover:text-white transition-colors border border-slate-700/60 cursor-pointer"
+              title="最初からやり直す（回答データを初期化）"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>再診断</span>
+            </button>
           </div>
         </div>
       </header>
@@ -1501,6 +1526,38 @@ ${shareUrl}
         {/* 近日公開（Coming Soon）機能エリア */}
         {/* ======================================================== */}
         <ComingSoonSection />
+
+        {/* ======================================================== */}
+        {/* ボトムアクションバー: トップに戻る / 最初から再診断 */}
+        {/* ======================================================== */}
+        <div className="pt-4 pb-2 space-y-3">
+          <div className="p-4 rounded-3xl bg-[#141A29] border border-slate-700/80 text-center space-y-3 shadow-lg">
+            <div className="flex items-center justify-center gap-2 text-xs font-bold text-slate-300">
+              <OwlMascot size={22} />
+              <span>ナビからのご案内</span>
+            </div>
+            <p className="text-[11px] text-slate-400 leading-relaxed max-w-xs mx-auto">
+              診断結果は端末の履歴に保存されています。別のニックネームで受け直したい時や、お友達に診断してもらう時はいつでもリセットして新しく始められます。
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 pt-1">
+              <button
+                onClick={handleTriggerBackToHome}
+                className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white font-bold text-xs border border-slate-700 flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+              >
+                <Home className="w-3.5 h-3.5 text-indigo-400" />
+                <span>トップ（紹介画面）へ戻る</span>
+              </button>
+
+              <button
+                onClick={handleTriggerRetest}
+                className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs shadow-md shadow-indigo-950 flex items-center justify-center gap-1.5 transition-transform active:scale-95 cursor-pointer"
+              >
+                <RotateCcw className="w-3.5 h-3.5 text-amber-300" />
+                <span>最初からやり直す（リセット）</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </main>
 
       {/* 法務・規約フッター */}

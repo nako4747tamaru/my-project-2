@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import ResultScreen from '../../components/result/ResultScreen';
 import { Answers } from '../../lib/personality';
 import { QUESTIONS as defaultQuestions } from '../../lib/questions';
+import { resetDiagnosticSession } from '../../lib/session';
 
 export default function ResultClient() {
   const searchParams = useSearchParams();
@@ -58,7 +59,11 @@ export default function ResultClient() {
         userName={userName}
         answers={answers}
         initialType={typeParam}
-        onRetest={() => router.push('/')}
+        onRetest={() => {
+          resetDiagnosticSession();
+          router.push('/?mode=chat');
+        }}
+        onBackToHome={() => router.push('/')}
       />
     </main>
   );
