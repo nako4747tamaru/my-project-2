@@ -17,7 +17,7 @@ export const typeAnimalMap: Record<string, { src: string; label: string }> = {
   INFJ: { src: '/images/animals/infj.png', label: 'シカ' },
   ENFP: { src: '/images/animals/enfp.png', label: 'イルカ' },
   ENFJ: { src: '/images/animals/enfj.png', label: 'ペンギン' },
-  ISTP: { src: '/images/animals/istp.png', label: 'タカ' },
+  ISTP: { src: '/images/animals/istp.png', label: 'オオカミ' },
   ISTJ: { src: '/images/animals/istj.png', label: 'カメ' },
   ESTP: { src: '/images/animals/estp.png', label: 'トラ' },
   ESTJ: { src: '/images/animals/estj.png', label: 'ウシ' },
