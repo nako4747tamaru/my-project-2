@@ -87,7 +87,7 @@ export default function ChatDiagnosticScreen({
         {
           id: 'welcome-1',
           sender: 'mascot',
-          text: 'こんにちは！ ココロナビの案内役、フクロウの「ナビ」だよ🦉✨',
+          text: 'こんにちは！ ココロナビの案内役、フクロウの「ミネルヴァ」だよ🦉✨',
         },
         {
           id: 'welcome-2',
@@ -105,7 +105,7 @@ export default function ChatDiagnosticScreen({
         {
           id: 'welcome-1',
           sender: 'mascot',
-          text: 'こんにちは！ ココロナビへようこそ🦉✨ 案内役のフクロウ「ナビ」だよ。会えて嬉しいな！',
+          text: 'こんにちは！ ココロナビへようこそ🦉✨ 案内役のフクロウ「ミネルヴァ」だよ。会えて嬉しいな！',
         },
         {
           id: 'welcome-2',
@@ -129,7 +129,7 @@ export default function ChatDiagnosticScreen({
   // ニックネーム送信
   const handleSendNickname = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    const trimmed = inputName.trim() || 'タカ';
+    const trimmed = inputName.trim() || 'ゲスト';
     setNickname(trimmed);
     setIsStarted(true);
     try {
@@ -148,7 +148,7 @@ export default function ChatDiagnosticScreen({
       {
         id: `mascot-greeting-${Date.now()}`,
         sender: 'mascot',
-        text: `${trimmed}さん、教えてくれてありがとう！お話しできてすごく嬉しいな🦉🎈\n\n質問には正解も不正解もないよ。「こうあるべき」は手放して、直感で「今の自分に近いな」と感じるものをぽちっと選んでみてね。\n\nそれじゃあ、心の探検に出発しよう！🌿`,
+        text: `${trimmed}さん、教えてくれてありがとう！ミネルヴァとお話しできてすごく嬉しいな🦉🎈\n\n質問には正解も不正解もないよ。「こうあるべき」は手放して、直感で「今の自分に近いな」と感じるものをぽちっと選んでみてね。\n\nそれじゃあ、心の探検に出発しよう！🌿`,
       },
     ]);
   };
@@ -189,7 +189,7 @@ export default function ChatDiagnosticScreen({
         id: `milestone-50-${Date.now()}`,
         sender: 'mascot',
         isMilestone: true,
-        text: `🌟 50問突破！ わあ、ちょうど折り返しのハーフタイムだよ！すごい集中力だね🦉💫\n\n${targetName}さんの豊かな個性や心のエネルギーが、少しずつ見えてきたよ…！\n軽く深呼吸して、首や肩をぐるっと回してリフレッシュしてみてね。後半もナビがずっとそばで見守っているよ🌿`,
+        text: `🌟 50問突破！ わあ、ちょうど折り返しのハーフタイムだよ！すごい集中力だね🦉💫\n\n${targetName}さんの豊かな個性や心のエネルギーが、少しずつ見えてきたよ…！\n軽く深呼吸して、首や肩をぐるっと回してリフレッシュしてみてね。後半もミネルヴァがずっとそばで見守っているよ🌿`,
       });
     } else if (nextIndex === 75) {
       newMessages.push({
@@ -203,7 +203,7 @@ export default function ChatDiagnosticScreen({
         id: `milestone-100-${Date.now()}`,
         sender: 'mascot',
         isMilestone: true,
-        text: `🎊 100問完走、本当にお疲れさまでした！！最後までナビとお話ししてくれてありがとう💐✨\n\n${targetName}さんが一生懸命自分と向き合ってくれたこと、ナビはすっごく誇らしいよ。\nいま心の状態と16タイプ、思考の癖を丁寧に紐解いているからね…！さあ、分析結果レポートをお届けするよ🕊️`,
+        text: `🎊 100問完走、本当にお疲れさまでした！！最後までミネルヴァとお話ししてくれてありがとう💐✨\n\n${targetName}さんが一生懸命自分と向き合ってくれたこと、ミネルヴァはすっごく誇らしいよ。\nいま心の状態と16タイプ、思考の癖を丁寧に紐解いているからね…！さあ、分析結果レポートをお届けするよ🕊️`,
       });
     }
 
@@ -245,7 +245,7 @@ export default function ChatDiagnosticScreen({
         {
           id: 'welcome-1',
           sender: 'mascot',
-          text: 'こんにちは！ ココロナビの案内役、フクロウの「ナビ」だよ🦉✨',
+          text: 'こんにちは！ ココロナビの案内役、フクロウの「ミネルヴァ」だよ🦉✨',
         },
         {
           id: 'welcome-2',
@@ -411,7 +411,7 @@ export default function ChatDiagnosticScreen({
                 {isMilestone && (
                   <div className="flex items-center gap-1.5 text-[10px] font-bold text-amber-300 mb-1.5 border-b border-amber-400/20 pb-1">
                     <Sparkles className="w-3 h-3 text-amber-400" />
-                    <span>ナビからの応援メッセージ</span>
+                    <span>ミネルヴァからの応援メッセージ</span>
                   </div>
                 )}
                 {m.text}
@@ -488,7 +488,7 @@ export default function ChatDiagnosticScreen({
                 type="text"
                 value={inputName}
                 onChange={(e) => setInputName(e.target.value)}
-                placeholder="ニックネームを入力 (例: タカ)"
+                placeholder="ニックネームを入力 (例: ミネルヴァ)"
                 maxLength={20}
                 className="flex-1 bg-[#151B2E] border border-slate-700/80 rounded-2xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 transition-colors"
                 autoFocus

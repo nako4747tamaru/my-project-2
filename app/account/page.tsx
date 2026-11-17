@@ -1012,7 +1012,7 @@ function AccountContent() {
                         type="text"
                         value={nameAuth}
                         onChange={(e) => setNameAuth(e.target.value)}
-                        placeholder="たか"
+                        placeholder="例: ミネルヴァ"
                         required
                         className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs text-white focus:outline-none focus:border-indigo-400"
                       />

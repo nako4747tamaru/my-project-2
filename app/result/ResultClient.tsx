@@ -11,7 +11,7 @@ export default function ResultClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const typeParam = searchParams.get('type')?.toUpperCase();
-  const nameParam = searchParams.get('name') || 'たか';
+  const nameParam = searchParams.get('name') || 'ゲスト';
 
   const [answers, setAnswers] = useState<Answers | undefined>(undefined);
   const [userName, setUserName] = useState<string>(nameParam);

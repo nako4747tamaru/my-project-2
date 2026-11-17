@@ -251,7 +251,7 @@ function ShareButtonGroup({
 }
 
 export default function ResultScreen({
-  userName = 'たか',
+  userName = 'ゲスト',
   answers,
   questions = defaultQuestions,
   initialResult,
@@ -1534,7 +1534,7 @@ ${shareUrl}
           <div className="p-4 rounded-3xl bg-[#141A29] border border-slate-700/80 text-center space-y-3 shadow-lg">
             <div className="flex items-center justify-center gap-2 text-xs font-bold text-slate-300">
               <OwlMascot size={22} />
-              <span>ナビからのご案内</span>
+              <span>案内役ミネルヴァからのご案内</span>
             </div>
             <p className="text-[11px] text-slate-400 leading-relaxed max-w-xs mx-auto">
               診断結果は端末の履歴に保存されています。別のニックネームで受け直したい時や、お友達に診断してもらう時はいつでもリセットして新しく始められます。

@@ -122,16 +122,16 @@ export default function TypeLandingSection({
           <div className="space-y-3 text-center sm:text-left max-w-xl">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-200 text-xs font-bold tracking-wide">
               <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-              <span>全16タイプ・キャラクター一覧</span>
+              <span>案内役ミネルヴァが紹介する全16タイプ</span>
             </div>
             <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-white tracking-tight leading-tight">
               あなたの本当の性格はどのタイプ？<br />
               <span className="bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300 bg-clip-text text-transparent">
-                心に寄り添う16のキャラクターたち
+                ミネルヴァが導く16の心のコンパス
               </span>
             </h2>
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              ココロナビでは、16タイプ性格診断に加えて「メンタル疲弊度」や「無意識の思考の癖」まで詳細に可視化します。まずは気になるキャラクターや性格タイプをチェックしてみましょう！
+              知恵のフクロウ「ミネルヴァ」が、各タイプの個性や心の活かし方を丁寧にサポート。16タイプ診断に加え、「心の疲弊度」や「無意識の思考の癖」まで詳細にガイドします。
             </p>
           </div>
 
@@ -246,6 +246,15 @@ export default function TypeLandingSection({
                 <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">
                   {info.description}
                 </p>
+
+                {/* ミネルヴァからのワンポイントサポート */}
+                <div className="p-2.5 rounded-xl bg-slate-900/80 border border-indigo-500/20 text-[11px] text-slate-300 flex items-start gap-2">
+                  <span className="text-sm shrink-0">🦉</span>
+                  <div className="leading-snug">
+                    <span className="font-bold text-indigo-300">ミネルヴァの一言: </span>
+                    <span className="text-slate-300 line-clamp-1">{info.growthAdvice}</span>
+                  </div>
+                </div>
 
                 {/* 特徴タグリスト */}
                 <div className="flex flex-wrap gap-1.5 pt-0.5">

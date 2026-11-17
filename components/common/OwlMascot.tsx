@@ -10,7 +10,7 @@ export default function OwlMascot({ className = '', size = 48 }: OwlMascotProps)
     <div
       className={`relative inline-flex items-center justify-center shrink-0 ${className}`}
       style={{ width: size, height: size }}
-      aria-label="ココロナビのマスコット フクロウのナビ"
+      aria-label="ココロナビの案内役 フクロウのミネルヴァ"
     >
       <svg
         viewBox="0 0 100 100"

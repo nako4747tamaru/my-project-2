@@ -22,7 +22,7 @@ function HomeContent() {
   // - それ以外: ランディングトップ画面 ('landing')
   const [viewMode, setViewMode] = useState<'landing' | 'chat' | 'result'>('landing');
   const [userAnswers, setUserAnswers] = useState<Answers | undefined>(undefined);
-  const [userName, setUserName] = useState<string>('たか');
+  const [userName, setUserName] = useState<string>('ゲスト');
   const [hasResumeData, setHasResumeData] = useState(false);
   const [resumeIndex, setResumeIndex] = useState(0);
 
@@ -86,7 +86,7 @@ function HomeContent() {
   // 100問回答完了時（結果画面へ切り替え）
   const handleComplete = (answers: Answers, nickname: string) => {
     setUserAnswers(answers);
-    setUserName(nickname || 'たか');
+    setUserName(nickname || 'ゲスト');
     setViewMode('result');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };

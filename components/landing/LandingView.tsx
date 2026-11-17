@@ -106,7 +106,7 @@ export default function LandingView({
 
           <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
             MBTI性格特性だけでなく、現在の「心の疲弊度」や「無意識の思考の癖」まで詳細に分析。
-            温かいフクロウのナビと一緒に、気負わずリラックスして心の探検へ出かけましょう。
+            知恵のフクロウ「ミネルヴァ」があなたの心に寄り添い、優しくナビゲートします。
           </p>
 
           {/* CTAボタングループ */}
