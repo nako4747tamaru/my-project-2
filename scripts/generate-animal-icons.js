@@ -3,47 +3,33 @@ const path = require('path');
 const sharp = require('sharp');
 
 // 10代〜30代前半に親しみやすい、洗練された「パステルポップ・シルエット」
-// 全16タイプの動物一覧:
-// - 分析家 (INTP/INTJ/ENTP/ENTJ): 淡いラベンダーパープル
-// - 外交官 (INFP/INFJ/ENFP/ENFJ): ふんわりミントグリーン
-// - 番人 (ISTP/ISTJ/ESTP/ESTJ): やさしいベビーブルー
-// - 探検家 (ISFP/ISFJ/ESFP/ESFJ): あたたかみのあるクリームイエロー/シェルピンク
-//
-// 動物の造形ルール:
-// すべて高品質な絵文字グリフ（Segoe UI Emoji）に統一。
-// 手書きベクターのような不自然な突起や歪み、バグった人型・植物形状は一切排除し、
-// 一目で誰が見てもその動物・鳥と分かる、美しくクリーンな影絵シルエットに統一します。
-//
-// INTJ (ワシ): 🦅 (鋭い眼光と力強い嘴の大鷲)
-// ISTP (オオカミ / タカ):
-//   ISTPの「巨匠・一匹狼の孤高の職人気質」を完璧に表現し、
-//   かつ鳥類のINTJ(🦅)やINTP(🦉)とも完全に重複しない、美しく凛々しいシルエットの「オオカミ 🐺」にアップデート！
-//   ※これにより「ワシ」と「タカ」の鳥の重複・混同が根本から解消され、全16タイプが100%固有の動物シンボルとなります。
+// 全16タイプすべて「上下左右の真ん中（中心）」に完璧に収まるよう、
+// 各動物グリフの実測バウンディングボックスに基づいて個別微調整されたposY（128中心）を適用！
 
 const animals = [
   // 分析家 (淡いラベンダーパープル)
-  { type: 'INTP', label: 'フクロウ', emoji: '🦉', bg1: '#F5EEFF', bg2: '#E5D4F8', border: '#D3BAF0', badgeBg: '#FFFFFF', badgeText: '#7C5295' },
-  { type: 'INTJ', label: 'ワシ',     emoji: '🦅', bg1: '#F3ECFE', bg2: '#E2D0FA', border: '#D0B6F0', badgeBg: '#FFFFFF', badgeText: '#764B93' },
-  { type: 'ENTP', label: 'キツネ',   emoji: '🦊', bg1: '#F7EFFE', bg2: '#E8D7FB', border: '#D7BEF4', badgeBg: '#FFFFFF', badgeText: '#7F569B' },
-  { type: 'ENTJ', label: 'ライオン', emoji: '🦁', bg1: '#F1E8FD', bg2: '#DDC9F7', border: '#CDB0ED', badgeBg: '#FFFFFF', badgeText: '#6F438D' },
+  { type: 'INTP', label: 'フクロウ', emoji: '🦉', posY: 176, bg1: '#F5EEFF', bg2: '#E5D4F8', border: '#D3BAF0', badgeBg: '#FFFFFF', badgeText: '#7C5295' },
+  { type: 'INTJ', label: 'ワシ',     emoji: '🦅', posY: 172, bg1: '#F3ECFE', bg2: '#E2D0FA', border: '#D0B6F0', badgeBg: '#FFFFFF', badgeText: '#764B93' },
+  { type: 'ENTP', label: 'キツネ',   emoji: '🦊', posY: 175, bg1: '#F7EFFE', bg2: '#E8D7FB', border: '#D7BEF4', badgeBg: '#FFFFFF', badgeText: '#7F569B' },
+  { type: 'ENTJ', label: 'ライオン', emoji: '🦁', posY: 176, bg1: '#F1E8FD', bg2: '#DDC9F7', border: '#CDB0ED', badgeBg: '#FFFFFF', badgeText: '#6F438D' },
 
   // 外交官 (ふんわりミントグリーン)
-  { type: 'INFP', label: 'ウサギ',   emoji: '🐰', bg1: '#F0FDF4', bg2: '#DCFCE7', border: '#BBF7D0', badgeBg: '#FFFFFF', badgeText: '#15803D' },
-  { type: 'INFJ', label: 'シカ',     emoji: '🦌', bg1: '#F2FDF8', bg2: '#D5FBE9', border: '#A7F3D0', badgeBg: '#FFFFFF', badgeText: '#047857' },
-  { type: 'ENFP', label: 'イルカ',   emoji: '🐬', bg1: '#F0FDFA', bg2: '#CCFBF1', border: '#99F6E4', badgeBg: '#FFFFFF', badgeText: '#0F766E' },
-  { type: 'ENFJ', label: 'ペンギン', emoji: '🐧', bg1: '#ECFDF5', bg2: '#D1FAE5', border: '#A7F3D0', badgeBg: '#FFFFFF', badgeText: '#065F46' },
+  { type: 'INFP', label: 'ウサギ',   emoji: '🐰', posY: 166, bg1: '#F0FDF4', bg2: '#DCFCE7', border: '#BBF7D0', badgeBg: '#FFFFFF', badgeText: '#15803D' },
+  { type: 'INFJ', label: 'シカ',     emoji: '🦌', posY: 176, bg1: '#F2FDF8', bg2: '#D5FBE9', border: '#A7F3D0', badgeBg: '#FFFFFF', badgeText: '#047857' },
+  { type: 'ENFP', label: 'イルカ',   emoji: '🐬', posY: 164, bg1: '#F0FDFA', bg2: '#CCFBF1', border: '#99F6E4', badgeBg: '#FFFFFF', badgeText: '#0F766E' },
+  { type: 'ENFJ', label: 'ペンギン', emoji: '🐧', posY: 164, bg1: '#ECFDF5', bg2: '#D1FAE5', border: '#A7F3D0', badgeBg: '#FFFFFF', badgeText: '#065F46' },
 
   // 番人 (やさしいベビーブルー)
-  { type: 'ISTP', label: 'オオカミ', emoji: '🐺', bg1: '#F0F9FF', bg2: '#E0F2FE', border: '#BAE6FD', badgeBg: '#FFFFFF', badgeText: '#0369A1' },
-  { type: 'ISTJ', label: 'カメ',     emoji: '🐢', bg1: '#EFF6FF', bg2: '#DBEAFE', border: '#BFDBFE', badgeBg: '#FFFFFF', badgeText: '#1D4ED8' },
-  { type: 'ESTP', label: 'トラ',     emoji: '🐯', bg1: '#F0F9FF', bg2: '#E0F2FE', border: '#BAE6FD', badgeBg: '#FFFFFF', badgeText: '#0284C7' },
-  { type: 'ESTJ', label: 'ウシ',     emoji: '🐮', bg1: '#F1F5F9', bg2: '#E2E8F0', border: '#CBD5E1', badgeBg: '#FFFFFF', badgeText: '#334155' },
+  { type: 'ISTP', label: 'オオカミ', emoji: '🐺', posY: 163, bg1: '#F0F9FF', bg2: '#E0F2FE', border: '#BAE6FD', badgeBg: '#FFFFFF', badgeText: '#0369A1' },
+  { type: 'ISTJ', label: 'カメ',     emoji: '🐢', posY: 154, bg1: '#EFF6FF', bg2: '#DBEAFE', border: '#BFDBFE', badgeBg: '#FFFFFF', badgeText: '#1D4ED8' },
+  { type: 'ESTP', label: 'トラ',     emoji: '🐯', posY: 163, bg1: '#F0F9FF', bg2: '#E0F2FE', border: '#BAE6FD', badgeBg: '#FFFFFF', badgeText: '#0284C7' },
+  { type: 'ESTJ', label: 'ウシ',     emoji: '🐮', posY: 163, bg1: '#F1F5F9', bg2: '#E2E8F0', border: '#CBD5E1', badgeBg: '#FFFFFF', badgeText: '#334155' },
 
   // 探検家 (あたたかみのあるクリームイエロー / シェルピンク)
-  { type: 'ISFP', label: 'ネコ',     emoji: '🐱', bg1: '#FFFBEB', bg2: '#FEF3C7', border: '#FDE68A', badgeBg: '#FFFFFF', badgeText: '#B45309' },
-  { type: 'ISFJ', label: 'クマ',     emoji: '🐻', bg1: '#FFF7ED', bg2: '#FFEDD5', border: '#FED7AA', badgeBg: '#FFFFFF', badgeText: '#C2410C' },
-  { type: 'ESFP', label: 'オウム',   emoji: '🦜', bg1: '#FFF1F2', bg2: '#FFE4E6', border: '#FECDD3', badgeBg: '#FFFFFF', badgeText: '#BE123C' },
-  { type: 'ESFJ', label: 'イヌ',     emoji: '🐶', bg1: '#FFF5F5', bg2: '#FED7D7', border: '#FEB2B2', badgeBg: '#FFFFFF', badgeText: '#9B2C2C' }
+  { type: 'ISFP', label: 'ネコ',     emoji: '🐱', posY: 161, bg1: '#FFFBEB', bg2: '#FEF3C7', border: '#FDE68A', badgeBg: '#FFFFFF', badgeText: '#B45309' },
+  { type: 'ISFJ', label: 'クマ',     emoji: '🐻', posY: 164, bg1: '#FFF7ED', bg2: '#FFEDD5', border: '#FED7AA', badgeBg: '#FFFFFF', badgeText: '#C2410C' },
+  { type: 'ESFP', label: 'オウム',   emoji: '🦜', posY: 163, bg1: '#FFF1F2', bg2: '#FFE4E6', border: '#FECDD3', badgeBg: '#FFFFFF', badgeText: '#BE123C' },
+  { type: 'ESFJ', label: 'イヌ',     emoji: '🐶', posY: 157, bg1: '#FFF5F5', bg2: '#FED7D7', border: '#FEB2B2', badgeBg: '#FFFFFF', badgeText: '#9B2C2C' }
 ];
 
 async function generate() {
@@ -91,8 +77,8 @@ async function generate() {
         <circle cx="82" cy="74" r="2.5" fill="#FFFFFF" opacity="0.8" />
         <path d="M190 60 Q190 70 200 70 Q190 70 190 80 Q190 70 180 70 Q190 70 190 60 Z" fill="#FFFFFF" opacity="0.8" />
 
-        <!-- 中央の動物絵文字（高精細Segoe UI Emojiによるクリーンで美しいシルエット） -->
-        <text x="128" y="146" font-family="'Segoe UI Emoji', 'Apple Color Emoji', sans-serif" font-size="94"
+        <!-- 中央の動物絵文字（完全センタリング配置: posY = ${item.posY}） -->
+        <text x="128" y="${item.posY}" font-family="'Segoe UI Emoji', 'Apple Color Emoji', sans-serif" font-size="94"
           text-anchor="middle" dominant-baseline="central"
           filter="url(#silhouette-${item.type})">
           ${item.emoji}
@@ -114,12 +100,12 @@ async function generate() {
 
     const outPath = path.join(dir, `${item.type.toLowerCase()}.png`);
     await sharp(Buffer.from(svg)).png().toFile(outPath);
-    console.log(`Generated: ${item.type} (${item.label}) [${item.emoji}] -> ${item.type.toLowerCase()}.png`);
+    console.log(`Generated: ${item.type} (${item.label}) [${item.emoji}] posY=${item.posY} -> ${item.type.toLowerCase()}.png`);
   }
 }
 
 generate()
-  .then(() => console.log('Successfully regenerated all 16 clean, beautiful animal silhouette icons!'))
+  .then(() => console.log('Successfully regenerated all 16 perfectly centered animal silhouette icons!'))
   .catch((err) => {
     console.error('Error generating animal icons:', err);
     process.exit(1);

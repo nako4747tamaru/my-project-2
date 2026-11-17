@@ -57,15 +57,17 @@ export default function TypeAnimalIcon({
   }
 
   return (
-    <Image
-      src={animal.src}
-      alt={`${normalizedType}タイプ・${animal.label}`}
-      width={size}
-      height={size}
-      unoptimized
-      priority={priority}
-      className={`rounded-full object-contain drop-shadow-md select-none ${className}`}
-      onError={() => setImgError(true)}
-    />
+    <div className="relative inline-flex items-center justify-center shrink-0 select-none">
+      <Image
+        src={animal.src}
+        alt={`${normalizedType}タイプ・${animal.label}`}
+        width={size}
+        height={size}
+        unoptimized
+        priority={priority}
+        className={`rounded-full object-contain object-center drop-shadow-md select-none ${className}`}
+        onError={() => setImgError(true)}
+      />
+    </div>
   );
 }
