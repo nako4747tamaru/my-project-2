@@ -19,6 +19,7 @@ import OwlMascot from '../common/OwlMascot';
 import LegalFooter from '../common/LegalFooter';
 import LegalModal, { LegalTab } from '../common/LegalModal';
 import TypeLandingSection from './TypeLandingSection';
+import ThemeToggle from '../theme/ThemeToggle';
 
 interface LandingViewProps {
   onStartDiagnosis: () => void;
@@ -69,6 +70,8 @@ export default function LandingView({
           </Link>
 
           <div className="flex items-center gap-2">
+            <ThemeToggle />
+
             <Link
               href="/account"
               className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-slate-800/90 hover:bg-slate-700 text-xs text-slate-300 hover:text-white transition-colors border border-slate-700/60"

@@ -7,6 +7,7 @@ import { ShieldCheck, FileText, Scale, Lock, ArrowLeft, AlertCircle } from 'luci
 import OwlMascot from '../../components/common/OwlMascot';
 import { LegalTab } from '../../components/common/LegalModal';
 import AdContainer from '../../components/common/AdContainer';
+import ThemeToggle from '../../components/theme/ThemeToggle';
 
 function LegalContent() {
   const searchParams = useSearchParams();
@@ -34,16 +35,19 @@ function LegalContent() {
             <span>診断トップへ戻る</span>
           </Link>
 
-          <Link
-            href="/"
-            className="flex items-center gap-2 hover:opacity-85 transition-opacity group"
-            title="トップページへ戻る"
-          >
-            <OwlMascot size={26} />
-            <span className="text-sm font-bold text-white tracking-wide group-hover:text-indigo-300 transition-colors">
-              ココロナビ 公式表記
-            </span>
-          </Link>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Link
+              href="/"
+              className="flex items-center gap-2 hover:opacity-85 transition-opacity group"
+              title="トップページへ戻る"
+            >
+              <OwlMascot size={26} />
+              <span className="text-sm font-bold text-white tracking-wide group-hover:text-indigo-300 transition-colors">
+                ココロナビ 公式表記
+              </span>
+            </Link>
+          </div>
         </div>
       </header>
 

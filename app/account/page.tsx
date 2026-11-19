@@ -33,6 +33,7 @@ import {
 import OwlMascot from '../../components/common/OwlMascot';
 import LegalFooter from '../../components/common/LegalFooter';
 import LegalModal, { LegalTab } from '../../components/common/LegalModal';
+import ThemeToggle from '../../components/theme/ThemeToggle';
 import {
   DiagnosticHistoryItem,
   getDiagnosticHistories,
@@ -443,7 +444,8 @@ function AccountContent() {
             <span className="text-xs text-slate-400 font-medium">マイページ</span>
           </div>
 
-          <div>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
             {user ? (
               <button
                 onClick={handleLogout}

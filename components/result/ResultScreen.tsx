@@ -46,6 +46,7 @@ import LegalModal, { LegalTab } from '../common/LegalModal';
 import LegalFooter from '../common/LegalFooter';
 import AdContainer from '../common/AdContainer';
 import ComingSoonSection from './ComingSoonSection';
+import ThemeToggle from '../theme/ThemeToggle';
 import { resetDiagnosticSession } from '../../lib/session';
 
 export interface ResultScreenProps {
@@ -681,6 +682,8 @@ ${shareUrl}
           </Link>
 
           <div className="flex items-center gap-2">
+            <ThemeToggle />
+
             <Link
               href="/account"
               title="マイページ・定期課金の確認と解約"

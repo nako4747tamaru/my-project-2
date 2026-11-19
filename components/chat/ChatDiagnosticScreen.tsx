@@ -16,6 +16,7 @@ import { Answers } from '../../lib/personality';
 import OwlMascot from '../common/OwlMascot';
 import LegalModal, { LegalTab } from '../common/LegalModal';
 import LegalFooter from '../common/LegalFooter';
+import ThemeToggle from '../theme/ThemeToggle';
 
 interface ChatDiagnosticScreenProps {
   onComplete: (answers: Answers, nickname: string) => void;
@@ -317,6 +318,7 @@ export default function ChatDiagnosticScreen({
           </button>
 
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             <button
               onClick={() => handleOpenLegal('privacy')}
               title="プライバシーポリシー・利用規約"
