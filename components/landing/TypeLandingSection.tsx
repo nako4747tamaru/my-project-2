@@ -306,27 +306,33 @@ export default function TypeLandingSection({
       )}
 
       {/* セクション下部 CTA バナー */}
-      <div className="rounded-3xl p-6 sm:p-7 bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border border-indigo-500/30 text-center space-y-4 shadow-xl">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-bold">
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>さあ、本当のあなたを見つけよう</span>
-        </div>
-        <h3 className="text-lg sm:text-xl font-bold text-white">
-          あなたのタイプはどれ？ 約100問の対話で精密プロファイリング
-        </h3>
-        <p className="text-xs text-slate-300 max-w-md mx-auto leading-relaxed">
-          途中で中断しても自動保存されるため、いつでも再開できます。
-          あなたのペースで心地よく心の探検をはじめましょう。
-        </p>
-        <div className="pt-2">
-          <button
-            onClick={onStartDiagnosis}
-            className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-600 hover:from-indigo-400 hover:to-pink-500 text-white font-extrabold text-sm shadow-xl shadow-purple-950/60 transition-all transform hover:scale-105 active:scale-100 inline-flex items-center gap-2 cursor-pointer"
-          >
-            <Sparkles className="w-4 h-4 text-amber-300" />
-            <span>今すぐ診断をはじめる（無料）</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+      <div className="rounded-3xl p-6 sm:p-8 bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 dark:from-slate-900 dark:via-indigo-950/40 dark:to-slate-900 border border-indigo-500/30 text-center space-y-4 shadow-xl bottom-cta-banner transition-all relative overflow-hidden">
+        {/* 背景の淡いパステルアクセント */}
+        <div className="absolute -top-12 -right-12 w-44 h-44 rounded-full bg-pink-400/10 blur-2xl pointer-events-none" />
+        <div className="absolute -bottom-12 -left-12 w-44 h-44 rounded-full bg-emerald-400/10 blur-2xl pointer-events-none" />
+
+        <div className="relative z-10 space-y-4">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-bold bottom-cta-badge">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>さあ、本当のあなたを見つけよう</span>
+          </div>
+          <h3 className="text-lg sm:text-xl font-bold text-white bottom-cta-title">
+            あなたのタイプはどれ？ 約100問の対話で精密プロファイリング
+          </h3>
+          <p className="text-xs text-slate-300 max-w-md mx-auto leading-relaxed bottom-cta-desc">
+            途中で中断しても自動保存されるため、いつでも再開できます。
+            あなたのペースで心地よく心の探検をはじめましょう。
+          </p>
+          <div className="pt-2">
+            <button
+              onClick={onStartDiagnosis}
+              className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-600 hover:from-indigo-400 hover:to-pink-500 text-white font-extrabold text-sm shadow-xl shadow-purple-950/60 transition-all transform hover:scale-105 active:scale-100 inline-flex items-center gap-2 cursor-pointer bottom-cta-button"
+            >
+              <Sparkles className="w-4 h-4 text-amber-300" />
+              <span>今すぐ診断をはじめる（無料）</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </div>
     </section>

@@ -47,7 +47,21 @@ export default function LandingView({
   };
 
   return (
-    <div className="min-h-screen bg-[#0C101C] text-slate-100 flex flex-col font-sans selection:bg-purple-900 selection:text-purple-200">
+    <div className="min-h-screen bg-[#0C101C] text-slate-100 flex flex-col font-sans selection:bg-purple-900 selection:text-purple-200 relative overflow-hidden">
+      {/* --- ライトモード用：グラデーション水玉アクセント（ソフトで優しい円形グラデーション） --- */}
+      <div className="hidden light-dots-layer pointer-events-none fixed inset-0 z-0 overflow-hidden">
+        {/* パステルピンク水玉（右上） */}
+        <div className="absolute -top-16 -right-16 w-80 h-80 rounded-full bg-gradient-to-br from-pink-300/35 via-rose-200/25 to-transparent blur-3xl" />
+        {/* パステルグリーン水玉（左中盤） */}
+        <div className="absolute top-1/4 -left-20 w-88 h-88 rounded-full bg-gradient-to-tr from-emerald-200/30 via-teal-100/20 to-transparent blur-3xl" />
+        {/* パステルイエロー水玉（右中盤） */}
+        <div className="absolute top-1/2 -right-24 w-96 h-96 rounded-full bg-gradient-to-bl from-amber-200/30 via-yellow-100/20 to-transparent blur-3xl" />
+        {/* ペールブルー・グリーン水玉（左下） */}
+        <div className="absolute bottom-1/4 -left-16 w-80 h-80 rounded-full bg-gradient-to-br from-sky-200/25 via-emerald-100/20 to-transparent blur-3xl" />
+        {/* パステルピンク水玉（右下フッター付近） */}
+        <div className="absolute -bottom-20 right-1/4 w-72 h-72 rounded-full bg-gradient-to-t from-pink-200/30 via-rose-100/15 to-transparent blur-3xl" />
+      </div>
+
       {/* --- ヘッダー --- */}
       <header className="sticky top-0 z-40 bg-[#0C101C]/95 backdrop-blur-md border-b border-slate-800/80 px-4 py-3">
         <div className="max-w-4xl mx-auto flex items-center justify-between">

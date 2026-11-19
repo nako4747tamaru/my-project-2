@@ -29,6 +29,11 @@ html.light {
   color-scheme: light;
 }
 
+/* ライトモード時のみ水玉アクセントレイヤーを表示 */
+html.light .light-dots-layer {
+  display: block !important;
+}
+
 /* 1. 全体ベース背景（水彩アイボリー） */
 html.light,
 html.light body,
@@ -58,7 +63,7 @@ html.light .bg-\[\#151B2E\] {
   box-shadow: 0 4px 18px -2px rgba(88, 70, 55, 0.05), 0 2px 6px -1px rgba(88, 70, 55, 0.03);
 }
 
-/* 3. 【重要】3つの特徴カードのライトモード水彩パステル化（グリーン・イエロー・ピンク） */
+/* 3. 3つの特徴カードのライトモード水彩パステル化（グリーン・イエロー・ピンク） */
 html.light .feature-card-green,
 html.light .bg-\[\#141A29\]\/70:has(.feature-icon-green) {
   background: linear-gradient(135deg, #EFF8F2 0%, #E3F2E7 100%) !important;
@@ -92,7 +97,7 @@ html.light .feature-icon-pink {
   color: #B53F60 !important;
 }
 
-/* 特徴カード内のテキスト視認性向上 */
+/* 特徴カード内のテキスト視認性 */
 html.light .feature-title {
   color: #332E2B !important;
   font-weight: 700 !important;
@@ -136,14 +141,49 @@ html.light .bg-purple-950\/60 {
   color: #94690C !important;
 }
 
-/* 16タイプ紹介上部の水彩バナー（ピンク・イエロー・グリーン・ペールブルーが溶け合う優しい絵の具風） */
+/* 16タイプ紹介上部の水彩バナー */
 html.light .from-indigo-950\/80.via-purple-950\/50.to-\[\#0C101C\] {
   background-image: linear-gradient(135deg, #FDECF0 0%, #FFF9E6 38%, #EDF8F0 72%, #EBF4FC 100%) !important;
   border-color: #EBDDCB !important;
   box-shadow: 0 10px 28px -6px rgba(210, 165, 140, 0.16) !important;
 }
 
-/* 6. 16タイプカード ＆ グループピルタブの水彩パステル化 */
+/* 6. 【重要】下部CTAバナー＆ボタンのライトモード対応 */
+html.light .bottom-cta-banner,
+html.light .from-slate-900.via-indigo-950\/40.to-slate-900 {
+  background-image: linear-gradient(135deg, #FFFDF5 0%, #FFF8DC 40%, #EFF8F2 75%, #FDE8EE 100%) !important;
+  border-color: #EFE2BE !important;
+  box-shadow: 0 12px 32px -6px rgba(226, 185, 75, 0.18), 0 4px 12px -2px rgba(88, 70, 55, 0.04) !important;
+}
+
+html.light .bottom-cta-badge {
+  background-color: #FFF2C6 !important;
+  border: 1px solid #F5DE94 !important;
+  color: #8C620B !important;
+}
+
+html.light .bottom-cta-title {
+  color: #332E2B !important;
+  font-weight: 800 !important;
+}
+
+html.light .bottom-cta-desc {
+  color: #5C544E !important;
+}
+
+html.light .bottom-cta-button,
+html.light .from-indigo-500.via-purple-600.to-pink-600 {
+  background-image: linear-gradient(135deg, #F0809C 0%, #E58BA3 50%, #F39BB3 100%) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 8px 24px -4px rgba(229, 139, 163, 0.45) !important;
+}
+
+html.light .bottom-cta-button:hover,
+html.light .from-indigo-500.via-purple-600.to-pink-600:hover {
+  background-image: linear-gradient(135deg, #EA7290 0%, #DC7C95 50%, #EE8FA8 100%) !important;
+}
+
+/* 7. 16タイプカード ＆ グループピルタブの水彩パステル化 */
 html.light .from-purple-900\/30.via-slate-900\/60.to-slate-950\/80 {
   background-image: linear-gradient(135deg, #FAF0FA 0%, #FFFDF9 100%) !important;
 }
@@ -154,7 +194,7 @@ html.light .from-blue-900\/30.via-slate-900\/60.to-slate-950\/80 {
   background-image: linear-gradient(135deg, #F0F6FC 0%, #FFFDF9 100%) !important;
 }
 
-/* 7. ボタン・サブアクション・入力欄 */
+/* 8. ボタン・サブアクション・入力欄 */
 html.light .bg-slate-800,
 html.light .bg-slate-800\/90,
 html.light .bg-slate-800\/80,
@@ -184,7 +224,7 @@ html.light .bg-slate-950\/90 {
   background-color: #FAF5ED !important;
 }
 
-/* 8. テキストカラー（濃いチャコール #332E2B で視認性を確保） */
+/* 9. テキストカラー（濃いチャコール #332E2B で視認性を確保） */
 html.light .text-white,
 html.light .text-slate-100 {
   color: #332E2B !important;
@@ -217,7 +257,7 @@ html.light .text-amber-300 {
   color: #A36506 !important;
 }
 
-/* 9. 枠線（柔らかいアースベージュ） */
+/* 10. 枠線（柔らかいアースベージュ） */
 html.light .border-slate-800,
 html.light .border-slate-800\/80,
 html.light .border-slate-700,
@@ -227,7 +267,7 @@ html.light .border-slate-700\/80 {
   border-color: #EFE7DA !important;
 }
 
-/* 10. フッターのライトモード対応 */
+/* 11. フッターのライトモード対応 */
 html.light footer {
   background-color: #FAF6EE !important;
   border-color: #EBDDCB !important;
@@ -240,7 +280,7 @@ html.light footer button:hover {
   color: #332E2B !important;
 }
 
-/* 11. チャット吹き出し・マイルストーン */
+/* 12. チャット吹き出し・マイルストーン */
 html.light .bg-\[\#181F33\] {
   background-color: #FFFDF9 !important;
   color: #332E2B !important;
