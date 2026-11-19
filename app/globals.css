@@ -3,11 +3,13 @@
 @tailwind utilities;
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  /* ライトモード：温かみのあるアイボリー背景＆濃いチャコール文字 */
+  --background: #FAF6EE;
+  --foreground: #3A3532;
 }
 
 html.dark {
+  /* ダークモード：既存の黒青（ダークネイビー）トーン */
   --background: #0c101c;
   --foreground: #f1f5f9;
 }
@@ -20,127 +22,222 @@ body {
 }
 
 /* ======================================================== */
-/* ライトモード（Light Mode）全般スタイリング */
+/* ライトモード（Light Mode）：アイボリー＆パステルピンク・グリーン・イエロー */
 /* ======================================================== */
 html.light {
   color-scheme: light;
 }
 
-/* メイン背景 & ヘッダー背景 */
+/* 1. ベース背景（アイボリー） */
+html.light,
+html.light body,
 html.light .bg-\[\#0C101C\] {
-  background-color: #f8fafc !important;
+  background-color: #FAF6EE !important;
 }
 
+/* ヘッダー背景（半透明アイボリー＋ブラー） */
+html.light header,
 html.light .bg-\[\#0C101C\]\/95,
 html.light .bg-\[\#0C101C\]\/90,
 html.light .bg-\[\#0C101C\]\/80 {
-  background-color: rgba(255, 255, 255, 0.94) !important;
+  background-color: rgba(250, 246, 238, 0.94) !important;
+  border-color: rgba(229, 220, 204, 0.85) !important;
 }
 
-/* カード & コンテナ背景 */
+/* 2. カード＆コンテナ背景（オフホワイト＆淡い温もり） */
 html.light .bg-\[\#141A29\],
 html.light .bg-\[\#141A2B\],
 html.light .bg-\[\#182033\],
-html.light .bg-\[\#101422\] {
-  background-color: #ffffff !important;
-  box-shadow: 0 4px 18px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+html.light .bg-\[\#101422\],
+html.light .bg-\[\#181F33\],
+html.light .bg-\[\#1A2238\],
+html.light .bg-\[\#151B2E\] {
+  background-color: #FFFDF7 !important;
+  border-color: #EFE8DC !important;
+  box-shadow: 0 4px 20px -3px rgba(78, 64, 52, 0.06), 0 2px 6px -1px rgba(78, 64, 52, 0.03);
 }
 
-/* チャット・インプット・子コンテナ背景 */
+/* 3. パステルカラー置き換え（ピンク・グリーン・イエロー） */
+
+/* 【パステルピンク】CTAボタン・強調エリア */
+html.light .from-indigo-600.to-purple-600,
+html.light .from-indigo-600.via-purple-600.to-pink-600 {
+  background-image: linear-gradient(135deg, #F0809C 0%, #E58BA3 50%, #F59DB4 100%) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 8px 24px -4px rgba(229, 139, 163, 0.4) !important;
+}
+
+html.light .from-indigo-600.to-purple-600:hover,
+html.light .from-indigo-600.via-purple-600.to-pink-600:hover {
+  background-image: linear-gradient(135deg, #EB7290 0%, #DC7B95 50%, #EF8FA8 100%) !important;
+}
+
+/* ヒーローグラデーション文字 */
+html.light .bg-gradient-to-r.from-indigo-300.via-purple-300.to-pink-300 {
+  background-image: linear-gradient(135deg, #E06D8A 0%, #745C97 50%, #4D8B6F 100%) !important;
+}
+
+/* 【ヒーロー上部バッジ＆中盤バナー】ダーク紫廃止 → パステルピンク / パステルイエロー / パステルグリーン */
+html.light .bg-indigo-950\/80,
+html.light .bg-indigo-950\/60,
+html.light .bg-indigo-950 {
+  background-color: #FDE8EE !important;
+  border-color: #F8C3D1 !important;
+  color: #B84766 !important;
+}
+
+html.light .bg-purple-950,
+html.light .bg-purple-950\/50,
+html.light .bg-purple-950\/60 {
+  background-color: #FFF8DC !important;
+  border-color: #F5E29E !important;
+  color: #9E7412 !important;
+}
+
+/* 16タイプ紹介上部の大型バナー（ダークグラデーションをパステルアイボリー＆ピンク・グリーンに刷新） */
+html.light .from-indigo-950\/80.via-purple-950\/50.to-\[\#0C101C\] {
+  background-image: linear-gradient(135deg, #FDE8EE 0%, #FFF8DC 50%, #E6F4EA 100%) !important;
+  border-color: #EBDDCB !important;
+  box-shadow: 0 10px 30px -5px rgba(229, 139, 163, 0.15) !important;
+}
+
+/* 4. 特徴ピル（3つの特徴バッジ）：パステルグリーン・ピンク・イエロー */
+html.light .bg-indigo-500\/20 {
+  background-color: #E6F4EA !important;
+  border-color: #BBE3C7 !important;
+  color: #397850 !important;
+}
+
+html.light .text-indigo-400 {
+  color: #397850 !important;
+}
+
+html.light .bg-purple-500\/20 {
+  background-color: #FFF8DC !important;
+  border-color: #F7E5A4 !important;
+  color: #A37617 !important;
+}
+
+html.light .text-purple-400 {
+  color: #A37617 !important;
+}
+
+html.light .bg-pink-500\/20 {
+  background-color: #FDE8EE !important;
+  border-color: #F8C3D1 !important;
+  color: #C04D6C !important;
+}
+
+html.light .text-pink-400 {
+  color: #C04D6C !important;
+}
+
+/* 5. チャットメッセージのライトモード対応 */
+/* マスコット吹き出し：やさしいアイボリーホワイト */
+html.light .bg-\[\#181F33\] {
+  background-color: #FFFDF9 !important;
+  color: #3A3532 !important;
+  border-color: #EFE4D2 !important;
+  box-shadow: 0 2px 10px -2px rgba(60, 50, 40, 0.05);
+}
+
+/* ユーザー吹き出し：明るく元気なパステルピンクローズ */
+html.light .from-\[\#6366F1\].to-\[\#7C3AED\] {
+  background-image: linear-gradient(135deg, #F0809C 0%, #E58BA3 100%) !important;
+  color: #FFFFFF !important;
+}
+
+/* マイルストーン応援吹き出し：パステルイエロー（温かい陽だまり） */
+html.light .from-\[\#25284A\].via-\[\#1D213B\].to-\[\#15192C\] {
+  background-image: linear-gradient(135deg, #FFF9E6 0%, #FFF4D0 50%, #FEEDBA 100%) !important;
+  border-color: #E6BF55 !important;
+  color: #4A3E1B !important;
+  box-shadow: 0 6px 18px -3px rgba(226, 185, 75, 0.25) !important;
+}
+
+/* 6. テキストカラー（濃いチャコール・ダークブラウン系で視認性を完全確保） */
+html.light .text-white,
+html.light .text-slate-100 {
+  color: #3A3532 !important;
+}
+
+html.light .text-slate-200 {
+  color: #4A4440 !important;
+}
+
+html.light .text-slate-300 {
+  color: #5C5550 !important;
+}
+
+html.light .text-slate-400 {
+  color: #7A726C !important;
+}
+
+/* 各種テキストハイライト */
+html.light .text-indigo-300,
+html.light .text-indigo-200 {
+  color: #B84766 !important;
+}
+
+html.light .text-purple-300 {
+  color: #9E7412 !important;
+}
+
+html.light .text-emerald-300 {
+  color: #2D6A4F !important;
+}
+
+html.light .text-blue-300 {
+  color: #2F6690 !important;
+}
+
+html.light .text-amber-300 {
+  color: #B45309 !important;
+}
+
+/* 7. ボタン・サブアクション（アイボリー＆パステル調） */
+html.light .bg-slate-800,
+html.light .bg-slate-800\/90,
+html.light .bg-slate-800\/80,
+html.light .bg-slate-800\/60 {
+  background-color: #F5EFE4 !important;
+  border-color: #E6DCcb !important;
+  color: #4A4440 !important;
+}
+
+html.light .bg-slate-800:hover,
+html.light .bg-slate-800\/90:hover {
+  background-color: #EDE4D5 !important;
+  color: #2F2A28 !important;
+}
+
+/* サブコンテナや入力欄 */
 html.light .bg-slate-900,
 html.light .bg-slate-900\/60,
 html.light .bg-slate-900\/80,
 html.light .bg-slate-900\/90 {
-  background-color: #f1f5f9 !important;
+  background-color: #F8F3EA !important;
+  border-color: #EBDDCB !important;
 }
 
 html.light .bg-slate-950,
 html.light .bg-slate-950\/60,
 html.light .bg-slate-950\/80,
 html.light .bg-slate-950\/90 {
-  background-color: #f8fafc !important;
+  background-color: #FAF5ED !important;
 }
 
-/* ボタンやバッジ背景 */
-html.light .bg-slate-800,
-html.light .bg-slate-800\/90,
-html.light .bg-slate-800\/80,
-html.light .bg-slate-800\/60 {
-  background-color: #e2e8f0 !important;
-  color: #1e293b !important;
-}
-
-/* テキストカラー（高コントラスト＆見やすさ向上） */
-html.light .text-white {
-  color: #0f172a !important;
-}
-
-html.light .text-slate-100 {
-  color: #0f172a !important;
-}
-
-html.light .text-slate-200 {
-  color: #1e293b !important;
-}
-
-html.light .text-slate-300 {
-  color: #334155 !important;
-}
-
-html.light .text-slate-400 {
-  color: #64748b !important;
-}
-
-/* 枠線・区切り線 */
+/* 8. 枠線・境界線の統一 */
 html.light .border-slate-800,
 html.light .border-slate-800\/80,
 html.light .border-slate-700,
 html.light .border-slate-700\/60,
 html.light .border-slate-700\/70,
 html.light .border-slate-700\/80 {
-  border-color: rgba(226, 232, 240, 0.95) !important;
+  border-color: #EFE7DA !important;
 }
 
-/* インディゴ / パープルアクセントのライト調整 */
-html.light .bg-indigo-950,
-html.light .bg-indigo-950\/40,
-html.light .bg-indigo-950\/60,
-html.light .bg-indigo-950\/80 {
-  background-color: #e0e7ff !important;
-  color: #3730a3 !important;
-}
-
-html.light .bg-purple-950,
-html.light .bg-purple-950\/50,
-html.light .bg-purple-950\/60 {
-  background-color: #f3e8ff !important;
-  color: #6b21a8 !important;
-}
-
-html.light .text-indigo-300 {
-  color: #4338ca !important;
-}
-
-html.light .text-indigo-200 {
-  color: #3730a3 !important;
-}
-
-html.light .text-purple-300 {
-  color: #7e22ce !important;
-}
-
-html.light .text-emerald-300 {
-  color: #047857 !important;
-}
-
-html.light .text-blue-300 {
-  color: #1d4ed8 !important;
-}
-
-html.light .text-amber-300 {
-  color: #b45309 !important;
-}
-
+/* 9. アニメーション & 印刷設定 */
 @keyframes fadeIn {
   from {
     opacity: 0;
