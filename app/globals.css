@@ -3,13 +3,13 @@
 @tailwind utilities;
 
 :root {
-  /* ライトモード：温かみのあるアイボリー背景＆濃いチャコール文字 */
+  /* ライトモード：温かみのある水彩アイボリー背景＆濃いチャコール文字 */
   --background: #FAF6EE;
-  --foreground: #3A3532;
+  --foreground: #332E2B;
 }
 
 html.dark {
-  /* ダークモード：既存の黒青（ダークネイビー）トーン */
+  /* ダークモード：黒青（ダークネイビー）トーン */
   --background: #0c101c;
   --foreground: #f1f5f9;
 }
@@ -22,13 +22,14 @@ body {
 }
 
 /* ======================================================== */
-/* ライトモード（Light Mode）：アイボリー＆パステルピンク・グリーン・イエロー */
+/* ライトモード（Light Mode）：水彩パステル＆アイボリー設計 */
+/* 水彩絵の具がふわっと滲んだような優しく柔らかい配色 */
 /* ======================================================== */
 html.light {
   color-scheme: light;
 }
 
-/* 1. ベース背景（アイボリー） */
+/* 1. 全体ベース背景（水彩アイボリー） */
 html.light,
 html.light body,
 html.light .bg-\[\#0C101C\] {
@@ -41,10 +42,10 @@ html.light .bg-\[\#0C101C\]\/95,
 html.light .bg-\[\#0C101C\]\/90,
 html.light .bg-\[\#0C101C\]\/80 {
   background-color: rgba(250, 246, 238, 0.94) !important;
-  border-color: rgba(229, 220, 204, 0.85) !important;
+  border-color: #EBDDCB !important;
 }
 
-/* 2. カード＆コンテナ背景（オフホワイト＆淡い温もり） */
+/* 2. カード＆コンテナ（淡い水彩ホワイト＆ソフトシャドウ） */
 html.light .bg-\[\#141A29\],
 html.light .bg-\[\#141A2B\],
 html.light .bg-\[\#182033\],
@@ -52,36 +53,77 @@ html.light .bg-\[\#101422\],
 html.light .bg-\[\#181F33\],
 html.light .bg-\[\#1A2238\],
 html.light .bg-\[\#151B2E\] {
-  background-color: #FFFDF7 !important;
-  border-color: #EFE8DC !important;
-  box-shadow: 0 4px 20px -3px rgba(78, 64, 52, 0.06), 0 2px 6px -1px rgba(78, 64, 52, 0.03);
+  background-color: #FFFDF9 !important;
+  border-color: #EFE6D8 !important;
+  box-shadow: 0 4px 18px -2px rgba(88, 70, 55, 0.05), 0 2px 6px -1px rgba(88, 70, 55, 0.03);
 }
 
-/* 3. パステルカラー置き換え（ピンク・グリーン・イエロー） */
+/* 3. 【重要】3つの特徴カードのライトモード水彩パステル化（グリーン・イエロー・ピンク） */
+html.light .feature-card-green,
+html.light .bg-\[\#141A29\]\/70:has(.feature-icon-green) {
+  background: linear-gradient(135deg, #EFF8F2 0%, #E3F2E7 100%) !important;
+  border-color: #CCE8D3 !important;
+  box-shadow: 0 4px 14px -2px rgba(95, 168, 120, 0.12) !important;
+}
+html.light .feature-icon-green {
+  background-color: #D3ECD8 !important;
+  color: #2D6A43 !important;
+}
 
-/* 【パステルピンク】CTAボタン・強調エリア */
+html.light .feature-card-yellow,
+html.light .bg-\[\#141A29\]\/70:has(.feature-icon-yellow) {
+  background: linear-gradient(135deg, #FFFDF0 0%, #FFF8DC 100%) !important;
+  border-color: #F8E7AC !important;
+  box-shadow: 0 4px 14px -2px rgba(226, 185, 75, 0.15) !important;
+}
+html.light .feature-icon-yellow {
+  background-color: #FEF0BE !important;
+  color: #8C620B !important;
+}
+
+html.light .feature-card-pink,
+html.light .bg-\[\#141A29\]\/70:has(.feature-icon-pink) {
+  background: linear-gradient(135deg, #FFF2F5 0%, #FDE8EE 100%) !important;
+  border-color: #F9CCD7 !important;
+  box-shadow: 0 4px 14px -2px rgba(229, 139, 163, 0.15) !important;
+}
+html.light .feature-icon-pink {
+  background-color: #FCD6E0 !important;
+  color: #B53F60 !important;
+}
+
+/* 特徴カード内のテキスト視認性向上 */
+html.light .feature-title {
+  color: #332E2B !important;
+  font-weight: 700 !important;
+}
+html.light .feature-desc {
+  color: #615750 !important;
+  font-weight: 500 !important;
+}
+
+/* 4. メインCTAボタン（水彩パステルピンク＆ローズグラデーション） */
 html.light .from-indigo-600.to-purple-600,
 html.light .from-indigo-600.via-purple-600.to-pink-600 {
-  background-image: linear-gradient(135deg, #F0809C 0%, #E58BA3 50%, #F59DB4 100%) !important;
+  background-image: linear-gradient(135deg, #F0809C 0%, #E58BA3 50%, #F39BB3 100%) !important;
   color: #FFFFFF !important;
-  box-shadow: 0 8px 24px -4px rgba(229, 139, 163, 0.4) !important;
+  box-shadow: 0 6px 20px -3px rgba(229, 139, 163, 0.42) !important;
 }
-
 html.light .from-indigo-600.to-purple-600:hover,
 html.light .from-indigo-600.via-purple-600.to-pink-600:hover {
-  background-image: linear-gradient(135deg, #EB7290 0%, #DC7B95 50%, #EF8FA8 100%) !important;
+  background-image: linear-gradient(135deg, #EA7290 0%, #DC7C95 50%, #EE8FA8 100%) !important;
 }
 
-/* ヒーローグラデーション文字 */
+/* ヒーロー水彩グラデーション見出しテキスト */
 html.light .bg-gradient-to-r.from-indigo-300.via-purple-300.to-pink-300 {
-  background-image: linear-gradient(135deg, #E06D8A 0%, #745C97 50%, #4D8B6F 100%) !important;
+  background-image: linear-gradient(135deg, #DE5D7E 0%, #76569B 50%, #3B8263 100%) !important;
 }
 
-/* 【ヒーロー上部バッジ＆中盤バナー】ダーク紫廃止 → パステルピンク / パステルイエロー / パステルグリーン */
+/* 5. ヒーロー上部バッジ＆中盤大型バナー（水彩グラデーション） */
 html.light .bg-indigo-950\/80,
 html.light .bg-indigo-950\/60,
 html.light .bg-indigo-950 {
-  background-color: #FDE8EE !important;
+  background: linear-gradient(135deg, #FFF0F4 0%, #FDE8EE 100%) !important;
   border-color: #F8C3D1 !important;
   color: #B84766 !important;
 }
@@ -89,129 +131,44 @@ html.light .bg-indigo-950 {
 html.light .bg-purple-950,
 html.light .bg-purple-950\/50,
 html.light .bg-purple-950\/60 {
-  background-color: #FFF8DC !important;
+  background: linear-gradient(135deg, #FFFDF2 0%, #FFF8DC 100%) !important;
   border-color: #F5E29E !important;
-  color: #9E7412 !important;
+  color: #94690C !important;
 }
 
-/* 16タイプ紹介上部の大型バナー（ダークグラデーションをパステルアイボリー＆ピンク・グリーンに刷新） */
+/* 16タイプ紹介上部の水彩バナー（ピンク・イエロー・グリーン・ペールブルーが溶け合う優しい絵の具風） */
 html.light .from-indigo-950\/80.via-purple-950\/50.to-\[\#0C101C\] {
-  background-image: linear-gradient(135deg, #FDE8EE 0%, #FFF8DC 50%, #E6F4EA 100%) !important;
+  background-image: linear-gradient(135deg, #FDECF0 0%, #FFF9E6 38%, #EDF8F0 72%, #EBF4FC 100%) !important;
   border-color: #EBDDCB !important;
-  box-shadow: 0 10px 30px -5px rgba(229, 139, 163, 0.15) !important;
+  box-shadow: 0 10px 28px -6px rgba(210, 165, 140, 0.16) !important;
 }
 
-/* 4. 特徴ピル（3つの特徴バッジ）：パステルグリーン・ピンク・イエロー */
-html.light .bg-indigo-500\/20 {
-  background-color: #E6F4EA !important;
-  border-color: #BBE3C7 !important;
-  color: #397850 !important;
+/* 6. 16タイプカード ＆ グループピルタブの水彩パステル化 */
+html.light .from-purple-900\/30.via-slate-900\/60.to-slate-950\/80 {
+  background-image: linear-gradient(135deg, #FAF0FA 0%, #FFFDF9 100%) !important;
+}
+html.light .from-emerald-900\/30.via-slate-900\/60.to-slate-950\/80 {
+  background-image: linear-gradient(135deg, #F0F9F3 0%, #FFFDF9 100%) !important;
+}
+html.light .from-blue-900\/30.via-slate-900\/60.to-slate-950\/80 {
+  background-image: linear-gradient(135deg, #F0F6FC 0%, #FFFDF9 100%) !important;
 }
 
-html.light .text-indigo-400 {
-  color: #397850 !important;
-}
-
-html.light .bg-purple-500\/20 {
-  background-color: #FFF8DC !important;
-  border-color: #F7E5A4 !important;
-  color: #A37617 !important;
-}
-
-html.light .text-purple-400 {
-  color: #A37617 !important;
-}
-
-html.light .bg-pink-500\/20 {
-  background-color: #FDE8EE !important;
-  border-color: #F8C3D1 !important;
-  color: #C04D6C !important;
-}
-
-html.light .text-pink-400 {
-  color: #C04D6C !important;
-}
-
-/* 5. チャットメッセージのライトモード対応 */
-/* マスコット吹き出し：やさしいアイボリーホワイト */
-html.light .bg-\[\#181F33\] {
-  background-color: #FFFDF9 !important;
-  color: #3A3532 !important;
-  border-color: #EFE4D2 !important;
-  box-shadow: 0 2px 10px -2px rgba(60, 50, 40, 0.05);
-}
-
-/* ユーザー吹き出し：明るく元気なパステルピンクローズ */
-html.light .from-\[\#6366F1\].to-\[\#7C3AED\] {
-  background-image: linear-gradient(135deg, #F0809C 0%, #E58BA3 100%) !important;
-  color: #FFFFFF !important;
-}
-
-/* マイルストーン応援吹き出し：パステルイエロー（温かい陽だまり） */
-html.light .from-\[\#25284A\].via-\[\#1D213B\].to-\[\#15192C\] {
-  background-image: linear-gradient(135deg, #FFF9E6 0%, #FFF4D0 50%, #FEEDBA 100%) !important;
-  border-color: #E6BF55 !important;
-  color: #4A3E1B !important;
-  box-shadow: 0 6px 18px -3px rgba(226, 185, 75, 0.25) !important;
-}
-
-/* 6. テキストカラー（濃いチャコール・ダークブラウン系で視認性を完全確保） */
-html.light .text-white,
-html.light .text-slate-100 {
-  color: #3A3532 !important;
-}
-
-html.light .text-slate-200 {
-  color: #4A4440 !important;
-}
-
-html.light .text-slate-300 {
-  color: #5C5550 !important;
-}
-
-html.light .text-slate-400 {
-  color: #7A726C !important;
-}
-
-/* 各種テキストハイライト */
-html.light .text-indigo-300,
-html.light .text-indigo-200 {
-  color: #B84766 !important;
-}
-
-html.light .text-purple-300 {
-  color: #9E7412 !important;
-}
-
-html.light .text-emerald-300 {
-  color: #2D6A4F !important;
-}
-
-html.light .text-blue-300 {
-  color: #2F6690 !important;
-}
-
-html.light .text-amber-300 {
-  color: #B45309 !important;
-}
-
-/* 7. ボタン・サブアクション（アイボリー＆パステル調） */
+/* 7. ボタン・サブアクション・入力欄 */
 html.light .bg-slate-800,
 html.light .bg-slate-800\/90,
 html.light .bg-slate-800\/80,
 html.light .bg-slate-800\/60 {
   background-color: #F5EFE4 !important;
   border-color: #E6DCcb !important;
-  color: #4A4440 !important;
+  color: #332E2B !important;
 }
-
 html.light .bg-slate-800:hover,
 html.light .bg-slate-800\/90:hover {
   background-color: #EDE4D5 !important;
-  color: #2F2A28 !important;
+  color: #26221F !important;
 }
 
-/* サブコンテナや入力欄 */
 html.light .bg-slate-900,
 html.light .bg-slate-900\/60,
 html.light .bg-slate-900\/80,
@@ -227,7 +184,40 @@ html.light .bg-slate-950\/90 {
   background-color: #FAF5ED !important;
 }
 
-/* 8. 枠線・境界線の統一 */
+/* 8. テキストカラー（濃いチャコール #332E2B で視認性を確保） */
+html.light .text-white,
+html.light .text-slate-100 {
+  color: #332E2B !important;
+}
+html.light .text-slate-200 {
+  color: #453F3A !important;
+}
+html.light .text-slate-300 {
+  color: #574F49 !important;
+}
+html.light .text-slate-400 {
+  color: #706760 !important;
+}
+
+/* 各種カラーバッジの視認性文字色 */
+html.light .text-indigo-300,
+html.light .text-indigo-200 {
+  color: #B53F60 !important;
+}
+html.light .text-purple-300 {
+  color: #8C620B !important;
+}
+html.light .text-emerald-300 {
+  color: #2D6A43 !important;
+}
+html.light .text-blue-300 {
+  color: #285F88 !important;
+}
+html.light .text-amber-300 {
+  color: #A36506 !important;
+}
+
+/* 9. 枠線（柔らかいアースベージュ） */
 html.light .border-slate-800,
 html.light .border-slate-800\/80,
 html.light .border-slate-700,
@@ -237,7 +227,38 @@ html.light .border-slate-700\/80 {
   border-color: #EFE7DA !important;
 }
 
-/* 9. アニメーション & 印刷設定 */
+/* 10. フッターのライトモード対応 */
+html.light footer {
+  background-color: #FAF6EE !important;
+  border-color: #EBDDCB !important;
+  color: #706760 !important;
+}
+html.light footer button {
+  color: #574F49 !important;
+}
+html.light footer button:hover {
+  color: #332E2B !important;
+}
+
+/* 11. チャット吹き出し・マイルストーン */
+html.light .bg-\[\#181F33\] {
+  background-color: #FFFDF9 !important;
+  color: #332E2B !important;
+  border-color: #EFE4D2 !important;
+  box-shadow: 0 2px 10px -2px rgba(60, 50, 40, 0.05);
+}
+html.light .from-\[\#6366F1\].to-\[\#7C3AED\] {
+  background-image: linear-gradient(135deg, #F0809C 0%, #E58BA3 100%) !important;
+  color: #FFFFFF !important;
+}
+html.light .from-\[\#25284A\].via-\[\#1D213B\].to-\[\#15192C\] {
+  background-image: linear-gradient(135deg, #FFFDF0 0%, #FFF8DC 50%, #FEF0BE 100%) !important;
+  border-color: #E6BF55 !important;
+  color: #4A3E1B !important;
+  box-shadow: 0 6px 18px -3px rgba(226, 185, 75, 0.2) !important;
+}
+
+/* アニメーション & 印刷 */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -253,7 +274,6 @@ html.light .border-slate-700\/80 {
   animation: fadeIn 0.25s ease-out forwards;
 }
 
-/* 印刷・PDF出力用スタイル */
 @media print {
   body {
     background-color: #ffffff !important;
@@ -261,19 +281,9 @@ html.light .border-slate-700\/80 {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
-
-  /* 印刷時に非表示にする要素 */
-  .no-print,
-  nav,
-  button,
-  footer,
-  .print-hidden,
-  .adsbygoogle,
-  .google-auto-placed {
+  .no-print, nav, button, footer, .print-hidden, .adsbygoogle, .google-auto-placed {
     display: none !important;
   }
-
-  /* 印刷時のコンテナ調整 */
   .print-area {
     background: #ffffff !important;
     color: #0f172a !important;
@@ -284,12 +294,7 @@ html.light .border-slate-700\/80 {
     padding: 0 !important;
     margin: 0 !important;
   }
-
-  /* 印刷時の見栄え改善 */
-  .shadow-xl,
-  .shadow-2xl,
-  .shadow-lg,
-  .shadow-md {
+  .shadow-xl, .shadow-2xl, .shadow-lg, .shadow-md {
     box-shadow: none !important;
   }
 }

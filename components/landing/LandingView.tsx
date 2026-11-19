@@ -142,35 +142,35 @@ export default function LandingView({
             </Link>
           </div>
 
-          {/* 3つの特徴ピル */}
+          {/* 3つの特徴ピル（水彩パステルトーン：グリーン・イエロー・ピンク） */}
           <div className="pt-4 grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl mx-auto text-left">
-            <div className="p-3.5 rounded-2xl bg-[#141A29]/70 border border-slate-800 flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center shrink-0">
+            <div className="p-3.5 rounded-2xl bg-[#141A29]/70 dark:bg-[#141A29]/70 border border-slate-800 dark:border-slate-800 flex items-center gap-3 feature-card-green transition-all">
+              <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 dark:text-emerald-400 flex items-center justify-center shrink-0 feature-icon-green">
                 <Brain className="w-4 h-4" />
               </div>
               <div>
-                <p className="text-xs font-bold text-white">16タイプ性格プロファイリング</p>
-                <p className="text-[10px] text-slate-400">認知機能の強みと行動特性</p>
+                <p className="text-xs font-bold text-white dark:text-white feature-title">16タイプ性格プロファイリング</p>
+                <p className="text-[10px] text-slate-400 dark:text-slate-400 feature-desc">認知機能の強みと行動特性</p>
               </div>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-[#141A29]/70 border border-slate-800 flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center shrink-0">
+            <div className="p-3.5 rounded-2xl bg-[#141A29]/70 dark:bg-[#141A29]/70 border border-slate-800 dark:border-slate-800 flex items-center gap-3 feature-card-yellow transition-all">
+              <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 dark:text-amber-400 flex items-center justify-center shrink-0 feature-icon-yellow">
                 <MessageCircle className="w-4 h-4" />
               </div>
               <div>
-                <p className="text-xs font-bold text-white">やさしい対話型チャット</p>
-                <p className="text-[10px] text-slate-400">途中で閉じても自動保存</p>
+                <p className="text-xs font-bold text-white dark:text-white feature-title">やさしい対話型チャット</p>
+                <p className="text-[10px] text-slate-400 dark:text-slate-400 feature-desc">途中で閉じても自動保存</p>
               </div>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-[#141A29]/70 border border-slate-800 flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-pink-500/20 text-pink-400 flex items-center justify-center shrink-0">
+            <div className="p-3.5 rounded-2xl bg-[#141A29]/70 dark:bg-[#141A29]/70 border border-slate-800 dark:border-slate-800 flex items-center gap-3 feature-card-pink transition-all">
+              <div className="w-9 h-9 rounded-xl bg-pink-500/20 text-pink-400 dark:text-pink-400 flex items-center justify-center shrink-0 feature-icon-pink">
                 <Compass className="w-4 h-4" />
               </div>
               <div>
-                <p className="text-xs font-bold text-white">認知の歪み＆心の疲弊度</p>
-                <p className="text-[10px] text-slate-400">多角的なメンタルケア処方箋</p>
+                <p className="text-xs font-bold text-white dark:text-white feature-title">認知の歪み＆心の疲弊度</p>
+                <p className="text-[10px] text-slate-400 dark:text-slate-400 feature-desc">多角的なメンタルケア処方箋</p>
               </div>
             </div>
           </div>
