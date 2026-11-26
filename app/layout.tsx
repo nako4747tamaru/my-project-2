@@ -31,6 +31,9 @@ export const metadata: Metadata = {
     description: '100の問いから紡ぎ出された、あなたの心の地図。MBTI性格診断・メンタル疲弊度・認知の歪み分析アプリ',
     images: ['/api/og?type=INTP&name=ココロナビ'],
   },
+  verification: {
+    google: 'rvZudja28WS1feh6gw0MDGQMgIZcODdB2-HQaVpGTYc',
+  },
 };
 
 export default function RootLayout({
