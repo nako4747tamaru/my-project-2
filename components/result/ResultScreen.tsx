@@ -437,7 +437,20 @@ export default function ResultScreen({
       window.location.href = data.url;
     } catch (err: any) {
       console.error('Checkout error:', err);
-      setExportErrorMessage(err.message || '決済画面の起動に失敗しました。時間をおいて再試行してください。');
+      const rawMessage = err.message || '';
+      let friendlyMessage = '決済画面の起動に失敗しました。時間をおいて再試行してください。';
+
+      if (
+        rawMessage.includes('cannot currently make live charges') ||
+        rawMessage.includes('live charges') ||
+        rawMessage.includes('signed up for live')
+      ) {
+        friendlyMessage = '【決済準備中】現在Stripe本番決済機能の申請・確認中です。完了まで今しばらくお待ちください。';
+      } else if (rawMessage) {
+        friendlyMessage = `決済エラー: ${rawMessage}`;
+      }
+
+      setExportErrorMessage(friendlyMessage);
       setIsCheckingOut(false);
     }
   };
@@ -663,51 +676,51 @@ ${shareUrl}
   return (
     <div className="min-h-screen bg-[#0C101C] text-slate-100 font-sans pb-16 selection:bg-purple-900 selection:text-purple-200">
       {/* --- ヘッダー / ナビバー --- */}
-      <header className="sticky top-0 z-40 bg-[#0C101C]/90 backdrop-blur-md border-b border-slate-800/80 px-4 py-3">
-        <div className="max-w-md mx-auto flex items-center justify-between">
+      <header className="sticky top-0 z-40 bg-[#0C101C]/90 backdrop-blur-md border-b border-slate-800/80 px-3 sm:px-4 py-2.5 sm:py-3">
+        <div className="max-w-md mx-auto flex items-center justify-between gap-2">
           <Link
             href="/"
-            className="flex items-center gap-2 hover:opacity-85 transition-opacity group"
+            className="flex items-center gap-1.5 sm:gap-2 hover:opacity-85 transition-opacity group shrink-0 min-w-0"
             title="トップページ（再診断）へ戻る"
           >
-            <OwlMascot size={26} />
-            <div className="flex items-center gap-1.5">
-              <span className="text-base font-bold text-slate-100 group-hover:text-indigo-300 transition-colors tracking-tight">
+            <OwlMascot size={26} className="shrink-0" />
+            <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
+              <span className="text-sm sm:text-base font-bold text-slate-100 group-hover:text-indigo-300 transition-colors tracking-tight whitespace-nowrap">
                 分析結果
               </span>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-800/60 font-medium">
+              <span className="hidden sm:inline-block text-xs px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-800/60 font-medium whitespace-nowrap shrink-0">
                 100問完了
               </span>
             </div>
           </Link>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <ThemeToggle />
 
             <Link
               href="/account"
               title="マイページ・定期課金の確認と解約"
-              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-800/90 hover:bg-slate-700 text-xs text-slate-300 hover:text-white transition-colors border border-slate-700/60 cursor-pointer"
+              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-800/90 hover:bg-slate-700 text-xs text-slate-300 hover:text-white transition-colors border border-slate-700/60 cursor-pointer whitespace-nowrap shrink-0"
             >
-              <CreditCard className="w-3.5 h-3.5 text-indigo-400" />
+              <CreditCard className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
               <span className="hidden sm:inline">マイページ</span>
             </Link>
 
             <button
               onClick={() => handleOpenLegal('privacy')}
               title="プライバシーポリシー・利用規約"
-              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-800/90 hover:bg-slate-700 text-xs text-slate-400 hover:text-white transition-colors border border-slate-700/60 cursor-pointer"
+              className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-slate-800/90 hover:bg-slate-700 text-xs text-slate-400 hover:text-white transition-colors border border-slate-700/60 cursor-pointer whitespace-nowrap shrink-0"
             >
-              <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
-              <span className="hidden sm:inline">規約</span>
+              <ShieldCheck className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+              <span>規約</span>
             </button>
 
             <button
               onClick={handleTriggerRetest}
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-slate-800/90 hover:bg-slate-700 text-xs text-slate-300 hover:text-white transition-colors border border-slate-700/60 cursor-pointer"
+              className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-full bg-slate-800/90 hover:bg-slate-700 text-xs text-slate-300 hover:text-white transition-colors border border-slate-700/60 cursor-pointer whitespace-nowrap shrink-0"
               title="最初からやり直す（回答データを初期化）"
             >
-              <RotateCcw className="w-3.5 h-3.5" />
+              <RotateCcw className="w-3.5 h-3.5 shrink-0" />
               <span>再診断</span>
             </button>
           </div>
@@ -1601,15 +1614,24 @@ ${shareUrl}
       {/* 完了・エラートースト通知 */}
       {/* ======================================================== */}
       {exportSuccessMessage && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-full bg-emerald-950/95 border border-emerald-500/80 text-emerald-200 text-xs font-bold shadow-xl shadow-emerald-950/50 flex items-center gap-2 animate-fadeIn max-w-[90vw]">
-          <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-          <span className="truncate">{exportSuccessMessage}</span>
+        <div className="fixed top-16 sm:top-20 left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-50 px-4 py-3 rounded-2xl bg-emerald-950/95 border border-emerald-500/80 text-emerald-200 text-xs font-bold shadow-2xl shadow-emerald-950/60 flex items-start sm:items-center gap-2.5 animate-fadeIn sm:max-w-md">
+          <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5 sm:mt-0" />
+          <span className="leading-relaxed break-words">{exportSuccessMessage}</span>
         </div>
       )}
       {exportErrorMessage && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-full bg-rose-950/95 border border-rose-500/80 text-rose-200 text-xs font-bold shadow-xl shadow-rose-950/50 flex items-center gap-2 animate-fadeIn max-w-[90vw]">
-          <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
-          <span className="truncate">{exportErrorMessage}</span>
+        <div className="fixed top-16 sm:top-20 left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-50 px-4 py-3 rounded-2xl bg-rose-950/95 border border-rose-500/80 text-rose-200 text-xs font-bold shadow-2xl shadow-rose-950/60 flex items-start sm:items-center gap-2.5 animate-fadeIn sm:max-w-md">
+          <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5 sm:mt-0" />
+          <div className="flex-1 min-w-0">
+            <p className="leading-relaxed break-words">{exportErrorMessage}</p>
+          </div>
+          <button
+            onClick={() => setExportErrorMessage(null)}
+            className="text-rose-300 hover:text-white p-1 shrink-0 -mr-1 cursor-pointer"
+            title="閉じる"
+          >
+            ✕
+          </button>
         </div>
       )}
     </div>

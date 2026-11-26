@@ -419,48 +419,49 @@ function AccountContent() {
   return (
     <div className="min-h-screen bg-[#0C101C] text-slate-100 font-sans pb-16 selection:bg-purple-900 selection:text-purple-200">
       {/* --- ヘッダー --- */}
-      <header className="sticky top-0 z-40 bg-[#0C101C]/90 backdrop-blur-md border-b border-slate-800/80 px-4 py-3">
-        <div className="max-w-xl mx-auto flex items-center justify-between">
+      <header className="sticky top-0 z-40 bg-[#0C101C]/90 backdrop-blur-md border-b border-slate-800/80 px-3 sm:px-4 py-2.5 sm:py-3">
+        <div className="max-w-xl mx-auto flex items-center justify-between gap-2">
           <Link
             href="/result"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800/90 hover:bg-slate-700 text-xs text-slate-300 hover:text-white transition-colors border border-slate-700/60"
+            className="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-slate-800/90 hover:bg-slate-700 text-xs text-slate-300 hover:text-white transition-colors border border-slate-700/60 whitespace-nowrap shrink-0"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>診断結果へ戻る</span>
+            <ArrowLeft className="w-3.5 h-3.5 shrink-0" />
+            <span className="hidden sm:inline">診断結果へ戻る</span>
+            <span className="sm:hidden">結果へ</span>
           </Link>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
             <Link
               href="/"
-              className="flex items-center gap-2 hover:opacity-85 transition-opacity group"
+              className="flex items-center gap-1.5 hover:opacity-85 transition-opacity group min-w-0"
               title="トップページへ戻る"
             >
-              <OwlMascot size={26} />
-              <span className="text-sm font-bold text-white tracking-wide group-hover:text-indigo-300 transition-colors">
+              <OwlMascot size={24} className="shrink-0" />
+              <span className="text-xs sm:text-sm font-bold text-white tracking-wide group-hover:text-indigo-300 transition-colors whitespace-nowrap truncate">
                 ココロナビ
               </span>
             </Link>
-            <span className="text-slate-600">/</span>
-            <span className="text-xs text-slate-400 font-medium">マイページ</span>
+            <span className="text-slate-600 shrink-0">/</span>
+            <span className="text-xs text-slate-400 font-medium whitespace-nowrap shrink-0">マイページ</span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <ThemeToggle />
             {user ? (
               <button
                 onClick={handleLogout}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-rose-950/60 hover:bg-rose-900/80 border border-rose-800/60 text-[11px] text-rose-200 cursor-pointer"
+                className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-rose-950/60 hover:bg-rose-900/80 border border-rose-800/60 text-xs text-rose-200 cursor-pointer whitespace-nowrap shrink-0"
                 title="ログアウト"
               >
-                <LogOut className="w-3 h-3" />
-                <span>ログアウト</span>
+                <LogOut className="w-3.5 h-3.5 shrink-0" />
+                <span className="hidden sm:inline">ログアウト</span>
               </button>
             ) : (
               <button
                 onClick={() => setActiveTab('auth')}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-indigo-950/60 hover:bg-indigo-900/80 border border-indigo-700/60 text-[11px] text-indigo-200 cursor-pointer"
+                className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-full bg-indigo-950/60 hover:bg-indigo-900/80 border border-indigo-700/60 text-xs text-indigo-200 cursor-pointer whitespace-nowrap shrink-0"
               >
-                <LogIn className="w-3 h-3" />
+                <LogIn className="w-3.5 h-3.5 shrink-0" />
                 <span>ログイン</span>
               </button>
             )}
