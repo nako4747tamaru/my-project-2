@@ -226,27 +226,27 @@ function ShareButtonGroup({
         </button>
       </div>
 
-      {/* PDF形式ダウンロード用オプションボタン */}
-      <div className="flex items-center justify-between pt-1 border-t border-slate-800/80">
-        <span className="text-[10px] text-slate-400">印刷・保管用フォーマット</span>
-        <button
-          onClick={onSavePdf}
-          disabled={isExportingAny}
-          className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-300 hover:text-emerald-200 py-1 px-2.5 rounded-xl bg-emerald-950/60 hover:bg-emerald-900/60 border border-emerald-700/60 transition-colors disabled:opacity-50 cursor-pointer"
-        >
-          {isExportingPdf ? (
-            <>
-              <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-300" />
-              <span>PDF作成中...</span>
-            </>
-          ) : (
-            <>
-              <FileDown className="w-3.5 h-3.5 text-emerald-400" />
-              <span>PDFでダウンロード</span>
-            </>
-          )}
-        </button>
-      </div>
+        {/* PDF形式ダウンロード用オプションボタン */}
+        <div className="flex items-center justify-between pt-1 border-t border-slate-800/80">
+          <span className="text-[10px] text-slate-400">印刷・保管用フォーマット</span>
+          <button
+            onClick={onSavePdf}
+            disabled={isExportingAny}
+            className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-300 hover:text-emerald-200 py-1 px-2.5 rounded-xl bg-emerald-950/60 hover:bg-emerald-900/60 border border-emerald-700/60 transition-colors disabled:opacity-50 cursor-pointer pdf-download-btn"
+          >
+            {isExportingPdf ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-300 pdf-download-icon" />
+                <span>PDF作成中...</span>
+              </>
+            ) : (
+              <>
+                <FileDown className="w-3.5 h-3.5 text-emerald-400 pdf-download-icon" />
+                <span>PDFでダウンロード</span>
+              </>
+            )}
+          </button>
+        </div>
     </div>
   );
 }
@@ -897,20 +897,20 @@ ${shareUrl}
               </div>
             </div>
 
-            {/* グループバッジ（アイコン直上・中央揃え） */}
-            <div className="flex justify-center mb-2">
-              <div className={`inline-flex items-center px-3.5 py-1 rounded-full border text-xs font-bold tracking-wide shadow-sm ${
-                (result.info.group || '').includes('外交官')
-                  ? 'bg-emerald-950/90 border-emerald-400/40 text-emerald-200'
-                  : (result.info.group || '').includes('番人')
-                  ? 'bg-sky-950/90 border-sky-400/40 text-sky-200'
-                  : (result.info.group || '').includes('探検家')
-                  ? 'bg-amber-950/90 border-amber-400/40 text-amber-200'
-                  : 'bg-purple-950/90 border-purple-400/40 text-purple-200'
-              }`}>
-                <span>{result.info.group || '分析家グループ'}</span>
-              </div>
-            </div>
+        {/* グループバッジ（アイコン直上・中央揃え） */}
+        <div className="flex justify-center mb-2">
+          <div className={`inline-flex items-center px-3.5 py-1 rounded-full border text-xs font-bold tracking-wide shadow-sm result-group-badge ${
+            (result.info.group || '').includes('外交官')
+              ? 'bg-emerald-950/90 border-emerald-400/40 text-emerald-200 badge-group-diplomat'
+              : (result.info.group || '').includes('番人')
+              ? 'bg-sky-950/90 border-sky-400/40 text-sky-200 badge-group-sentinel'
+              : (result.info.group || '').includes('探検家')
+              ? 'bg-amber-950/90 border-amber-400/40 text-amber-200 badge-group-explorer'
+              : 'bg-purple-950/90 border-purple-400/40 text-purple-200 badge-group-analyst'
+          }`}>
+            <span>{result.info.group || '分析家グループ'}</span>
+          </div>
+        </div>
 
             {/* 動物アイコン（最新パステル・影絵シルエット画像） */}
             <div className="flex justify-center my-3">
@@ -1225,10 +1225,10 @@ ${shareUrl}
             ]).map((pattern, idx) => (
               <div
                 key={idx}
-                className="p-3.5 rounded-2xl bg-[#1F273D]/70 border border-slate-700/60 flex items-start gap-3"
+                className="p-3.5 rounded-2xl bg-[#1F273D]/70 border border-slate-700/60 flex items-start gap-3 stress-pattern-item"
               >
-                <div className="w-7 h-7 rounded-full bg-rose-950/80 border border-rose-700/60 flex items-center justify-center shrink-0 mt-0.5">
-                  <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
+                <div className="w-7 h-7 rounded-full bg-rose-950/80 stress-warning-icon-box border border-rose-700/60 flex items-center justify-center shrink-0 mt-0.5">
+                  <AlertTriangle className="w-3.5 h-3.5 text-rose-400 stress-warning-icon" />
                 </div>
                 <div className="space-y-1">
                   <h4 className="text-xs font-bold text-slate-100">
@@ -1307,7 +1307,7 @@ ${shareUrl}
                 PREMIUM
               </span>
             ) : (
-              <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-700 font-bold flex items-center gap-1">
+              <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-700 font-bold flex items-center gap-1 unlocked-badge">
                 <CheckCircle2 className="w-2.5 h-2.5" />
                 解放済み
               </span>

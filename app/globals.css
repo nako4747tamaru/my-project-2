@@ -777,6 +777,97 @@ html.light .share-preview-footer span:last-child {
   color: #BE123C !important;
 }
 
+/* ======================================================== */
+/* 18. 【微修正】残存ダークバッジ・ボタン・タブ枠のライトモード配色調整 */
+/* ======================================================== */
+
+/* 18-1. 「PDFでダウンロード」ボタン */
+html.light .pdf-download-btn {
+  background-color: #FFFDF9 !important;
+  border-color: #FBCFE8 !important;
+  color: #1F2937 !important;
+  box-shadow: 0 2px 6px -1px rgba(244, 114, 182, 0.2) !important;
+}
+html.light .pdf-download-btn:hover {
+  background-color: #FFF0F5 !important;
+  border-color: #F472B6 !important;
+  color: #111827 !important;
+}
+html.light .pdf-download-btn .pdf-download-icon {
+  color: #BE123C !important;
+}
+html.light .pdf-download-btn span {
+  color: #1F2937 !important;
+}
+
+/* 18-2. 「番人グループ」等のグループバッジ */
+html.light .result-group-badge {
+  box-shadow: 0 2px 8px -2px rgba(60, 50, 40, 0.08) !important;
+}
+html.light .badge-group-sentinel {
+  background-color: #EFF6FF !important; /* 淡いパステルスカイブルー */
+  border-color: #BFDBFE !important;
+  color: #1E40AF !important; /* 視認性の高い濃いブルー */
+}
+html.light .badge-group-diplomat {
+  background-color: #ECFDF5 !important; /* 淡いパステルエメラルド */
+  border-color: #A7F3D0 !important;
+  color: #065F46 !important;
+}
+html.light .badge-group-explorer {
+  background-color: #FFFBEB !important; /* 淡いパステルイエロー */
+  border-color: #FDE68A !important;
+  color: #92400E !important;
+}
+html.light .badge-group-analyst {
+  background-color: #FAF5FF !important; /* 淡いパステルパープル */
+  border-color: #E9D5FF !important;
+  color: #6B21A8 !important;
+}
+
+/* 18-3. 「陥りやすいストレスパターン」の⚠️マーク */
+html.light .stress-warning-icon-box {
+  background-color: #FFF1F2 !important; /* 淡いコーラルピンク */
+  border-color: #FECDD3 !important;
+  box-shadow: 0 2px 6px -1px rgba(244, 63, 94, 0.15) !important;
+}
+html.light .stress-warning-icon {
+  color: #E11D48 !important; /* くっきり鮮やかなローズレッド */
+}
+
+/* 18-4. 「解放済み」バッジ */
+html.light .unlocked-badge {
+  background-color: #ECFDF5 !important; /* 爽やかなパステルミントグリーン */
+  border-color: #A7F3D0 !important;
+  color: #065F46 !important; /* 濃いエメラルドグリーンで文字をくっきり */
+  box-shadow: 0 1px 4px rgba(16, 185, 129, 0.15) !important;
+}
+html.light .unlocked-badge svg {
+  color: #059669 !important;
+}
+
+/* 18-5. マイページ（/account）のタブバー親枠 */
+html.light .account-tab-nav {
+  background-color: #FFFDF9 !important; /* 温かみのあるアイボリー */
+  border-color: #FBCFE8 !important; /* 柔らかいパステルピンク枠線 */
+  box-shadow: 0 2px 10px -2px rgba(244, 114, 182, 0.12) !important;
+}
+html.light .account-tab-nav .active-tab {
+  background-image: linear-gradient(135deg, #F472B6 0%, #FB7185 100%) !important; /* 明るいパステルピンク〜コーラル */
+  color: #FFFFFF !important;
+  box-shadow: 0 2px 8px -1px rgba(244, 114, 182, 0.35) !important;
+}
+html.light .account-tab-nav .active-tab * {
+  color: #FFFFFF !important;
+}
+html.light .account-tab-nav .inactive-tab {
+  color: #6B7280 !important;
+}
+html.light .account-tab-nav .inactive-tab:hover {
+  background-color: #FFF0F5 !important;
+  color: #1F2937 !important;
+}
+
 /* アニメーション & 印刷 */
 @keyframes fadeIn {
   from {

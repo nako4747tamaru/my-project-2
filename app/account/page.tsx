@@ -507,13 +507,13 @@ function AccountContent() {
         </div>
 
         {/* タブナビゲーション（4タブ） */}
-        <div className="flex rounded-2xl bg-slate-900/90 p-1 border border-slate-800">
+        <div className="flex rounded-2xl bg-slate-900/90 p-1 border border-slate-800 account-tab-nav">
           <button
             onClick={() => setActiveTab('subscription')}
             className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
               activeTab === 'subscription'
-                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md active-tab'
+                : 'text-slate-400 hover:text-white inactive-tab'
             }`}
           >
             <CreditCard className="w-3.5 h-3.5" />
@@ -524,8 +524,8 @@ function AccountContent() {
             onClick={() => setActiveTab('history')}
             className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
               activeTab === 'history'
-                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md active-tab'
+                : 'text-slate-400 hover:text-white inactive-tab'
             }`}
           >
             <History className="w-3.5 h-3.5" />
@@ -537,8 +537,8 @@ function AccountContent() {
               onClick={() => setActiveTab('settings')}
               className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
                 activeTab === 'settings'
-                  ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md active-tab'
+                  : 'text-slate-400 hover:text-white inactive-tab'
               }`}
             >
               <Settings className="w-3.5 h-3.5" />
@@ -550,8 +550,8 @@ function AccountContent() {
             onClick={() => setActiveTab('auth')}
             className={`flex-1 py-2 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
               activeTab === 'auth'
-                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md active-tab'
+                : 'text-slate-400 hover:text-white inactive-tab'
             }`}
           >
             <KeyRound className="w-3.5 h-3.5" />
