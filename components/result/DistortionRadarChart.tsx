@@ -60,7 +60,7 @@ export default function DistortionRadarChart({
         width={size}
         height={size}
         viewBox={`0 0 ${size} ${size}`}
-        className="overflow-visible"
+        className="overflow-visible radar-chart-svg"
         aria-label="認知の歪み7パターン レーダーチャート"
       >
         {/* 定義: グラデーション */}
@@ -70,6 +70,11 @@ export default function DistortionRadarChart({
             <stop offset="50%" stopColor="#A855F7" stopOpacity="0.55" />
             <stop offset="100%" stopColor="#EC4899" stopOpacity="0.45" />
           </linearGradient>
+          <linearGradient id="distortionRadarGradLight" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#F472B6" stopOpacity="0.5" />
+            <stop offset="50%" stopColor="#FB7185" stopOpacity="0.45" />
+            <stop offset="100%" stopColor="#FBBF24" stopOpacity="0.4" />
+          </linearGradient>
         </defs>
 
         {/* グリッド同心7角形 */}
@@ -77,6 +82,7 @@ export default function DistortionRadarChart({
           <polygon
             key={level}
             points={points}
+            className="radar-grid-polygon"
             fill={level === 1.0 ? '#131B2E' : level === 0.6 ? '#161F36' : 'none'}
             fillOpacity={level === 1.0 ? '0.4' : '0.2'}
             stroke={level === 1.0 ? '#475569' : '#334155'}
@@ -95,6 +101,7 @@ export default function DistortionRadarChart({
               y1={center}
               x2={x}
               y2={y}
+              className="radar-axis-line"
               stroke="#334155"
               strokeWidth="1"
             />
@@ -104,6 +111,7 @@ export default function DistortionRadarChart({
         {/* ユーザースコアポリゴン (塗りつぶし＆ボーダー) */}
         <polygon
           points={scorePoints}
+          className="radar-score-polygon"
           fill="url(#distortionRadarGrad)"
           stroke="#C084FC"
           strokeWidth="2.5"
@@ -120,6 +128,7 @@ export default function DistortionRadarChart({
                 cx={x}
                 cy={y}
                 r={isHighest ? 5 : 3.5}
+                className={`radar-vertex-dot ${isHighest ? 'radar-vertex-highest' : 'radar-vertex-normal'}`}
                 fill={isHighest ? '#F43F5E' : '#A855F7'}
                 stroke="#FFFFFF"
                 strokeWidth={isHighest ? 2 : 1.5}
@@ -164,7 +173,7 @@ export default function DistortionRadarChart({
                 x={x}
                 y={y + dy1}
                 textAnchor={textAnchor}
-                className={`text-[10px] font-bold ${
+                className={`text-[10px] font-bold radar-label-title ${
                   isHighest ? 'fill-rose-300 font-extrabold' : 'fill-slate-300'
                 }`}
                 style={{ fontSize: '10.5px' }}
@@ -175,7 +184,7 @@ export default function DistortionRadarChart({
                 x={x}
                 y={y + dy2}
                 textAnchor={textAnchor}
-                className={`text-[10px] font-mono font-bold ${
+                className={`text-[10px] font-mono font-bold radar-label-score ${
                   isHighest ? 'fill-amber-300' : 'fill-indigo-300'
                 }`}
                 style={{ fontSize: '10px' }}
