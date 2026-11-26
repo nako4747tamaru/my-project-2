@@ -7,6 +7,7 @@ import {
   deleteAccount,
   generateSessionToken,
 } from '@/lib/auth';
+import { sendSecurityAlertEmail } from '@/lib/mailer';
 
 /**
  * ユーザープロファイル・設定更新・退会 API
@@ -29,12 +30,27 @@ export async function PUT(req: NextRequest) {
     const body = await req.json();
     const { action, name, oldPassword, newPassword } = body;
 
+    const ipAddress =
+      req.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
+      req.headers.get('x-real-ip') ||
+      '不明';
+    const userAgent = req.headers.get('user-agent') || '不明なブラウザ';
+
     if (action === 'update_profile') {
       if (!name || !name.trim()) {
         return NextResponse.json({ error: 'お名前を入力してください。' }, { status: 400 });
       }
       const updatedUser = updateProfile(payload.email, name);
       const newToken = generateSessionToken(updatedUser);
+
+      // プロフィール更新時のセキュリティ通知メール（非同期）
+      sendSecurityAlertEmail({
+        toEmail: updatedUser.email,
+        userName: updatedUser.name,
+        type: 'profile_updated',
+        ipAddress,
+        userAgent,
+      }).catch((e: any) => console.warn('Profile update alert email error:', e));
 
       const res = NextResponse.json({
         success: true,
@@ -59,6 +75,16 @@ export async function PUT(req: NextRequest) {
         );
       }
       changePassword(payload.email, oldPassword, newPassword);
+
+      // パスワード変更時のセキュリティ通知メール（非同期）
+      sendSecurityAlertEmail({
+        toEmail: payload.email,
+        userName: payload.name,
+        type: 'password_changed',
+        ipAddress,
+        userAgent,
+      }).catch((e: any) => console.warn('Password change alert email error:', e));
+
       return NextResponse.json({
         success: true,
         message: 'パスワードを変更しました。',

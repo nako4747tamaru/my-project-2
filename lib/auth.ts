@@ -23,6 +23,81 @@ export interface SessionData {
 
 const JWT_SECRET = process.env.AUTH_SECRET || 'kokoro-navi-secure-auth-secret-key-2026';
 
+// ------------------------------------------------------------
+// ログイン試行回数の制限（スロットリング / ブルートフォース保護）
+// ------------------------------------------------------------
+interface RateLimitRecord {
+  attempts: number;
+  lockoutUntil: number;
+}
+
+declare global {
+  // eslint-disable-next-line no-var
+  var __KOKORO_LOGIN_LIMITS__: Map<string, RateLimitRecord> | undefined;
+}
+
+if (!global.__KOKORO_LOGIN_LIMITS__) {
+  global.__KOKORO_LOGIN_LIMITS__ = new Map<string, RateLimitRecord>();
+}
+
+const loginLimits = global.__KOKORO_LOGIN_LIMITS__;
+
+const MAX_LOGIN_ATTEMPTS = 5; // 連続失敗5回でロック
+const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15分間ロックアウト
+
+/**
+ * ログイン試行制限のチェック
+ */
+export function checkLoginRateLimit(key: string): { isLocked: boolean; remainingMinutes?: number } {
+  const normalizedKey = key.trim().toLowerCase();
+  const record = loginLimits.get(normalizedKey);
+  if (!record) return { isLocked: false };
+
+  const now = Date.now();
+  if (record.lockoutUntil > now) {
+    const remainingMinutes = Math.ceil((record.lockoutUntil - now) / 60000);
+    return { isLocked: true, remainingMinutes };
+  }
+
+  // ロックアウト期限が過ぎている場合はリセット
+  if (record.lockoutUntil > 0 && record.lockoutUntil <= now) {
+    loginLimits.delete(normalizedKey);
+  }
+
+  return { isLocked: false };
+}
+
+/**
+ * ログイン失敗の記録
+ */
+export function recordLoginFailure(key: string): { attempts: number; isLocked: boolean; remainingMinutes?: number } {
+  const normalizedKey = key.trim().toLowerCase();
+  const now = Date.now();
+  const record = loginLimits.get(normalizedKey) || { attempts: 0, lockoutUntil: 0 };
+
+  record.attempts += 1;
+  if (record.attempts >= MAX_LOGIN_ATTEMPTS) {
+    record.lockoutUntil = now + LOCKOUT_DURATION_MS;
+    loginLimits.set(normalizedKey, record);
+    return {
+      attempts: record.attempts,
+      isLocked: true,
+      remainingMinutes: Math.ceil(LOCKOUT_DURATION_MS / 60000),
+    };
+  }
+
+  loginLimits.set(normalizedKey, record);
+  return { attempts: record.attempts, isLocked: false };
+}
+
+/**
+ * ログイン成功時のカウントリセット
+ */
+export function resetLoginRateLimit(key: string): void {
+  const normalizedKey = key.trim().toLowerCase();
+  loginLimits.delete(normalizedKey);
+}
+
 declare global {
   // eslint-disable-next-line no-var
   var __KOKORO_USERS_STORE__: Map<string, UserWithPassword> | undefined;
