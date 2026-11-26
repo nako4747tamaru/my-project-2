@@ -98,7 +98,7 @@ export default function LegalFooter({
 
           {/* コピーライト */}
           <p className="text-[10px] text-slate-600 font-mono">
-            © 2026 ココロナビ（KokoroNavi） All rights reserved.
+            © 2026 ココロナビ 16タイプ診断（KokoroNavi） All rights reserved.
           </p>
         </div>
       </footer>

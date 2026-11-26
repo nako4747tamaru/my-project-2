@@ -22,7 +22,7 @@ export async function generateMetadata(
   };
 
   const typeName = info.shortName || info.name || type;
-  const title = `【診断結果】${name}さんの性格タイプ: ${type}（${typeName}）| ココロナビ`;
+  const title = `【診断結果】${name}さんの性格タイプ: ${type}（${typeName}）| ココロナビ 16タイプ診断`;
   const description = `「${info.catchphrase}」100問の対話で導き出した、${name}さんの心と性格の取扱説明書です。あなたは何タイプ？無料で今すぐ診断！`;
   const ogImageUrl = `/api/og?type=${encodeURIComponent(type)}&name=${encodeURIComponent(name)}`;
 

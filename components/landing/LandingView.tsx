@@ -71,17 +71,17 @@ export default function LandingView({
             href="/"
             className="flex items-center gap-2.5 hover:opacity-85 transition-opacity group cursor-pointer"
           >
-            <OwlMascot size={32} />
+            <OwlMascot size={34} />
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="text-sm font-bold text-white tracking-tight group-hover:text-indigo-300 transition-colors">
-                  ココロナビ
+                  ココロナビ 16タイプ診断
                 </span>
                 <span className="px-1.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-[10px] font-bold border border-indigo-500/30">
                   Kokoro Navi
                 </span>
               </div>
-              <p className="text-[10px] text-slate-400">16タイプ × メンタル・疲弊度診断</p>
+              <p className="text-[10px] text-slate-400">100問の精密性格分析 × メンタル疲弊度チェック</p>
             </div>
           </Link>
 

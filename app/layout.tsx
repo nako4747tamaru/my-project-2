@@ -7,19 +7,21 @@ const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://kokoronavi.dev';
 
 export const metadata: Metadata = {
   metadataBase: new URL(appUrl),
-  title: 'Kokoro Navi - 100問のメンタル・性格診断',
-  description: '100の問いから紡ぎ出された、あなたの心の地図。MBTI性格診断・メンタル疲弊度・認知の歪み分析アプリ',
+  title: 'ココロナビ 16タイプ診断｜100問の精密性格分析 × メンタル疲弊度チェック',
+  description:
+    '「ココロナビ 16タイプ診断」は、100の質問からあなたの本質と現在の心の疲弊度を精密分析する無料診断アプリです。知恵のフクロウ「ミネルヴァ」が16タイプの性格特性と思考のクセを優しくナビゲートします。',
   openGraph: {
-    title: 'Kokoro Navi - 100問のメンタル・性格診断',
-    description: '100の問いから紡ぎ出された、あなたの心の地図。MBTI性格診断・メンタル疲弊度・認知の歪み分析アプリ',
+    title: 'ココロナビ 16タイプ診断｜100問の精密性格分析 × メンタル疲弊度チェック',
+    description:
+      '「ココロナビ 16タイプ診断」は、100の質問からあなたの本質と現在の心の疲弊度を精密分析する無料診断アプリです。知恵のフクロウ「ミネルヴァ」が16タイプの性格特性と思考のクセを優しくナビゲートします。',
     url: appUrl,
-    siteName: 'ココロナビ KokoroNavi',
+    siteName: 'ココロナビ 16タイプ診断',
     images: [
       {
-        url: '/api/og?type=INTP&name=ココロナビ',
+        url: '/api/og?type=INTP&name=ココロナビ 16タイプ診断',
         width: 1200,
         height: 630,
-        alt: 'ココロナビ 診断結果プレビュー',
+        alt: 'ココロナビ 16タイプ診断 プレビュー',
       },
     ],
     locale: 'ja_JP',
@@ -27,9 +29,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Kokoro Navi - 100問のメンタル・性格診断',
-    description: '100の問いから紡ぎ出された、あなたの心の地図。MBTI性格診断・メンタル疲弊度・認知の歪み分析アプリ',
-    images: ['/api/og?type=INTP&name=ココロナビ'],
+    title: 'ココロナビ 16タイプ診断｜100問の精密性格分析 × メンタル疲弊度チェック',
+    description:
+      '「ココロナビ 16タイプ診断」は、100の質問からあなたの本質と現在の心の疲弊度を精密分析する無料診断アプリです。知恵のフクロウ「ミネルヴァ」が16タイプの性格特性と思考のクセを優しくナビゲートします。',
+    images: ['/api/og?type=INTP&name=ココロナビ 16タイプ診断'],
   },
   verification: {
     google: 'rvZudja28WS1feh6gw0MDGQMgIZcODdB2-HQaVpGTYc',

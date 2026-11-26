@@ -8,7 +8,7 @@ import ThemeToggle from '../../components/theme/ThemeToggle';
 import LegalFooter from '../../components/common/LegalFooter';
 
 export const metadata: Metadata = {
-  title: '16タイプ一覧と心理学解説 | ココロナビ',
+  title: '16タイプ一覧と心理学解説 | ココロナビ 16タイプ診断',
   description: 'ユング心理学・MBTIの枠組みに基づく全16タイプの性格特性、強み・弱み、ストレスサイン、認知行動療法（CBT）アプローチを網羅した詳細解説インデックス。',
 };
 

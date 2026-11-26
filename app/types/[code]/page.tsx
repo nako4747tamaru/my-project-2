@@ -38,7 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: 'タイプが見つかりません | ココロナビ' };
   }
 
-  const title = `【${code}（${info.name}）の性格とメンタルケア解説】強み・弱み・ストレスサイン | ココロナビ`;
+  const title = `【${code}（${info.name}）の性格とメンタルケア解説】強み・弱み・ストレスサイン | ココロナビ 16タイプ診断`;
   const description = `16タイプ性格診断における${code}（${info.name}）の詳しい解説。${info.catchphrase}。本来の強み、陥りやすい弱点、ストレス時の危険信号と認知行動療法アプローチ。`;
 
   return {
