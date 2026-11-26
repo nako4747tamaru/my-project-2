@@ -612,14 +612,18 @@ function AccountContent() {
                 <div className="p-3 rounded-2xl bg-black/30 border border-slate-800 space-y-1">
                   <span className="text-slate-400 text-[10px]">プラン名称</span>
                   <p className="font-bold text-white text-xs sm:text-sm">
-                    {subDetails?.planName || 'ココロナビ 完全レポート解放（月額会員）'}
+                    {isUnlocked
+                      ? (subDetails?.planName || 'ココロナビ 完全レポート解放（月額会員）')
+                      : '無料プラン'}
                   </p>
                 </div>
 
                 <div className="p-3 rounded-2xl bg-black/30 border border-slate-800 space-y-1">
                   <span className="text-slate-400 text-[10px]">お支払い金額</span>
-                  <p className="font-bold text-amber-300 text-xs sm:text-sm">
-                    ¥{(subDetails?.amount || 980).toLocaleString()} / 月（税込）
+                  <p className={`font-bold text-xs sm:text-sm ${isUnlocked ? 'text-amber-300' : 'text-slate-300'}`}>
+                    {isUnlocked
+                      ? `¥${(subDetails?.amount || 980).toLocaleString()} / 月（税込）`
+                      : '¥0（無料）'}
                   </p>
                 </div>
 
@@ -629,7 +633,11 @@ function AccountContent() {
                     <span>次回更新日 / 請求予定</span>
                   </span>
                   <p className="font-bold text-slate-200 text-xs">
-                    {subDetails?.currentPeriodEnd ? formatPeriodEnd(subDetails.currentPeriodEnd) : '契約中（次回更新あり）'}
+                    {isUnlocked
+                      ? (subDetails?.currentPeriodEnd
+                          ? formatPeriodEnd(subDetails.currentPeriodEnd)
+                          : '契約中（次回更新あり）')
+                      : '請求予定なし'}
                   </p>
                 </div>
 
@@ -639,12 +647,14 @@ function AccountContent() {
                     <span>更新ステータス</span>
                   </span>
                   <p className="font-bold text-xs">
-                    {subDetails?.cancelAtPeriodEnd ? (
-                      <span className="text-amber-400">期間終了時に解約予定</span>
-                    ) : isUnlocked ? (
-                      <span className="text-emerald-400">自動更新中（いつでも解約可）</span>
+                    {isUnlocked ? (
+                      subDetails?.cancelAtPeriodEnd ? (
+                        <span className="text-amber-400">期間終了時に解約予定</span>
+                      ) : (
+                        <span className="text-emerald-400">自動更新中（いつでも解約可）</span>
+                      )
                     ) : (
-                      <span className="text-slate-400">未登録</span>
+                      <span className="text-slate-400">未契約（無料プラン利用中）</span>
                     )}
                   </p>
                 </div>
