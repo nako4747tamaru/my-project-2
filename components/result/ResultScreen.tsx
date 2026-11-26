@@ -145,27 +145,27 @@ function ShareButtonGroup({
         {/* 1. X（旧Twitter）シェアボタン */}
         <button
           onClick={onShareX}
-          className="flex flex-col items-start p-3 sm:p-3.5 rounded-2xl bg-[#0b0e14] hover:bg-[#141a24] border border-slate-700/80 hover:border-slate-500 shadow-md text-left transition-all active:scale-[0.98] cursor-pointer group"
+          className="flex flex-col items-start p-3 sm:p-3.5 rounded-2xl bg-[#0b0e14] dark:bg-[#0b0e14] light:bg-[#FFFDF9] hover:bg-[#141a24] border border-slate-700/80 hover:border-slate-500 shadow-md text-left transition-all active:scale-[0.98] cursor-pointer group share-btn-x"
           title="診断結果をXでポスト"
         >
           <div className="flex items-center justify-between w-full mb-1.5">
-            <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center text-white group-hover:bg-white/20 transition-colors">
-              <svg className="w-3.5 h-3.5 fill-white" viewBox="0 0 24 24">
+            <div className="w-7 h-7 rounded-lg bg-white/10 dark:bg-white/10 flex items-center justify-center text-white share-x-icon-box group-hover:bg-white/20 transition-colors">
+              <svg className="w-3.5 h-3.5 fill-white dark:fill-white share-x-icon" viewBox="0 0 24 24">
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
               </svg>
             </div>
-            <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-white/10 text-slate-300 font-semibold group-hover:text-white">
+            <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-white/10 dark:bg-white/10 share-x-badge font-semibold group-hover:text-white">
               ポスト
             </span>
           </div>
-          <span className="text-xs sm:text-sm font-bold text-white tracking-wide">X でシェア</span>
-          <span className="text-[10px] text-slate-400 mt-0.5">#ココロナビ 投稿</span>
+          <span className="text-xs sm:text-sm font-bold text-white dark:text-white share-x-text tracking-wide">X でシェア</span>
+          <span className="text-[10px] text-slate-400 dark:text-slate-400 share-x-subtext mt-0.5">#ココロナビ 投稿</span>
         </button>
 
         {/* 2. LINEで送るボタン */}
         <button
           onClick={onShareLine}
-          className="flex flex-col items-start p-3 sm:p-3.5 rounded-2xl bg-[#06C755] hover:bg-[#05b34c] shadow-md shadow-emerald-950/40 text-left transition-all active:scale-[0.98] cursor-pointer group"
+          className="flex flex-col items-start p-3 sm:p-3.5 rounded-2xl bg-[#06C755] hover:bg-[#05b34c] shadow-md shadow-emerald-950/40 text-left transition-all active:scale-[0.98] cursor-pointer group share-btn-white-text"
           title="LINEで友だちやトークに共有"
         >
           <div className="flex items-center justify-between w-full mb-1.5">
@@ -179,14 +179,14 @@ function ShareButtonGroup({
             </span>
           </div>
           <span className="text-xs sm:text-sm font-bold text-white tracking-wide">LINEで送る</span>
-          <span className="text-[10px] text-emerald-100 mt-0.5">友だちに教える</span>
+          <span className="text-[10px] text-white/90 mt-0.5">友だちに教える</span>
         </button>
 
         {/* 3. 「結果カードを画像として保存」（Instagram・TikTok・保存用） */}
         <button
           onClick={onSaveImage}
           disabled={isExportingAny}
-          className="flex flex-col items-start p-3 sm:p-3.5 rounded-2xl bg-gradient-to-tr from-[#F58529] via-[#DD2A7B] to-[#8134AF] hover:opacity-95 shadow-md shadow-pink-950/40 text-left transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer group"
+          className="flex flex-col items-start p-3 sm:p-3.5 rounded-2xl bg-gradient-to-tr from-[#F58529] via-[#DD2A7B] to-[#8134AF] hover:opacity-95 shadow-md shadow-pink-950/40 text-left transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer group share-btn-white-text"
           title="インスタストーリーやTikTok用の高画質画像（PNG）として保存"
         >
           <div className="flex items-center justify-between w-full mb-1.5">
@@ -204,13 +204,13 @@ function ShareButtonGroup({
           <span className="text-xs sm:text-sm font-bold text-white tracking-wide">
             {isExportingImage ? '画像作成中...' : '画像として保存'}
           </span>
-          <span className="text-[10px] text-pink-100 mt-0.5">ストーリー・TikTok📸</span>
+          <span className="text-[10px] text-white/90 mt-0.5">ストーリー・TikTok📸</span>
         </button>
 
         {/* 4. スマホ標準の共有（Web Share API / その他） */}
         <button
           onClick={onShareNative}
-          className="flex flex-col items-start p-3 sm:p-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-sky-600 hover:from-indigo-500 hover:to-sky-500 shadow-md shadow-indigo-950/40 text-left transition-all active:scale-[0.98] cursor-pointer group"
+          className="flex flex-col items-start p-3 sm:p-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-sky-600 hover:from-indigo-500 hover:to-sky-500 shadow-md shadow-indigo-950/40 text-left transition-all active:scale-[0.98] cursor-pointer group share-btn-white-text"
           title="AirDropやその他のSNSで共有、またはリンクをコピー"
         >
           <div className="flex items-center justify-between w-full mb-1.5">
@@ -222,7 +222,7 @@ function ShareButtonGroup({
             </span>
           </div>
           <span className="text-xs sm:text-sm font-bold text-white tracking-wide">その他で共有</span>
-          <span className="text-[10px] text-indigo-100 mt-0.5">AirDrop・リンクコピー</span>
+          <span className="text-[10px] text-white/90 mt-0.5">AirDrop・リンクコピー</span>
         </button>
       </div>
 
@@ -741,15 +741,15 @@ ${shareUrl}
         {/* ======================================================== */}
         {/* SNS・LINEシェア用専用カード（プレビュー用デザインボックス） */}
         {/* ======================================================== */}
-        <div className="rounded-3xl bg-gradient-to-b from-[#1E1B4B]/70 via-[#161C2E] to-[#121625] border border-indigo-500/40 p-4 sm:p-5 shadow-2xl space-y-3.5 relative overflow-hidden">
+        <div className="rounded-3xl bg-gradient-to-b from-[#1E1B4B]/70 via-[#161C2E] to-[#121625] share-outer-card border border-indigo-500/40 p-4 sm:p-5 shadow-2xl space-y-3.5 relative overflow-hidden">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="p-1 rounded-lg bg-pink-500/20 text-pink-300">
+              <div className="p-1 rounded-lg bg-pink-500/20 text-pink-300 share-card-top-icon">
                 <Share2 className="w-3.5 h-3.5" />
               </div>
-              <span className="text-xs font-bold text-white tracking-wide">SNS・LINEシェア用カード</span>
+              <span className="text-xs font-bold text-white share-card-top-title tracking-wide">SNS・LINEシェア用カード</span>
             </div>
-            <span className="text-[10px] text-indigo-300/80 bg-indigo-950/60 px-2 py-0.5 rounded-full border border-indigo-800/60">
+            <span className="text-[10px] text-indigo-300/80 bg-indigo-950/60 share-card-badge px-2 py-0.5 rounded-full border border-indigo-800/60">
               シェア専用画像
             </span>
           </div>
@@ -757,15 +757,15 @@ ${shareUrl}
           {/* シェア用カード本体（html2canvasキャプチャ対象） */}
           <div
             ref={shareCardPreviewRef}
-            className="rounded-2xl bg-gradient-to-br from-[#1C2339] via-[#121727] to-[#0A0D18] border border-indigo-400/30 p-4 sm:p-5 text-center shadow-lg relative overflow-hidden"
+            className="rounded-2xl bg-gradient-to-br from-[#1C2339] via-[#121727] to-[#0A0D18] share-preview-card border border-indigo-400/30 p-4 sm:p-5 text-center shadow-lg relative overflow-hidden"
           >
             {/* 上部ヘッダーバッジ */}
-            <div className="flex items-center justify-between pb-2 mb-3 border-b border-slate-800/80">
+            <div className="flex items-center justify-between pb-2 mb-3 border-b border-slate-800/80 share-preview-header">
               <div className="flex items-center gap-1.5">
                 <OwlMascot size={20} />
-                <span className="text-[11px] font-black tracking-wider text-indigo-200">ココロナビ KokoroNavi</span>
+                <span className="text-[11px] font-black tracking-wider text-indigo-200 share-preview-brand">ココロナビ KokoroNavi</span>
               </div>
-              <span className="text-[10px] text-slate-300 bg-slate-800/80 px-2 py-0.5 rounded-full border border-slate-700/60">
+              <span className="text-[10px] text-slate-300 bg-slate-800/80 share-preview-user-badge px-2 py-0.5 rounded-full border border-slate-700/60">
                 {userName}さんの診断結果
               </span>
             </div>
@@ -776,37 +776,37 @@ ${shareUrl}
                 <TypeAnimalIcon type={result.type} size={64} priority />
               </div>
               <div className="text-left space-y-0.5">
-                <span className="text-[10px] text-indigo-300 font-bold block">
+                <span className="text-[10px] text-indigo-300 share-preview-group font-bold block">
                   {result.info.group || '性格タイプ'}
                 </span>
-                <h3 className="text-2xl sm:text-3xl font-black text-white tracking-wider">
+                <h3 className="text-2xl sm:text-3xl font-black text-white share-preview-type tracking-wider">
                   {result.type}
                 </h3>
-                <p className="text-xs font-bold text-slate-200">
+                <p className="text-xs font-bold text-slate-200 share-preview-typename">
                   {result.info.shortName || result.title}
                 </p>
               </div>
             </div>
 
             {/* キャッチフレーズ */}
-            <div className="my-2.5 px-3 py-1.5 rounded-xl bg-purple-950/50 border border-purple-500/30 inline-block max-w-full">
+            <div className="my-2.5 px-3 py-1.5 rounded-xl bg-purple-950/50 share-preview-catchphrase border border-purple-500/30 inline-block max-w-full">
               <p className="text-xs font-medium text-purple-200 italic">
                 「{result.catchphrase}」
               </p>
             </div>
 
             {/* 要約テキスト */}
-            <p className="text-[11px] text-slate-300 leading-relaxed text-left bg-black/30 p-2.5 rounded-xl border border-slate-800/80 line-clamp-3">
+            <p className="text-[11px] text-slate-300 share-preview-description leading-relaxed text-left bg-black/30 p-2.5 rounded-xl border border-slate-800/80 line-clamp-3">
               {result.description}
             </p>
 
             {/* 疲弊度 ＆ 最も出やすい思考の癖（要約バッジ） */}
             <div className="grid grid-cols-2 gap-2 my-2.5 text-[10px]">
-              <div className="p-2 rounded-lg bg-slate-900/70 border border-slate-800 text-left">
+              <div className="p-2 rounded-lg bg-slate-900/70 share-preview-subcard border border-slate-800 text-left">
                 <span className="text-slate-400 block">🌿 メンタル疲弊度</span>
                 <span className="font-bold text-amber-300">{result.fatigue.title} (Lv.{result.fatigue.level}/5)</span>
               </div>
-              <div className="p-2 rounded-lg bg-slate-900/70 border border-slate-800 text-left">
+              <div className="p-2 rounded-lg bg-slate-900/70 share-preview-subcard border border-slate-800 text-left">
                 <span className="text-slate-400 block">🧠 思考の癖傾向</span>
                 <span className="font-bold text-rose-300 truncate block">
                   {topDistortion?.name || '良好・バランス型'}
@@ -815,7 +815,7 @@ ${shareUrl}
             </div>
 
             {/* ハッシュタグ・フッター */}
-            <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] text-slate-400">
+            <div className="pt-2 border-t border-slate-800/80 share-preview-footer flex items-center justify-between text-[10px] text-slate-400">
               <span className="text-slate-300 font-bold">#ココロナビ #性格診断 #{result.type}</span>
               <span className="font-mono text-indigo-400">kokoronavi.com</span>
             </div>
@@ -1428,44 +1428,44 @@ ${shareUrl}
               </p>
 
               {/* 得られるメリットの箇条書きカード */}
-              <div className="w-full max-w-sm bg-gradient-to-b from-[#182038]/90 to-[#121729]/95 border border-slate-700/80 rounded-2xl p-4 mb-4 text-left space-y-3 shadow-inner">
-                <div className="flex items-start gap-2.5 text-xs text-slate-200">
-                  <div className="w-5 h-5 rounded-full bg-amber-500/20 border border-amber-400/40 flex items-center justify-center shrink-0 mt-0.5">
+              <div className="w-full max-w-sm bg-gradient-to-b from-[#182038]/90 to-[#121729]/95 benefit-summary-box border border-slate-700/80 rounded-2xl p-4 mb-4 text-left space-y-3 shadow-inner">
+                <div className="flex items-start gap-2.5 text-xs text-slate-200 benefit-item">
+                  <div className="w-5 h-5 rounded-full bg-amber-500/20 benefit-icon-box border border-amber-400/40 flex items-center justify-center shrink-0 mt-0.5">
                     <CheckCircle2 className="w-3.5 h-3.5 text-amber-400" />
                   </div>
                   <div>
-                    <span className="font-bold text-white text-xs block mb-0.5">
+                    <span className="font-bold text-white benefit-title text-xs block mb-0.5">
                       認知の歪み7パターン詳細分析
                     </span>
-                    <p className="text-[11px] text-slate-400 leading-relaxed">
+                    <p className="text-[11px] text-slate-400 benefit-desc leading-relaxed">
                       「白黒思考」「すべき思考」「心の読みすぎ」など無意識の思考癖を精密スコア化。なぜ落ち込んでしまうのか、心のつまずきポイントを根本から特定します。
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-2.5 text-xs text-slate-200">
-                  <div className="w-5 h-5 rounded-full bg-rose-500/20 border border-rose-400/40 flex items-center justify-center shrink-0 mt-0.5">
+                <div className="flex items-start gap-2.5 text-xs text-slate-200 benefit-item">
+                  <div className="w-5 h-5 rounded-full bg-rose-500/20 benefit-icon-box border border-rose-400/40 flex items-center justify-center shrink-0 mt-0.5">
                     <CheckCircle2 className="w-3.5 h-3.5 text-rose-400" />
                   </div>
                   <div>
-                    <span className="font-bold text-white text-xs block mb-0.5">
+                    <span className="font-bold text-white benefit-title text-xs block mb-0.5">
                       1日3分のCBTセルフケアワーク（メンタル処方箋）
                     </span>
-                    <p className="text-[11px] text-slate-400 leading-relaxed">
+                    <p className="text-[11px] text-slate-400 benefit-desc leading-relaxed">
                       {result.type}型（{result.info.shortName || result.title}）専用の「リフレーミングの問い」と「今日できるアクション」。不安や焦りを感じたその場でサッと心をリセット。
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-2.5 text-xs text-slate-200">
-                  <div className="w-5 h-5 rounded-full bg-purple-500/20 border border-purple-400/40 flex items-center justify-center shrink-0 mt-0.5">
+                <div className="flex items-start gap-2.5 text-xs text-slate-200 benefit-item">
+                  <div className="w-5 h-5 rounded-full bg-purple-500/20 benefit-icon-box border border-purple-400/40 flex items-center justify-center shrink-0 mt-0.5">
                     <CheckCircle2 className="w-3.5 h-3.5 text-purple-400" />
                   </div>
                   <div>
-                    <span className="font-bold text-white text-xs block mb-0.5">
+                    <span className="font-bold text-white benefit-title text-xs block mb-0.5">
                       一生使えるあなただけの心の取扱説明書
                     </span>
-                    <p className="text-[11px] text-slate-400 leading-relaxed">
+                    <p className="text-[11px] text-slate-400 benefit-desc leading-relaxed">
                       スマホでいつでも読み返せる安心のセーフティネット。人間関係や仕事で疲れたときの心強いお守りになります。
                     </p>
                   </div>

@@ -563,23 +563,22 @@ html.light .py-2\.5.px-1.bg-slate-900\/50 {
 
 /* レーダーチャート同心グリッド線＆軸線 */
 html.light .radar-grid-polygon {
-  stroke: #E2D7C5 !important;
+  stroke: #FBCFE8 !important; /* パステルピンク枠線 */
 }
 html.light .radar-grid-polygon[fill="#131B2E"],
 html.light .radar-grid-polygon[fill="#161F36"] {
-  fill: #FAF6EE !important;
-  fill-opacity: 0.65 !important;
+  fill: #FFF5F7 !important; /* 淡いピンク・アイボリー */
+  fill-opacity: 0.75 !important;
 }
 html.light .radar-axis-line {
-  stroke: #E8DECة !important;
-  stroke: #E2D7C5 !important;
+  stroke: #FBCFE8 !important;
 }
 
 /* スコアポリゴン（ライトモードは温かみのあるパステルピンク〜コーラルグラデーション） */
 html.light .radar-score-polygon {
   fill: url(#distortionRadarGradLight) !important;
   stroke: #F43F5E !important;
-  stroke-width: 2px !important;
+  stroke-width: 2.5px !important;
 }
 
 /* 頂点マーカー */
@@ -594,18 +593,188 @@ html.light .radar-vertex-dot.radar-vertex-highest {
 
 /* ラベルテキスト */
 html.light .radar-label-title {
-  fill: #453F3A !important;
+  fill: #1F2937 !important; /* くっきり黒系 */
+  font-weight: 700 !important;
 }
 html.light .radar-label-title.fill-rose-300 {
   fill: #BE123C !important;
-  font-weight: 800 !important;
+  font-weight: 900 !important;
 }
 html.light .radar-label-score {
-  fill: #706760 !important;
+  fill: #4B5563 !important;
 }
 html.light .radar-label-score.fill-amber-300 {
   fill: #D97706 !important;
   font-weight: 800 !important;
+}
+
+/* ======================================================== */
+/* 17. 【徹底修正】ライトモードのダーク要素全廃＆アイボリー・ピンク系統一 */
+/* ======================================================== */
+
+/* 17-1. 共有ボタン群の文字色指定 */
+/* 「Xでシェア」は文字・アイコンを黒系に */
+html.light .share-btn-x {
+  background-color: #FFFDF9 !important;
+  border-color: #FBCFE8 !important;
+  color: #1F2937 !important;
+  box-shadow: 0 2px 8px -2px rgba(244, 114, 182, 0.2) !important;
+}
+html.light .share-btn-x:hover {
+  background-color: #FFF0F5 !important;
+}
+html.light .share-btn-x .share-x-icon-box {
+  background-color: #FCE7F3 !important;
+}
+html.light .share-btn-x .share-x-icon path {
+  fill: #1F2937 !important;
+}
+html.light .share-btn-x .share-x-badge {
+  background-color: #FCE7F3 !important;
+  color: #1F2937 !important;
+}
+html.light .share-btn-x .share-x-text {
+  color: #1F2937 !important;
+}
+html.light .share-btn-x .share-x-subtext {
+  color: #4B5563 !important;
+}
+
+/* それ以外の共有ボタン（LINE・画像保存・その他）は文字・アイコン・バッジすべて白（#FFFFFF） */
+html.light .share-btn-white-text,
+html.light .share-btn-white-text * {
+  color: #FFFFFF !important;
+  fill: #FFFFFF !important;
+}
+html.light .share-btn-white-text span {
+  color: #FFFFFF !important;
+}
+html.light .share-btn-white-text svg {
+  color: #FFFFFF !important;
+  fill: #FFFFFF !important;
+}
+
+/* 17-2. Coming Soon セクション全体のアイボリー・パステルピンク化 */
+html.light .coming-soon-card {
+  background-image: linear-gradient(180deg, #FFFDF9 0%, #FAF3F0 100%) !important;
+  border-color: #FBCFE8 !important;
+  box-shadow: 0 4px 20px -2px rgba(244, 114, 182, 0.15) !important;
+}
+html.light .coming-soon-title {
+  color: #1F2937 !important;
+}
+html.light .coming-soon-desc {
+  color: #4B5563 !important;
+}
+html.light .coming-soon-item-card {
+  background-image: linear-gradient(180deg, #FFFDF9 0%, #FFF5F7 100%) !important;
+  border-color: #FBCFE8 !important;
+  box-shadow: 0 2px 8px -2px rgba(244, 114, 182, 0.12) !important;
+}
+html.light .coming-soon-icon-box {
+  background-color: #FCE7F3 !important;
+  border-color: #FBCFE8 !important;
+}
+html.light .coming-soon-item-title {
+  color: #1F2937 !important;
+}
+html.light .coming-soon-item-desc {
+  color: #4B5563 !important;
+}
+html.light .coming-soon-item-footer {
+  border-color: #FBCFE8 !important;
+  color: #BE123C !important;
+}
+
+/* 17-3. メンタル処方箋（ロック時）3つのメリットボックス＆オーバーレイ */
+html.light .benefit-summary-box {
+  background-image: linear-gradient(180deg, #FFFDF9 0%, #FFF5F7 100%) !important;
+  border-color: #FBCFE8 !important;
+  box-shadow: 0 2px 10px -2px rgba(244, 114, 182, 0.1) !important;
+}
+html.light .benefit-title {
+  color: #1F2937 !important;
+}
+html.light .benefit-desc {
+  color: #4B5563 !important;
+}
+html.light .benefit-icon-box {
+  background-color: #FCE7F3 !important;
+  border-color: #FBCFE8 !important;
+}
+
+/* 17-4. SNS・LINEシェア用専用カード（プレビュー用）のアイボリー・ピンク化 */
+html.light .share-outer-card {
+  background-image: linear-gradient(180deg, #FFFDF9 0%, #FAF3F0 100%) !important;
+  border-color: #FBCFE8 !important;
+  box-shadow: 0 6px 20px -2px rgba(244, 114, 182, 0.15) !important;
+}
+html.light .share-card-top-title {
+  color: #1F2937 !important;
+}
+html.light .share-card-top-icon {
+  background-color: #FCE7F3 !important;
+  color: #BE123C !important;
+}
+html.light .share-card-badge {
+  background-color: #FCE7F3 !important;
+  border-color: #FBCFE8 !important;
+  color: #BE123C !important;
+}
+
+html.light .share-preview-card {
+  background-image: linear-gradient(135deg, #FFFDF9 0%, #FFF5F7 50%, #FFFDF9 100%) !important;
+  border-color: #FBCFE8 !important;
+  box-shadow: 0 4px 16px -2px rgba(244, 114, 182, 0.12) !important;
+}
+html.light .share-preview-header {
+  border-color: #FBCFE8 !important;
+}
+html.light .share-preview-brand {
+  color: #BE123C !important;
+}
+html.light .share-preview-user-badge {
+  background-color: #FCE7F3 !important;
+  border-color: #FBCFE8 !important;
+  color: #1F2937 !important;
+}
+html.light .share-preview-group {
+  color: #9D174D !important;
+}
+html.light .share-preview-type {
+  color: #1F2937 !important;
+}
+html.light .share-preview-typename {
+  color: #374151 !important;
+}
+html.light .share-preview-catchphrase {
+  background-color: #FFF0F5 !important;
+  border-color: #FBCFE8 !important;
+}
+html.light .share-preview-catchphrase p {
+  color: #9D174D !important;
+}
+html.light .share-preview-description {
+  background-color: #FFFDF9 !important;
+  border-color: #FBCFE8 !important;
+  color: #374151 !important;
+}
+html.light .share-preview-subcard {
+  background-color: #FFF5F7 !important;
+  border-color: #FBCFE8 !important;
+}
+html.light .share-preview-subcard span:first-child {
+  color: #4B5563 !important;
+}
+html.light .share-preview-footer {
+  border-color: #FBCFE8 !important;
+  color: #4B5563 !important;
+}
+html.light .share-preview-footer span:first-child {
+  color: #1F2937 !important;
+}
+html.light .share-preview-footer span:last-child {
+  color: #BE123C !important;
 }
 
 /* アニメーション & 印刷 */

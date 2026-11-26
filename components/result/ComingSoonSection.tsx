@@ -65,8 +65,8 @@ export default function ComingSoonSection() {
   ];
 
   return (
-    <section className="w-full max-w-2xl mx-auto my-8 px-4">
-      <div className="rounded-3xl bg-gradient-to-b from-[#182038]/95 to-[#101424]/95 border border-indigo-500/30 p-5 sm:p-7 shadow-2xl relative overflow-hidden">
+    <section className="w-full max-w-2xl mx-auto my-8 px-4 coming-soon-section">
+      <div className="rounded-3xl bg-gradient-to-b from-[#182038]/95 to-[#101424]/95 coming-soon-card border border-indigo-500/30 p-5 sm:p-7 shadow-2xl relative overflow-hidden">
         {/* 背景の装飾パステルオーラ */}
         <div className="absolute -top-16 -right-16 w-44 h-44 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none" />
         <div className="absolute -bottom-16 -left-16 w-44 h-44 rounded-full bg-purple-500/10 blur-3xl pointer-events-none" />
@@ -79,14 +79,14 @@ export default function ComingSoonSection() {
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <h3 className="text-sm sm:text-base font-black text-white tracking-tight">
+                <h3 className="text-sm sm:text-base font-black text-white coming-soon-title tracking-tight">
                   今後のアップデート予定
                 </h3>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-400/30">
                   Coming Soon
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] text-slate-400 coming-soon-desc">
                 ココロナビは、あなたの心に寄り添う新機能を順次拡張予定です🌿
               </p>
             </div>
@@ -100,11 +100,11 @@ export default function ComingSoonSection() {
               key={feature.id}
               onClick={() => setSelectedFeature(feature)}
               type="button"
-              className={`rounded-2xl p-4 text-left border bg-gradient-to-b ${feature.bgGradient} ${feature.borderColor} transition-all duration-200 hover:-translate-y-0.5 shadow-lg group cursor-pointer relative overflow-hidden flex flex-col justify-between`}
+              className={`rounded-2xl p-4 text-left border bg-gradient-to-b coming-soon-item-card ${feature.bgGradient} ${feature.borderColor} transition-all duration-200 hover:-translate-y-0.5 shadow-lg group cursor-pointer relative overflow-hidden flex flex-col justify-between`}
             >
               <div>
                 <div className="flex items-center justify-between mb-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-slate-800/80 border border-slate-700/60 flex items-center justify-center shadow-sm">
+                  <div className="w-8 h-8 rounded-xl bg-slate-800/80 coming-soon-icon-box border border-slate-700/60 flex items-center justify-center shadow-sm">
                     {feature.icon}
                   </div>
                   <span
@@ -114,16 +114,16 @@ export default function ComingSoonSection() {
                   </span>
                 </div>
 
-                <h4 className="text-xs sm:text-sm font-bold text-white group-hover:text-indigo-200 transition-colors mb-1 line-clamp-1">
+                <h4 className="text-xs sm:text-sm font-bold text-white coming-soon-item-title group-hover:text-indigo-200 transition-colors mb-1 line-clamp-1">
                   {feature.title}
                 </h4>
 
-                <p className="text-[10px] text-slate-400 leading-relaxed line-clamp-2 mb-2">
+                <p className="text-[10px] text-slate-400 coming-soon-item-desc leading-relaxed line-clamp-2 mb-2">
                   {feature.subtitle}
                 </p>
               </div>
 
-              <div className="flex items-center gap-1 text-[10px] font-semibold text-indigo-300/90 pt-1 border-t border-slate-700/40">
+              <div className="flex items-center gap-1 text-[10px] font-semibold text-indigo-300/90 coming-soon-item-footer pt-1 border-t border-slate-700/40">
                 <Clock className="w-3 h-3" />
                 <span>準備中（詳細を見る）</span>
                 <ChevronRight className="w-3 h-3 ml-auto transition-transform group-hover:translate-x-0.5" />
