@@ -57,7 +57,10 @@ html.light .bg-\[\#182033\],
 html.light .bg-\[\#101422\],
 html.light .bg-\[\#181F33\],
 html.light .bg-\[\#1A2238\],
-html.light .bg-\[\#151B2E\] {
+html.light .bg-\[\#151B2E\],
+html.light .bg-\[\#182038\]\/95,
+html.light .bg-\[\#101424\]\/95,
+html.light .bg-\[\#1C253D\] {
   background-color: #FFFDF9 !important;
   border-color: #EFE6D8 !important;
   box-shadow: 0 4px 18px -2px rgba(88, 70, 55, 0.05), 0 2px 6px -1px rgba(88, 70, 55, 0.03);
@@ -109,19 +112,23 @@ html.light .feature-desc {
 
 /* 4. メインCTAボタン（水彩パステルピンク＆ローズグラデーション） */
 html.light .from-indigo-600.to-purple-600,
-html.light .from-indigo-600.via-purple-600.to-pink-600 {
+html.light .from-indigo-600.via-purple-600.to-pink-600,
+html.light .from-pink-600.via-rose-600.to-purple-600 {
   background-image: linear-gradient(135deg, #F0809C 0%, #E58BA3 50%, #F39BB3 100%) !important;
   color: #FFFFFF !important;
   box-shadow: 0 6px 20px -3px rgba(229, 139, 163, 0.42) !important;
 }
 html.light .from-indigo-600.to-purple-600:hover,
-html.light .from-indigo-600.via-purple-600.to-pink-600:hover {
+html.light .from-indigo-600.via-purple-600.to-pink-600:hover,
+html.light .from-pink-600.via-rose-600.to-purple-600:hover {
   background-image: linear-gradient(135deg, #EA7290 0%, #DC7C95 50%, #EE8FA8 100%) !important;
 }
 
 /* ヒーロー水彩グラデーション見出しテキスト */
-html.light .bg-gradient-to-r.from-indigo-300.via-purple-300.to-pink-300 {
+html.light .bg-gradient-to-r.from-indigo-300.via-purple-300.to-pink-300,
+html.light .bg-gradient-to-r.from-pink-300.via-purple-200.to-indigo-300 {
   background-image: linear-gradient(135deg, #DE5D7E 0%, #76569B 50%, #3B8263 100%) !important;
+  color: #DE5D7E !important;
 }
 
 /* 5. ヒーロー上部バッジ＆中盤大型バナー（水彩グラデーション） */
@@ -142,7 +149,11 @@ html.light .bg-purple-950\/60 {
 }
 
 /* 16タイプ紹介上部の水彩バナー */
-html.light .from-indigo-950\/80.via-purple-950\/50.to-\[\#0C101C\] {
+html.light .from-indigo-950\/80.via-purple-950\/50.to-\[\#0C101C\],
+html.light .from-indigo-950\/70.via-\[\#182033\].to-\[\#101422\],
+html.light .from-indigo-950\/60.via-purple-950\/40.to-\[\#0C101C\],
+html.light .from-indigo-950\/50.via-purple-950\/30.to-\[\#0C101C\],
+html.light .from-indigo-950\/40.via-purple-950\/20.to-\[\#0C101C\] {
   background-image: linear-gradient(135deg, #FDECF0 0%, #FFF9E6 38%, #EDF8F0 72%, #EBF4FC 100%) !important;
   border-color: #EBDDCB !important;
   box-shadow: 0 10px 28px -6px rgba(210, 165, 140, 0.16) !important;
@@ -183,8 +194,7 @@ html.light .from-indigo-500.via-purple-600.to-pink-600:hover {
   background-image: linear-gradient(135deg, #EA7290 0%, #DC7C95 50%, #EE8FA8 100%) !important;
 }
 
-/* 7. 16タイプカード全4グループ（分析家・外交官・番人・探検家）のライトモード背景統一 */
-/* ウシ（ESTJ）等の番人グループと同じ明るく温かいアイボリー・クリーム系へ完全統一 */
+/* 7. 16タイプカード全4グループのライトモード背景統一 */
 html.light .from-purple-900\/30.via-slate-900\/60.to-slate-950\/80,
 html.light .from-emerald-900\/30.via-slate-900\/60.to-slate-950\/80,
 html.light .from-blue-900\/30.via-slate-900\/60.to-slate-950\/80,
@@ -192,11 +202,80 @@ html.light .from-amber-900\/30.via-slate-900\/60.to-slate-950\/80 {
   background-image: linear-gradient(135deg, #FFFDF9 0%, #FAF5ED 100%) !important;
 }
 
-/* 8. ボタン・サブアクション・入力欄 */
+/* ======================================================== */
+/* 8. 【追加】診断結果画面（/result）のカード・ボックスのライトモード対応 */
+/* ======================================================== */
+/* 結果画面のメイングラデーションカード群（ESTJカード、疲弊度、認知の歪み、アドバイス） */
+html.light .from-\[\#1C2339\].via-\[\#161C2E\].to-\[\#121625\],
+html.light .from-\[\#181F33\].to-\[\#121625\],
+html.light .from-\[\#1E1B4B\]\/70.via-\[\#161C2E\].to-\[\#121625\],
+html.light .from-\[\#182033\].via-\[\#141A2B\].to-\[\#101422\] {
+  background-image: linear-gradient(180deg, #FFFDF9 0%, #FBF6EE 100%) !important;
+  border-color: #EFE6D8 !important;
+  box-shadow: 0 8px 24px -4px rgba(88, 70, 55, 0.08) !important;
+}
+
+/* 結果画面のキャプチャヘッダー＆フッターバイラルバナー */
+html.light .from-\[\#1E1B4B\]\/95.via-\[\#2A164D\]\/90.to-\[\#181F33\]\/95,
+html.light .from-\[\#211638\].via-\[\#1A1D33\].to-\[\#121B35\] {
+  background-image: linear-gradient(135deg, #FDECF0 0%, #FFF9E6 50%, #EDF8F0 100%) !important;
+  border-color: #EBDDCB !important;
+  box-shadow: 0 4px 14px -2px rgba(88, 70, 55, 0.05) !important;
+}
+
+/* 結果カード内のサブボックス（キャッチフレーズ、要約、ストレスパターン、タグ等） */
+html.light .bg-\[\#242C44\]\/80,
+html.light .bg-\[\#20273D\],
+html.light .bg-\[\#1F273D\]\/70,
+html.light .bg-black\/30 {
+  background-color: #F8F3EA !important;
+  border-color: #EBDDCB !important;
+  color: #332E2B !important;
+}
+
+/* レーダーチャート背景 */
+html.light .bg-slate-900\/50,
+html.light .bg-slate-900\/40,
+html.light .bg-slate-900\/60,
+html.light .bg-slate-900\/70,
+html.light .bg-slate-900\/80,
+html.light .bg-slate-900 {
+  background-color: #F8F3EA !important;
+  border-color: #EBDDCB !important;
+}
+
+/* 最も出やすい思考の癖カード */
+html.light .from-\[\#291E3B\].to-\[\#191D33\] {
+  background-image: linear-gradient(135deg, #FFF2F5 0%, #FDE8EE 100%) !important;
+  border-color: #F9CCD7 !important;
+  box-shadow: 0 4px 12px -2px rgba(229, 139, 163, 0.15) !important;
+}
+
+/* ======================================================== */
+/* 9. 【追加】Coming Soon（今後のアップデート予定）のライトモード対応 */
+/* ======================================================== */
+html.light .from-rose-950\/30.via-slate-900\/60.to-purple-950\/20 {
+  background-image: linear-gradient(135deg, #FFF4F6 0%, #FFFDF9 100%) !important;
+  border-color: #F8C3D1 !important;
+}
+html.light .from-amber-950\/30.via-slate-900\/60.to-indigo-950\/20 {
+  background-image: linear-gradient(135deg, #FFFDF0 0%, #FFFDF9 100%) !important;
+  border-color: #F8E7AC !important;
+}
+html.light .from-teal-950\/30.via-slate-900\/60.to-slate-900\/40 {
+  background-image: linear-gradient(135deg, #F0FAF7 0%, #FFFDF9 100%) !important;
+  border-color: #BEEADB !important;
+}
+
+/* ======================================================== */
+/* 10. ボタン・サブアクション・入力欄 */
+/* ======================================================== */
 html.light .bg-slate-800,
 html.light .bg-slate-800\/90,
 html.light .bg-slate-800\/80,
-html.light .bg-slate-800\/60 {
+html.light .bg-slate-800\/70,
+html.light .bg-slate-800\/60,
+html.light .bg-slate-800\/50 {
   background-color: #F5EFE4 !important;
   border-color: #E6DCcb !important;
   color: #332E2B !important;
@@ -207,15 +286,6 @@ html.light .bg-slate-800\/90:hover {
   color: #26221F !important;
 }
 
-/* カード内の「ミネルヴァの一言」やアイコン背景、タグ、サブコンテナの統一 */
-html.light .bg-slate-900,
-html.light .bg-slate-900\/60,
-html.light .bg-slate-900\/80,
-html.light .bg-slate-900\/90 {
-  background-color: #F8F3EA !important;
-  border-color: #EBDDCB !important;
-}
-
 html.light .bg-slate-950,
 html.light .bg-slate-950\/60,
 html.light .bg-slate-950\/80,
@@ -223,7 +293,7 @@ html.light .bg-slate-950\/90 {
   background-color: #FAF5ED !important;
 }
 
-/* 9. テキストカラー（濃いチャコール #332E2B で視認性を確保） */
+/* 11. テキストカラー（濃いチャコール #332E2B で視認性を確保） */
 html.light .text-white,
 html.light .text-slate-100 {
   color: #332E2B !important;
@@ -243,30 +313,40 @@ html.light .text-indigo-300,
 html.light .text-indigo-200 {
   color: #B53F60 !important;
 }
-html.light .text-purple-300 {
+html.light .text-purple-300,
+html.light .text-purple-200 {
   color: #8C620B !important;
 }
-html.light .text-emerald-300 {
+html.light .text-emerald-300,
+html.light .text-emerald-200 {
   color: #2D6A43 !important;
 }
-html.light .text-blue-300 {
+html.light .text-blue-300,
+html.light .text-sky-200 {
   color: #285F88 !important;
 }
-html.light .text-amber-300 {
+html.light .text-amber-300,
+html.light .text-amber-400 {
   color: #A36506 !important;
 }
+html.light .text-rose-300,
+html.light .text-rose-400 {
+  color: #B53F60 !important;
+}
 
-/* 10. 枠線（柔らかいアースベージュ） */
+/* 12. 枠線（柔らかいアースベージュ） */
 html.light .border-slate-800,
 html.light .border-slate-800\/80,
+html.light .border-slate-800\/60,
 html.light .border-slate-700,
-html.light .border-slate-700\/60,
+html.light .border-slate-700\/80,
 html.light .border-slate-700\/70,
-html.light .border-slate-700\/80 {
+html.light .border-slate-700\/60,
+html.light .border-slate-700\/40 {
   border-color: #EFE7DA !important;
 }
 
-/* 11. フッターのライトモード対応 */
+/* 13. フッターのライトモード対応 */
 html.light footer {
   background-color: #FAF6EE !important;
   border-color: #EBDDCB !important;
@@ -279,7 +359,7 @@ html.light footer button:hover {
   color: #332E2B !important;
 }
 
-/* 12. チャット吹き出し・マイルストーン */
+/* 14. チャット吹き出し・マイルストーン */
 html.light .bg-\[\#181F33\] {
   background-color: #FFFDF9 !important;
   color: #332E2B !important;

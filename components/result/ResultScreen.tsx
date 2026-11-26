@@ -758,7 +758,6 @@ ${shareUrl}
           <div
             ref={shareCardPreviewRef}
             className="rounded-2xl bg-gradient-to-br from-[#1C2339] via-[#121727] to-[#0A0D18] border border-indigo-400/30 p-4 sm:p-5 text-center shadow-lg relative overflow-hidden"
-            style={{ backgroundColor: '#0F1322', color: '#F1F5F9' }}
           >
             {/* 上部ヘッダーバッジ */}
             <div className="flex items-center justify-between pb-2 mb-3 border-b border-slate-800/80">
@@ -863,7 +862,6 @@ ${shareUrl}
           ref={captureCardRef}
           id="diagnostic-result-capture-area"
           className="space-y-5 rounded-3xl bg-[#0C101C] p-0.5"
-          style={{ backgroundColor: '#0C101C', color: '#F1F5F9' }}
         >
           {/* キャプチャ画像用公式ヘッダーバナー */}
           <div className="rounded-2xl bg-gradient-to-r from-[#1E1B4B]/95 via-[#2A164D]/90 to-[#181F33]/95 border border-indigo-500/40 p-3.5 flex items-center justify-between text-xs shadow-md">
