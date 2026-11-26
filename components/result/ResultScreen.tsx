@@ -772,7 +772,7 @@ ${shareUrl}
 
             {/* キャラクターアイコン ＆ タイプ表示 */}
             <div className="flex items-center justify-center gap-3 my-2">
-              <div className="p-1 rounded-2xl bg-indigo-950/80 border border-indigo-500/30 shadow-md">
+              <div className="p-1 rounded-2xl bg-indigo-950/80 dark:bg-indigo-950/80 animal-avatar-box border border-indigo-500/30 shadow-md">
                 <TypeAnimalIcon type={result.type} size={64} priority />
               </div>
               <div className="text-left space-y-0.5">

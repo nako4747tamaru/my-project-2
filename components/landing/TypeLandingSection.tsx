@@ -226,7 +226,7 @@ export default function TypeLandingSection({
               <div className="relative z-10 space-y-3.5">
                 {/* ヘッダー: アイコン ＆ タイプ名 ＆ グループバッジ */}
                 <div className="flex items-start gap-3.5">
-                  <div className="w-16 h-16 shrink-0 rounded-2xl bg-slate-900/90 border border-slate-700/80 p-1 flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform">
+                  <div className="w-16 h-16 shrink-0 rounded-2xl bg-slate-900/90 dark:bg-slate-900/90 animal-avatar-box border border-slate-700/80 p-1 flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform">
                     <TypeAnimalIcon type={typeCode} size={56} />
                   </div>
 
