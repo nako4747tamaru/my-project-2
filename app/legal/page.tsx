@@ -214,7 +214,7 @@ function LegalContent() {
                     <tr className="border-b border-slate-800">
                       <th className="p-3 font-bold text-slate-200 bg-slate-800/40">販売価格</th>
                       <td className="p-3 text-slate-300">
-                        プレミアム完全レポート解放: ¥980（税込・初月限定キャンペーン価格）<br />
+                        プレミアム完全レポート解放: ¥980/月（税込）<br />
                         ※詳細は各購入画面の表示価格をご確認ください。
                       </td>
                     </tr>

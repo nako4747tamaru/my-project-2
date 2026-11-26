@@ -1405,10 +1405,10 @@ ${shareUrl}
           {/* ロックオーバーレイ（未購入時） */}
           {!unlocked && (
             <div className="absolute inset-0 bg-[#0C101C]/88 backdrop-blur-md flex flex-col items-center justify-center p-5 sm:p-6 text-center z-20 overflow-y-auto">
-              {/* 初月お試しキャンペーンバッジ */}
-              <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-gradient-to-r from-amber-500/25 via-rose-500/25 to-purple-500/25 border border-amber-400/60 text-amber-200 text-[11px] font-bold shadow-lg shadow-amber-950/50 mb-3 animate-pulse">
-                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                <span>✨ 今なら初月お試しキャンペーン実施中！</span>
+              {/* プレミアム解放案内バッジ */}
+              <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-gradient-to-r from-amber-500/25 via-rose-500/25 to-purple-500/25 border border-amber-400/60 text-amber-200 text-[11px] font-bold shadow-lg shadow-amber-950/50 mb-3 animate-pulse premium-feature-badge">
+                <Sparkles className="w-3.5 h-3.5 text-amber-300 premium-feature-sparkle" />
+                <span>✨ 認知行動療法（CBT）×精密プロファイリング</span>
               </div>
 
               {/* アイコン */}
@@ -1491,13 +1491,13 @@ ${shareUrl}
                     ) : (
                       <>
                         <Sparkles className="w-4 h-4 text-amber-200 animate-pulse" />
-                        <span>今すぐ初月お試しで完全レポートを解放する</span>
+                        <span>今すぐ完全レポートを解放する</span>
                         <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                       </>
                     )}
                   </div>
                   <span className="text-[10px] text-rose-100 font-medium">
-                    初月限定 ¥980（1日たった32円） ・ 縛りなし / いつでも解約可能
+                    ¥980/月（税込・1日約32円） ・ 縛りなし / いつでも解約可能
                   </span>
                 </div>
               </button>
