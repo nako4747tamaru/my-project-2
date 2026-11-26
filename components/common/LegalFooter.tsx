@@ -7,7 +7,7 @@ import { LegalTab } from './LegalModal';
 import AdContainer from './AdContainer';
 
 interface LegalFooterProps {
-  onOpenLegal: (tab: LegalTab) => void;
+  onOpenLegal?: (tab: LegalTab) => void;
   className?: string;
   /** フッター直上の広告表示枠を表示するかどうか (デフォルト: true) */
   showAd?: boolean;
@@ -27,26 +27,60 @@ export default function LegalFooter({
         <div className="max-w-md mx-auto space-y-3">
           {/* 法務・規約リンクリスト */}
           <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-[11px] font-medium text-slate-400">
-            <button
-              onClick={() => onOpenLegal('privacy')}
+            <Link
+              href="/types"
               className="hover:text-slate-200 transition-colors underline underline-offset-4 decoration-slate-700 hover:decoration-slate-400 cursor-pointer"
             >
-              プライバシーポリシー
-            </button>
+              16タイプ一覧解説
+            </Link>
             <span className="text-slate-700 hidden sm:inline">•</span>
-            <button
-              onClick={() => onOpenLegal('tokusho')}
-              className="hover:text-slate-200 transition-colors underline underline-offset-4 decoration-slate-700 hover:decoration-slate-400 cursor-pointer"
-            >
-              特定商取引法に基づく表記
-            </button>
+            {onOpenLegal ? (
+              <button
+                onClick={() => onOpenLegal('privacy')}
+                className="hover:text-slate-200 transition-colors underline underline-offset-4 decoration-slate-700 hover:decoration-slate-400 cursor-pointer"
+              >
+                プライバシーポリシー
+              </button>
+            ) : (
+              <Link
+                href="/legal?tab=privacy"
+                className="hover:text-slate-200 transition-colors underline underline-offset-4 decoration-slate-700 hover:decoration-slate-400"
+              >
+                プライバシーポリシー
+              </Link>
+            )}
             <span className="text-slate-700 hidden sm:inline">•</span>
-            <button
-              onClick={() => onOpenLegal('terms')}
-              className="hover:text-slate-200 transition-colors underline underline-offset-4 decoration-slate-700 hover:decoration-slate-400 cursor-pointer"
-            >
-              利用規約
-            </button>
+            {onOpenLegal ? (
+              <button
+                onClick={() => onOpenLegal('tokusho')}
+                className="hover:text-slate-200 transition-colors underline underline-offset-4 decoration-slate-700 hover:decoration-slate-400 cursor-pointer"
+              >
+                特定商取引法に基づく表記
+              </button>
+            ) : (
+              <Link
+                href="/legal?tab=tokusho"
+                className="hover:text-slate-200 transition-colors underline underline-offset-4 decoration-slate-700 hover:decoration-slate-400"
+              >
+                特定商取引法に基づく表記
+              </Link>
+            )}
+            <span className="text-slate-700 hidden sm:inline">•</span>
+            {onOpenLegal ? (
+              <button
+                onClick={() => onOpenLegal('terms')}
+                className="hover:text-slate-200 transition-colors underline underline-offset-4 decoration-slate-700 hover:decoration-slate-400 cursor-pointer"
+              >
+                利用規約
+              </button>
+            ) : (
+              <Link
+                href="/legal?tab=terms"
+                className="hover:text-slate-200 transition-colors underline underline-offset-4 decoration-slate-700 hover:decoration-slate-400"
+              >
+                利用規約
+              </Link>
+            )}
             <span className="text-slate-700 hidden sm:inline">•</span>
             <Link
               href="/account"

@@ -19,6 +19,8 @@ import OwlMascot from '../common/OwlMascot';
 import LegalFooter from '../common/LegalFooter';
 import LegalModal, { LegalTab } from '../common/LegalModal';
 import TypeLandingSection from './TypeLandingSection';
+import MethodologySection from './MethodologySection';
+import FaqSection from './FaqSection';
 import ThemeToggle from '../theme/ThemeToggle';
 
 interface LandingViewProps {
@@ -196,6 +198,16 @@ export default function LandingView({
             onStartDiagnosis={onStartDiagnosis}
             onPreviewType={onPreviewType}
           />
+        </div>
+
+        {/* 心理学アプローチ・3本柱とミネルヴァの役割 */}
+        <div className="w-full border-t border-slate-800/80 pt-6">
+          <MethodologySection />
+        </div>
+
+        {/* よくある質問（FAQ） */}
+        <div className="w-full border-t border-slate-800/80 pt-6">
+          <FaqSection />
         </div>
       </main>
 

@@ -12,7 +12,8 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import TypeAnimalIcon, { typeAnimalMap } from '../result/TypeAnimalIcon';
-import { PERSONALITY_TYPES } from '../../lib/analytics';
+import { PERSONALITY_TYPES, PersonalityTypeInfo } from '../../lib/analytics';
+import TypeDetailModal from './TypeDetailModal';
 
 interface TypeLandingSectionProps {
   onStartDiagnosis: () => void;
@@ -91,6 +92,13 @@ export default function TypeLandingSection({
 }: TypeLandingSectionProps) {
   const [selectedGroup, setSelectedGroup] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [selectedTypeCode, setSelectedTypeCode] = useState<string | null>(null);
+
+  const handleOpenDetail = (code: string) => {
+    setSelectedTypeCode(code);
+    setDetailModalOpen(true);
+  };
 
   const typeEntries = Object.entries(PERSONALITY_TYPES);
 
@@ -279,15 +287,13 @@ export default function TypeLandingSection({
                   <ChevronRight className="w-3.5 h-3.5" />
                 </button>
 
-                {onPreviewType && (
-                  <button
-                    onClick={() => onPreviewType(typeCode)}
-                    className="py-2 px-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-[11px] font-semibold border border-slate-700 transition-colors cursor-pointer"
-                    title="このタイプの詳細サンプルを見る"
-                  >
-                    詳細
-                  </button>
-                )}
+                <button
+                  onClick={() => handleOpenDetail(typeCode)}
+                  className="py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-[11px] font-semibold border border-slate-700 transition-colors cursor-pointer"
+                  title="このタイプの詳しい解説・ストレスサインを見る"
+                >
+                  解説
+                </button>
               </div>
             </div>
           );
@@ -335,6 +341,16 @@ export default function TypeLandingSection({
           </div>
         </div>
       </div>
+
+      {/* 16タイプ詳細解説モーダル */}
+      <TypeDetailModal
+        isOpen={detailModalOpen}
+        typeCode={selectedTypeCode}
+        typeInfo={selectedTypeCode ? PERSONALITY_TYPES[selectedTypeCode] : null}
+        onClose={() => setDetailModalOpen(false)}
+        onStartDiagnosis={onStartDiagnosis}
+        onPreviewResult={onPreviewType}
+      />
     </section>
   );
 }
