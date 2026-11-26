@@ -61,9 +61,19 @@ export default function ResultClient() {
         initialType={typeParam}
         onRetest={() => {
           resetDiagnosticSession();
-          router.push('/?mode=chat');
+          if (typeof window !== 'undefined') {
+            window.location.href = '/?mode=chat&reset=true';
+          } else {
+            router.push('/?mode=chat&reset=true');
+          }
         }}
-        onBackToHome={() => router.push('/')}
+        onBackToHome={() => {
+          if (typeof window !== 'undefined') {
+            window.location.href = '/';
+          } else {
+            router.push('/');
+          }
+        }}
       />
     </main>
   );

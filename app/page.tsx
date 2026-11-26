@@ -28,6 +28,18 @@ function HomeContent() {
 
   // 保存データの確認
   useEffect(() => {
+    // リセットモード（?mode=chat&reset=true）の場合は、確実にローカルストレージとステートを空にする
+    const isReset = searchParams.get('reset') === 'true';
+    if (isReset) {
+      resetDiagnosticSession();
+      setUserAnswers(undefined);
+      setUserName('ゲスト');
+      setHasResumeData(false);
+      setResumeIndex(0);
+      setViewMode('chat');
+      return;
+    }
+
     try {
       const savedAnswers = localStorage.getItem('kokoro_navi_answers_v2');
       const savedName = localStorage.getItem('kokoro_navi_nickname_v2');

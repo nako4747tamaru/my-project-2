@@ -318,7 +318,7 @@ export default function ResultScreen({
       if (onRetest) {
         onRetest();
       } else if (typeof window !== 'undefined') {
-        window.location.href = '/?mode=chat';
+        window.location.href = '/?mode=chat&reset=true';
       }
     }
   };

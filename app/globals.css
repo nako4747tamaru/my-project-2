@@ -885,6 +885,28 @@ html.light .premium-feature-badge .premium-feature-sparkle {
   color: #D97706 !important;
 }
 
+/* ======================================================== */
+/* 20. 【UI改善】スクロールトップ「↑」ボタンのライトモード対応 */
+/* ======================================================== */
+html.light .scroll-to-top-btn {
+  background-color: #FFFDF9 !important; /* 温かみのあるアイボリー背景 */
+  border-color: #FBCFE8 !important; /* 淡いパステルピンクの枠線 */
+  color: #BE123C !important; /* 視認性の高いローズカラー */
+  box-shadow: 0 4px 16px -2px rgba(244, 114, 182, 0.3) !important;
+}
+html.light .scroll-to-top-btn:hover {
+  background-color: #FFF0F5 !important;
+  border-color: #F472B6 !important;
+  color: #9D174D !important;
+  box-shadow: 0 6px 20px -2px rgba(244, 114, 182, 0.45) !important;
+}
+html.light .scroll-to-top-btn .scroll-to-top-icon {
+  color: #BE123C !important;
+}
+html.light .scroll-to-top-btn:hover .scroll-to-top-icon {
+  color: #9D174D !important;
+}
+
 /* アニメーション & 印刷 */
 @keyframes fadeIn {
   from {

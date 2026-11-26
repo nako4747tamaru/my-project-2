@@ -7,9 +7,18 @@
 export function resetDiagnosticSession(): void {
   if (typeof window === 'undefined') return;
   try {
+    // 診断の回答・進捗・ニックネーム等のゲスト進捗キーを完全消去
     localStorage.removeItem('kokoro_navi_answers_v2');
     localStorage.removeItem('kokoro_navi_nickname_v2');
     localStorage.removeItem('kokoro_navi_current_index_v2');
+    localStorage.removeItem('kokoro_navi_answers');
+    localStorage.removeItem('kokoro_navi_nickname');
+    localStorage.removeItem('kokoro_navi_current_index');
+
+    // sessionStorage に一時キャッシュされているデータがあれば消去
+    sessionStorage.removeItem('kokoro_navi_answers_v2');
+    sessionStorage.removeItem('kokoro_navi_nickname_v2');
+    sessionStorage.removeItem('kokoro_navi_current_index_v2');
   } catch (e) {
     console.warn('Failed to reset diagnostic session:', e);
   }
